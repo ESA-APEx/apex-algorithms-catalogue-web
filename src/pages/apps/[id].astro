@@ -1,0 +1,33 @@
+---
+import { marked } from 'marked';
+import Layout from '../../layouts/Layout.astro';
+import Prose from '../../components/Prose.astro';
+import { loadCatalogueDetailData } from '../../utils/load-catalogue'
+
+import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
+
+export const prerender = true;
+
+export const getStaticPaths = (() => { 
+    const data = loadCatalogueDetailData()
+    return data.map((item) => ({
+        params: { id: item.id },
+        props: {
+            data: item, 
+        }
+    }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { data } = Astro.props;
+const content = marked.parse(data.description)
+---
+
+<Layout title={data.id}>
+	<div class="flex-1 max-w-screen-xl mx-auto px-4 mt-8">
+        <Prose>
+            <article set:html={content}/>
+        </Prose>
+    </div>
+</Layout>

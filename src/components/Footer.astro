@@ -1,0 +1,141 @@
+---
+const title = 'APEx'
+const subtitle = 'Application Propagation Environment'
+const socials = [
+    {
+        title: 'Linkedin',
+        url: '#',
+        icon: '/algorithms-catalogue/social-icons/linkedin.svg'
+    },
+    {
+        title: 'Youtube',
+        url: '#',
+        icon: '/algorithms-catalogue/social-icons/youtube.svg'
+    },
+    {
+        title: 'X',
+        url: '#',
+        icon: '/algorithms-catalogue/social-icons/x.svg'
+    }
+]
+
+const menu = [
+    {
+        title: 'APEx',
+        submenu: [
+            {
+                title: 'About APEx',
+                url: '#',
+                is_external: false,
+            },
+            {
+                title: 'Latest news',
+                url: '#',
+                is_external: false
+            },
+            {
+                title: 'Cases',
+                url: '#',
+                is_external: false
+            },
+            {
+                title: 'Services',
+                url: '#',
+                is_external: false
+            }
+        ]
+    },
+    {
+        title: 'Support',
+        submenu: [
+            {
+                title: 'FAQ',
+                url: '#',
+                is_external: false
+            },
+            {
+                title: 'Contact',
+                url: '#',
+                is_external: false
+            },
+            {
+                title: 'Forum',
+                url: '#',
+                is_external: true
+            },
+            {
+                title: 'Documentation',
+                url: '#',
+                is_external: true
+            }
+        ]
+    }
+]
+
+const extras = [
+    {
+        title: 'Cookies',
+        url: '#'
+    },
+    {
+        title: 'Terms & conditions',
+        url: '#'
+    },
+    {
+        title: 'Disclaimer',
+        url: '#'
+    },
+    {
+        title: 'Privacy statement',
+        url: '#'
+    }
+]
+---
+
+<footer class="w-full max-w-screen-xl mx-auto px-4 my-14">
+    <div class="flex mb-14 border-t pt-14 border-brand-teal-70">
+        <div class="flex-1">
+            <p class="text-white text-4xl font-semibold mb-1">{title}</p>
+            <p class="text-brand-gray-50 mb-6">{subtitle}</p>
+            <ul class="flex gap-4 mb-6">
+                {socials.map(social => (
+                    <li class="w-5">
+                        <a href={social.url}>
+                            <img src={social.icon} alt={social.title} />
+                        </a>
+                    </li>
+                ))}
+            </ul>
+            <button class="bg-brand-teal-50 text-white font-semibold rounded-3xl px-6 py-2">Contact us</button>
+        </div>
+        <nav class="flex-none flex gap-8">
+            {menu.map(item => (
+                <div class="w-40">
+                    <p class="text-brand-gray-50 uppercase font-semibold text-sm mb-6">{item.title}</p>
+                    <ul>
+                        {item.submenu.map(submenu => (
+                            <li class="mb-2">
+                                <a class="inline-flex items-center underline text-white" href={submenu.url}>
+                                    {submenu.title}
+                                    {submenu.is_external && (
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                                            <polyline points="7 7 17 7 17 17"></polyline>
+                                        </svg>
+                                    )}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+        </nav>
+    </div>
+    <ul class="flex gap-4">
+        {extras.map(menu => (
+            <li class="text-xs text-brand-gray-50">
+                <a href={menu.url}>{menu.title}</a>
+            </li>
+        ))}
+    </ul>
+</footer>

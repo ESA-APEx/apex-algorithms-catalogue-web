@@ -1,0 +1,80 @@
+---
+interface Props {
+    title: string
+}
+
+const menu = [
+    {
+        title: 'APEx',
+        submenu: true,
+    },
+    {
+        title: 'Services',
+        submenu: true,
+    },
+    {
+        title: 'Solutions',
+        submenu: true,
+    },
+    {
+        title: 'Resources',
+        submenu: true,
+    },
+    {
+        title: 'Cases',
+        submenu: true,
+    },
+    {
+        title: 'Support',
+        submenu: true,
+    }
+]
+
+const { title } = Astro.props
+---
+
+<nav class="w-full max-w-screen-xl mx-auto px-4">
+    <div class="flex items-center border-b-2 border-brand-teal-50 text-white">
+        <div class="flex-1 flex items-center gap-3 py-4">
+            <button>
+                <svg class="text-white w-6 h-6" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <button>
+                <svg class="text-white w-6 h-6" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            <img class="ml-2 h-3" src="https://brand.esa.int/wp-content/themes/brandcentre/assets/img/ESA_Title.svg" alt="ESA signature">
+        </div>
+        <a href="https://www.esa.int">
+			<img class="h-8" src="https://brand.esa.int/wp-content/themes/brandcentre/assets/img/ESA_Logo.svg" alt="ESA logo">
+		</a>
+    </div>
+    <div class="flex border-b border-brand-teal-70 text-white">
+        <div class="flex-none flex flex-col justify-center">
+            <p class="text-2xl font-semibold">{title}</p>
+        </div>
+        <ul class="flex-1 flex gap-8 items-center justify-center py-8">
+            {menu.map((item) => (
+                <li>
+                    <span class="flex gap-1 items-center">
+                        {item.title}
+                        {item.submenu && (
+                            <svg class="text-brand-teal-50 w-4 h-4" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        )}
+                    </span>
+                </li>
+            ))}
+        </ul>
+        <div class="flex-none flex flex-col justify-center">
+            <button class="bg-brand-teal-50 text-white font-semibold rounded-3xl px-6 py-2">Contact us</button>
+        </div>
+    </div>
+</nav>
