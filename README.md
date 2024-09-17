@@ -1,54 +1,67 @@
-# Astro Starter Kit: Basics
+# APEx Algorithms Catalogue Web
+
+A website for discovering APEx Algorithms.
+
+## Development
+
+Follow these steps to start developing the site:
+
+1. Install Volta for Nodejs version manager. Follow the guidelines here https://docs.volta.sh/guide/getting-started.
+
+2. Install the Nodejs with correct version using Volta:
 
 ```sh
-npm create astro@latest -- --template basics
+$ volta install node@20.17.0
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+3. Clone the repository.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+$ git clone git@github.com:ESA-APEx/apex-algorithms-catalogue-web.git
+$ cd apex-algorithms-catalogue-web
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+4. Install dependencies.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```sh
+$ npm install
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+5. Run the dev server.
 
-## 🧞 Commands
+```sh
+$ npm run dev
+```
+
+6. Preview the homepage url `https://localhost:4321/algorithms-catalogue` on your browser.
+
+## UI Testing
+
+This project uses [Playwright](https://playwright.dev/) for UI testing. The test scripts are stored in `tests` folder. 
+
+Before running the tests, install the Playwright first:
+
+```sh
+$ npx playwright install --with-deps
+```
+
+After the installation, the tests can be run using command below:
+
+```sh
+$ npm run test
+```
+
+## Commands
 
 All commands are run from the root of the project, from a terminal:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+| Command                   | Action                                                                                             |
+| :------------------------ | :------------------------------------------------------------------------------------------------- |
+| `npm install`             | Install dependencies                                                                               |
+| `npm run dev`             | Start local dev server at `localhost:4321`                                                         |
+| `npm run build`           | Build your production site to `./dist/`                                                            |
+| `npm run preview`         | Preview your build locally, before deploying                                                       |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check`                                                   |
+| `npm run astro -- --help` | Get help using the Astro CLI                                                                       |
+| `npm run test`            | Run UI test using Playwright                                                                       |
+| `npm run download-source` | Download contents from ESA-APEx/apex_algorithms repository, and store them in `./contents/` folder |
