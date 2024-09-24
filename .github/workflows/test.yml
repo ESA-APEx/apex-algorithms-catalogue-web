@@ -6,6 +6,8 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: apex-algorithms-catalogue-web
+  DOCKER_REGISTRY_REGION: eu-nl
+  DOCKER_REGISTRY_URL: swr.eu-nl.otc.t-systems.com
   NODE_VERSION: 20.17.0
 
 permissions:
@@ -61,6 +63,7 @@ jobs:
           token: ${{ github.token }}
           branch: main
       - name: Create release tag
+        id: tagger
         uses: ncipollo/release-action@v1.12.0
         with:
           allowUpdates: true
@@ -69,3 +72,37 @@ jobs:
           tag: ${{ steps.semver.outputs.next }}
           body: Changelog Contents
           token: ${{ github.token }}
+
+  build-docker:
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get release version
+        env:
+          TAG_VERSION: ${{ needs.release.outputs.tagger.new_tag }}
+        run: |
+          echo "RELEASE_VERSION=${TAG_VERSION#v*}" >> $GITHUB_ENV
+          echo $RELEASE_VERSION
+      - name: Build docker image
+        run: docker build . --tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION
+      - name: Tag the image
+        run: |
+          docker tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
+          docker tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest
+      - name: Docker login
+        env:
+          DOCKER_ACCESS_KEY: ${{ secrets.DockerAccessKey }}
+          DOCKER_SECRET_KEY: ${{ secrets.DockerSecretKey }}
+        run: |
+          LOGIN_KEY=`printf "$DOCKER_ACCESS_KEY" | openssl dgst -binary -sha256 -hmac "$DOCKER_SECRET_KEY" | od -An -vtx1 | sed 's/[ \n]//g' | sed 'N;s/\n//'`
+          docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_REGION}
+      - name: Push image to registry
+        run: |
+          docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
+          docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest 
+      - name: Clean up the local images
+        run: |
+          docker rmi $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
+          docker rmi $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest 
+          docker rmi $DOCKER_IMAGE_NAME:$RELEASE_VERSION
