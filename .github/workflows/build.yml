@@ -80,20 +80,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Get release version
+      - name: Prepare envs
         env:
           TAG_VERSION: ${{ needs.release.outputs.version }}
         run: |
           echo "RELEASE_VERSION=${TAG_VERSION#v*}" >> $GITHUB_ENV
           echo $RELEASE_VERSION
-      - name: Build docker image
+      - name: Prepare envs
         run: |
           echo "IMAGE_NAME=${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}" >> $GITHUB_ENV
+          echo "IMAGE_TAG_RELEASE=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}" >> $GITHUB_ENV
+          echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
+      - name: Build docker image
+        run: |
           docker build . --tag $IMAGE_NAME
       - name: Tag the image
         run: |
-          echo "IMAGE_TAG_RELEASE=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}" >> $GITHUB_ENV
-          echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
           docker tag $IMAGE_NAME $IMAGE_TAG_RELEASE
           docker tag $IMAGE_NAME $IMAGE_TAG_LATEST
       - name: Docker login
