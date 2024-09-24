@@ -8,6 +8,7 @@ env:
   DOCKER_IMAGE_NAME: apex-algorithms-catalogue-web
   DOCKER_REGISTRY_REGION: eu-nl
   DOCKER_REGISTRY_URL: swr.eu-nl.otc.t-systems.com
+  DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 20.17.0
 
 permissions:
@@ -86,11 +87,17 @@ jobs:
           echo "RELEASE_VERSION=${TAG_VERSION#v*}" >> $GITHUB_ENV
           echo $RELEASE_VERSION
       - name: Build docker image
-        run: docker build . --tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION
+        run: |
+          echo "IMAGE_NAME=$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
+          docker build . --tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION
       - name: Tag the image
         run: |
-          docker tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
-          docker tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest
+          echo "IMAGE_TAG_RELEASE=$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_BUCKET/$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
+          echo "IMAGE_TAG_LATEST=$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_BUCKET/$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
+          echo $IMAGE_TAG_RELEASE
+          echo $IMAGE_TAG_LATEST
+          docker tag $IMAGE_NAME $IMAGE_TAG_RELEASE
+          docker tag $IMAGE_NAME $IMAGE_TAG_LATEST
       - name: Docker login
         env:
           DOCKER_ACCESS_KEY: ${{ secrets.DockerAccessKey }}
@@ -100,10 +107,10 @@ jobs:
           docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
       - name: Push image to registry
         run: |
-          docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
-          docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest 
+          docker push $IMAGE_TAG_RELEASE
+          docker push $IMAGE_TAG_LATEST 
       - name: Clean up the local images
         run: |
-          docker rmi $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
-          docker rmi $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:latest 
-          docker rmi $DOCKER_IMAGE_NAME:$RELEASE_VERSION
+          docker rmi $IMAGE_TAG_RELEASE
+          docker rmi $IMAGE_TAG_LATEST
+          docker rmi $IMAGE_NAME
