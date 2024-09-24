@@ -97,7 +97,7 @@ jobs:
           DOCKER_SECRET_KEY: ${{ secrets.DockerSecretKey }}
         run: |
           LOGIN_KEY=`printf "$DOCKER_ACCESS_KEY" | openssl dgst -binary -sha256 -hmac "$DOCKER_SECRET_KEY" | od -An -vtx1 | sed 's/[ \n]//g' | sed 'N;s/\n//'`
-          docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_REGION}
+          docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
       - name: Push image to registry
         run: |
           docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_NAME:$RELEASE_VERSION
