@@ -89,15 +89,13 @@ jobs:
       - name: Build docker image
         run: |
           echo "IMAGE_NAME=$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
-          docker build . --tag $DOCKER_IMAGE_NAME:$RELEASE_VERSION
+          docker build . --tag ${IMAGE_NAME}
       - name: Tag the image
         run: |
           echo "IMAGE_TAG_RELEASE=$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_BUCKET/$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
           echo "IMAGE_TAG_LATEST=$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_BUCKET/$DOCKER_IMAGE_NAME:$RELEASE_VERSION" >> $GITHUB_ENV
-          echo $IMAGE_TAG_RELEASE
-          echo $IMAGE_TAG_LATEST
-          docker tag $IMAGE_NAME $IMAGE_TAG_RELEASE
-          docker tag $IMAGE_NAME $IMAGE_TAG_LATEST
+          docker tag ${IMAGE_NAME} ${IMAGE_TAG_RELEASE}
+          docker tag ${IMAGE_NAME} ${IMAGE_TAG_LATEST}
       - name: Docker login
         env:
           DOCKER_ACCESS_KEY: ${{ secrets.DockerAccessKey }}
@@ -107,10 +105,10 @@ jobs:
           docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
       - name: Push image to registry
         run: |
-          docker push $IMAGE_TAG_RELEASE
-          docker push $IMAGE_TAG_LATEST 
+          docker push ${IMAGE_TAG_RELEASE}
+          docker push ${IMAGE_TAG_LATEST}
       - name: Clean up the local images
         run: |
-          docker rmi $IMAGE_TAG_RELEASE
-          docker rmi $IMAGE_TAG_LATEST
-          docker rmi $IMAGE_NAME
+          docker rmi ${IMAGE_TAG_RELEASE}
+          docker rmi ${IMAGE_TAG_LATEST}
+          docker rmi ${IMAGE_NAME}
