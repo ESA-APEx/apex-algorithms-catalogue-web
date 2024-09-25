@@ -2,3 +2,10 @@
 node_modules
 dist
 contents
+deployment
+kubeconfig.json
+.envrc
+terraform.tfstate
+terraform.tfstate.backup
+.terraform
+.terraform.lock.hcl

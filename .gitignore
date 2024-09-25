@@ -18,6 +18,13 @@ pnpm-debug.log*
 .env
 .env.production
 
+kubeconfig.json
+.envrc
+terraform.tfstate
+terraform.tfstate.backup
+.terraform
+.terraform.lock.hcl
+
 # macOS-specific files
 .DS_Store
 

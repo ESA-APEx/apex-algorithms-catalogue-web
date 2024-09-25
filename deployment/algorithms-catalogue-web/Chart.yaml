@@ -1,0 +1,6 @@
+apiVersion: v2
+version: 0.1.0
+name: algorithms-catalogue-web
+description: A K8s Helm chart for algorithms-catalogue-web service
+type: application
+appVersion: "1.16.0"
