@@ -1,5 +1,5 @@
 name: Deployment
-run-name: "Deploy #${{ github.run_number }}"
+run-name: "Deployment #${{ github.run_number }}"
 
 on:
   workflow_dispatch:
