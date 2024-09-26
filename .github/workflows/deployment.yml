@@ -3,6 +3,9 @@ name: Deployment
 on:
   workflow_dispatch:
 
+env:
+  NAMESPACE: algorithms-catalogue
+
 permissions:
   contents: write
   pages: write
@@ -31,4 +34,4 @@ jobs:
           tofu init
           tofu apply -auto-approve
       - name: Deploy
-        run: helm upgrade algorithms-catalogue-web . --install --namespace=algorithms-catalogue
+        run: helm upgrade algorithms-catalogue-web . --install --namespace="$NAMESPACE"
