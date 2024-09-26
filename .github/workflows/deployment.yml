@@ -25,5 +25,6 @@ jobs:
       - uses: opentofu/setup-opentofu@v1
       - name: OpenTofu init & apply
         run: |
+          ls
           tofu init
           tofu apply
