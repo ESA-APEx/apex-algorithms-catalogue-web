@@ -100,11 +100,11 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_TAG_LATEST
       - name: Docker login
         env:
-          DOCKER_ACCESS_KEY: ${{ secrets.DockerAccessKey }}
-          DOCKER_SECRET_KEY: ${{ secrets.DockerSecretKey }}
+          OS_ACCESS_KEY: ${{ secrets.OS_ACCESS_KEY }}
+          OS_SECRET_KEY: ${{ secrets.OS_SECRET_KEY }}
         run: |
-          LOGIN_KEY=`printf "$DOCKER_ACCESS_KEY" | openssl dgst -binary -sha256 -hmac "$DOCKER_SECRET_KEY" | od -An -vtx1 | sed 's/[ \n]//g' | sed 'N;s/\n//'`
-          docker login -u ${DOCKER_REGISTRY_REGION}@${DOCKER_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
+          LOGIN_KEY=`printf "$OS_ACCESS_KEY" | openssl dgst -binary -sha256 -hmac "$OS_SECRET_KEY" | od -An -vtx1 | sed 's/[ \n]//g' | sed 'N;s/\n//'`
+          docker login -u ${DOCKER_REGISTRY_REGION}@${OS_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
       - name: Push image to registry
         run: |
           docker push $IMAGE_TAG_RELEASE
