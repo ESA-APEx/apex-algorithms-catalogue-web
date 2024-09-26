@@ -1,0 +1,29 @@
+name: Deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./deployment/algorithms-catalogue-web
+    env:
+      OS_ACCESS_KEY: ${{ secrets.OS_ACCESS_KEY }}
+      OS_SECRET_KEY: ${{ secrets.OS_SECRET_KEY }}
+      KUBECONFIG: kubeconfig.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: opentofu/setup-opentofu@v1
+      - name: OpenTofu init & apply
+        run: |
+          tofu init
+          tofu apply
