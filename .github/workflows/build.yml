@@ -65,8 +65,11 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: main
+          noVersionBumpBehavior: silent
+          noNewCommitBehavior: silent
       - name: Create release tag
         uses: ncipollo/release-action@v1.12.0
+        if: ${{ steps.semver.outputs.next != null }}
         with:
           allowUpdates: true
           draft: false
@@ -78,6 +81,7 @@ jobs:
   build-docker:
     needs: [release]
     runs-on: ubuntu-latest
+    if: ${{ needs.release.outputs.version != null }}
     steps:
       - uses: actions/checkout@v4
       - name: Get release version
