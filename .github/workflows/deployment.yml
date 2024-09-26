@@ -23,7 +23,14 @@ jobs:
         with:
           fetch-depth: 0
       - uses: opentofu/setup-opentofu@v1
+      - uses: azure/setup-helm@v4.2.0
+        with:
+          version: 'v3.16.0'
       - name: OpenTofu init & apply
         run: |
           tofu init
           tofu apply -auto-approve
+      - name: Deploy
+        run: |
+        cd ..
+        helm upgrade algorithms-catalogue-web . --install
