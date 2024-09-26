@@ -25,12 +25,5 @@ jobs:
       - uses: opentofu/setup-opentofu@v1
       - name: OpenTofu init & apply
         run: |
-          ls
           tofu init
-          cat <<EOL > .envrc
-          export OS_ACCESS_KEY=${OS_ACCESS_KEY}
-          export OS_SECRET_KEY=${OS_SECRET_KEY}
-          export KUBECONFIG="kubeconfig.json"
-          EOL
-          cat .envrc
-          kubectl -h
+          tofu apply -auto-approve
