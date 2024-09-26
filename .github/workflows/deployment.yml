@@ -28,3 +28,4 @@ jobs:
           ls
           tofu init
           tofu apply
+          kubectl -h
