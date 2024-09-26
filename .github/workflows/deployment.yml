@@ -31,6 +31,4 @@ jobs:
           tofu init
           tofu apply -auto-approve
       - name: Deploy
-        run: |
-          cd ..
-          helm upgrade algorithms-catalogue-web . --install
+        run: helm upgrade algorithms-catalogue-web . --install
