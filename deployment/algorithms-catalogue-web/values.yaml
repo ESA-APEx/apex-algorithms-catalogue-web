@@ -6,7 +6,7 @@ image:
   pullPolicy: IfNotPresent
 
 imagePullSecrets:
-  - name: algorithms-catalogue-secret
+  - name: default-secret
 
 service:
   type: ClusterIP
@@ -14,7 +14,6 @@ service:
 
 ingress:
   enabled: true
-  className: traefik
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
   name: algorithms-catalogue
