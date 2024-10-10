@@ -1,10 +1,35 @@
 import fs from 'fs';
 import path from 'path';
+import https from 'https';
 import type { Catalogue } from '../types/models/catalogue';
 import type { CatalogueDetail } from '../types/models/catalogue-detail';
 
 const CATALOGUE_JSON_DIR = 'contents/apex_algorithms-main/algorithm_catalog'
-const CATALOGUE_DETAIL_JSON_DIR = 'contents/apex_algorithms-main/openeo_udp'
+
+const fetchJson = (url: string) => {
+  return new Promise<any>((resolve, reject) => {
+    https.get(url, (res) => {
+      let data = '';
+
+      // Collect data chunks
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      // On end, resolve the promise with parsed JSON
+      res.on('end', () => {
+        try {
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
+        } catch (error) {
+          reject(`Error parsing JSON: ${error}`);
+        }
+      });
+    }).on('error', (err) => {
+      reject(`Error fetching JSON: ${err.message}`);
+    });
+  });
+}
 
 export const loadCatalogueData = () => {
     const jsonsInDir = 
@@ -22,22 +47,25 @@ export const loadCatalogueData = () => {
     return data;
 }
 
-export const loadCatalogueDetailData = () => {
+export const loadCatalogueDetailData = async () => {
     const jsonsInDir = 
         fs.readdirSync(CATALOGUE_JSON_DIR)
             .filter(file => path.extname(file) === '.json');
 
     const data: CatalogueDetail[] = [];
 
-    jsonsInDir.forEach(file => {
+    for (const file of jsonsInDir) {
         try {
-            const fileData = fs.readFileSync(path.join(CATALOGUE_DETAIL_JSON_DIR, file));
-            const json = JSON.parse(fileData.toString());
-            data.push(json)
+            const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Catalogue;
+            const udpUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
+            if (udpUrl) {
+                const catalogueDetail = await fetchJson(udpUrl) as CatalogueDetail;
+                data.push(catalogueDetail)
+            }
         } catch (_err) {
             // do nothing
         }
-    });
+    }
 
     return data;
 }

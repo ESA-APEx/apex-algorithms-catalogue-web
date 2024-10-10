@@ -8,8 +8,8 @@ import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
 
 export const prerender = true;
 
-export const getStaticPaths = (() => { 
-    const data = loadCatalogueDetailData()
+export const getStaticPaths = (async () => { 
+    const data = await loadCatalogueDetailData()
     return data.map((item) => ({
         params: { id: item.id },
         props: {
