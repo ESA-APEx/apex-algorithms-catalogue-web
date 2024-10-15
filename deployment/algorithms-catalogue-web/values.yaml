@@ -18,14 +18,14 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
   name: algorithms-catalogue
   hosts:
-    - host: algorithms-catalogue.apex.inuits.dev
+    - host: algorithms-catalogue.apex.esa.int
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: algorithms-catalogue-tls
       hosts:
-        - algorithms-catalogue.apex.inuits.dev
+        - algorithms-catalogue.apex.esa.int
 
 resources:
   requests:
