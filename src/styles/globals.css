@@ -1,6 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'NotesEsa';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''), url('/algorithms-catalogue/fonts/NotesEsa.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa.woff') format('woff');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'NotesEsa';
+  font-style: italic;
+  font-weight: 400;
+  src: local(''), url('/algorithms-catalogue/fonts/NotesEsa-Italic.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-Italic.woff') format('woff');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Titillium';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''), url('/algorithms-catalogue/fonts/NotesEsa-Bold.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-Bold.woff') format('woff');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Titillium';
+  font-style: italic;
+  font-weight: 700;
+  src: local(''), url('/algorithms-catalogue/fonts/NotesEsa-BoldItalic.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-BoldItalic.woff') format('woff');
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -61,7 +91,7 @@
     @apply border-border;
   }
   body {
-    font-family: "Dosis", system-ui, sans-serif;
+    font-family: "NotesEsa", system-ui, sans-serif;
     background: #043346;
     font-size: 16px;
   }
