@@ -5,7 +5,7 @@ import node from "@astrojs/node";
 
 const config = {
   staging: {
-    SITE_URL: "https://staging.apex.com",
+    SITE_URL: "https://algorithms-catalogue.apex.esa.int",
     BASE_PATH: "/algorithms-catalogue"
   },
   production: {
