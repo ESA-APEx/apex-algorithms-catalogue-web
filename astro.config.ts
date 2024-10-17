@@ -28,7 +28,12 @@ export default defineConfig({
   image: {
     service: passthroughImageService()
   },
-  integrations: [tailwind(), react()],
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }), 
+    react()
+  ],
   adapter: node({
     mode: "standalone"
   })

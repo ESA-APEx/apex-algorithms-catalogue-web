@@ -1,4 +1,6 @@
 ---
+import '@/styles/globals.css'
+
 import NavBar from '../components/NavBar.astro';
 import Footer from '../components/Footer.astro';
 
@@ -28,11 +30,3 @@ const { title } = Astro.props;
 		<Footer />
 	</body>
 </html>
-
-<style is:global>
-	html {
-		font-family: "Dosis", system-ui, sans-serif;
-		background: #043346;
-		font-size: 16px;
-	}
-</style>

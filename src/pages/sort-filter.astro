@@ -1,37 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
-import { loadCatalogueData } from '../lib/load-catalogue';
+import { CatalogueList } from '../components/react/CatalogueList.tsx';
+import { loadCatalogueData } from '../lib/load-catalogue.ts';
 
-const data = loadCatalogueData({ demo: false });
+const data = loadCatalogueData({ demo: true });
 const title = 'Algorithms Catalogue'
 
 export const prerender = true;
 ---
 
 <Layout title={`${title} - APEx`}>
-	<div class="flex-1 max-w-screen-xl mx-auto px-4 mt-8">
-		<main class="rounded-lg py-8 grid grid-cols-2 gap-8">	
-			<div>
+	<div class="w-full max-w-screen-xl mx-auto px-4 mt-8">
+		<main class="w-full block">	
+			<div class="max-w-screen-md text-center mx-auto mb-6">
 				<h1 class="text-3xl font-semibold mb-4 text-white">
 					{title}
 				</h1>
-				<p class="text-pretty text-brand-gray-50">
+				<p class="text-balance text-brand-gray-50">
 					APEx Algorithms Catalogue is a valuable and innovative platform to access and offer a variety of high-quality EO services and it brings end users and service providers together. For end users, it is the place to discover EO services that meet their requirements. For service providers, it is an easy and reliable way to offer their technology to a global community.
 				</p>
 			</div>
-			<ul data-testid="apps">
-				{data.map((item) => (
-					<li class="mb-8" data-testid="apps-item">
-						<Card
-							href={`/algorithms-catalogue/apps/${item.id}`}
-							title={item.properties.title}
-							body={item.properties.description}
-							labels={item.properties.keywords}
-						/>
-					</li>
-				))}
-			</ul>
+			<CatalogueList catalogues={data} client:idle />
 		</main>
 	</div>
 </Layout>
