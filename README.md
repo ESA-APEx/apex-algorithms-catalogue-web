@@ -55,7 +55,7 @@ $ npm run test
 
 The [`Test & build`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/actions/workflows/build.yml) workflow will run every time a new commit is detected in the main branch. This workflow will run the UI testing, create a release tag, and build + push a docker image to a registry automatically. The image version is determined using semver version and conventional commits. Read more details about the versioning system here https://www.conventionalcommits.org/en/v1.0.0/.
 
-To deploy the website, run the [`Deployment`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/actions/workflows/deployment.yml) workflow manually. The site URL is https://algorithms-catalogue.apex.inuits.dev/.
+To deploy the website, run the [`Deployment`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/actions/workflows/deployment.yml) workflow manually. The site URL is https://algorithms-catalogue.apex.esa.int/.
 
 ## Commands
 
