@@ -31,23 +31,11 @@ const fetchJson = (url: string) => {
   });
 }
 
-interface LoadCatalogueData {
-    demo: boolean
-}
-
-export const loadCatalogueData = ({ demo }: LoadCatalogueData) => {
-    let jsonsInDir = 
+export const loadCatalogueData = () => {
+    const jsonsInDir = 
         fs.readdirSync(CATALOGUE_JSON_DIR)
-            .filter(file => path.extname(file) === '.json');
-    
-    if (demo) {
-        const NUM_OF_DUPLICATION = 6
-        const originalList = jsonsInDir.splice(0)
-        for (let i = 0; i < NUM_OF_DUPLICATION; i++) {
-            jsonsInDir = [...jsonsInDir, ...originalList]
-        }
-    }
-    
+            .filter(file => path.extname(file) === '.json');    
+   
     const data: Catalogue[] = [];
 
     jsonsInDir.forEach(file => {
