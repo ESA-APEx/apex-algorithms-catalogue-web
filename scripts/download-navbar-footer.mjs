@@ -6,8 +6,8 @@ import * as cheerio from 'cheerio';
 const MAIN_SITE_URL = 'https://apex-esa.drupal.int.vito.be/';
 const HEADER_SELECTOR = 'header';
 const FOOTER_SELECTOR = 'footer';
-const HEADER_FILENAME = 'NavBarV2.astro';
-const FOOTER_FILENAME = 'FooterV2.astro';
+const HEADER_FILENAME = 'NavBar.astro';
+const FOOTER_FILENAME = 'Footer.astro';
 const DOWNLOAD_DIR = 'src/components/';
 
 await main();
