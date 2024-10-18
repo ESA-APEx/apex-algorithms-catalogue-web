@@ -21,8 +21,8 @@ async function main() {
     const header = await page.locator(HEADER_SELECTOR).first().innerHTML();
     const footer = await page.locator(FOOTER_SELECTOR).first().innerHTML();
 
-    writeToFile(`<nav>${resolveExternalUrls(header, MAIN_SITE_URL)}</nav>`, HEADER_FILENAME);
-    writeToFile(`<footer>${resolveExternalUrls(footer, MAIN_SITE_URL)}</footer>`, FOOTER_FILENAME);
+    writeToFile(`<nav class="text-white w-full max-w-screen-2xl mx-auto px-4">${resolveExternalUrls(header, MAIN_SITE_URL)}</nav>`, HEADER_FILENAME);
+    writeToFile(`<footer class="text-white w-full max-w-screen-2xl mx-auto px-4">${resolveExternalUrls(footer, MAIN_SITE_URL)}</footer>`, FOOTER_FILENAME);
 
     await browser.close();
 }
