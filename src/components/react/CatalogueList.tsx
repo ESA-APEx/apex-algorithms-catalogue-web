@@ -125,6 +125,10 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         } 
     })
     const filterCounts = filterByLabels.length + filterByLicenses.length
+    const clearFilters = () => {
+        setFilterByLabels([])
+        setFilterByLicenses([])
+    }
 
     return 	(
         <>
@@ -162,7 +166,13 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                                 }
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="end">
+                        <PopoverContent align="end" className="relative">
+                            <Button 
+                                variant="link" 
+                                onClick={clearFilters}
+                                className="absolute right-0 top-2">
+                                Reset
+                            </Button>
                             <p className="mb-1">Licenses</p>
                             <div className="flex flex-col mb-4">
                                 {
