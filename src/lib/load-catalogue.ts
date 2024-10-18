@@ -41,7 +41,7 @@ export const loadCatalogueData = ({ demo }: LoadCatalogueData) => {
             .filter(file => path.extname(file) === '.json');
     
     if (demo) {
-        const NUM_OF_DUPLICATION = 5
+        const NUM_OF_DUPLICATION = 6
         const originalList = jsonsInDir.splice(0)
         for (let i = 0; i < NUM_OF_DUPLICATION; i++) {
             jsonsInDir = [...jsonsInDir, ...originalList]
