@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { CatalogueList } from '../components/react/CatalogueList.tsx';
 import { loadCatalogueData } from '../lib/load-catalogue.ts';
 
-const data = loadCatalogueData({ demo: true });
+const data = loadCatalogueData();
 const title = 'Algorithms Catalogue'
 
 export const prerender = true;
@@ -17,7 +17,7 @@ export const prerender = true;
 					{title}
 				</h1>
 				<p class="text-balance text-brand-gray-50">
-					APEx Algorithms Catalogue is a valuable and innovative platform to access and offer a variety of high-quality EO services and it brings end users and service providers together. For end users, it is the place to discover EO services that meet their requirements. For service providers, it is an easy and reliable way to offer their technology to a global community.
+					The APEx Algorithm Catalogue is a valuable and innovative resource that provides access to a wide range of high-quality EO services. For users, it offers a central place to discover EO services that meet their specific needs. For EO projects, it serves as an easy and reliable platform to showcase and offer their services to a broader community, fostering collaboration and wider usage of their results.
 				</p>
 			</div>
 			<CatalogueList catalogues={data} client:idle />
