@@ -1,80 +1,348 @@
----
-interface Props {
-    title: string
-}
-
-const menu = [
-    {
-        title: 'APEx',
-        submenu: true,
-    },
-    {
-        title: 'Services',
-        submenu: true,
-    },
-    {
-        title: 'Solutions',
-        submenu: true,
-    },
-    {
-        title: 'Resources',
-        submenu: true,
-    },
-    {
-        title: 'Cases',
-        submenu: true,
-    },
-    {
-        title: 'Support',
-        submenu: true,
-    }
-]
-
-const { title } = Astro.props
----
-
-<nav class="w-full max-w-screen-xl mx-auto px-4">
-    <div class="flex items-center border-b-2 border-brand-teal-50 text-white">
-        <div class="flex-1 flex items-center gap-3 py-4">
-            <button>
-                <svg class="text-white w-6 h-6" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <button>
-                <svg class="text-white w-6 h-6" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </button>
-            <img class="ml-2 h-3" src="https://brand.esa.int/wp-content/themes/brandcentre/assets/img/ESA_Title.svg" alt="ESA signature">
+<nav class="text-white w-full max-w-screen-2xl mx-auto px-4"><div class="container">
+    <div class="c-header__top">
+      <div class="c-header__navigate">
+        <div class="c-hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <a href="https://www.esa.int">
-			<img class="h-8" src="https://brand.esa.int/wp-content/themes/brandcentre/assets/img/ESA_Logo.svg" alt="ESA logo">
-		</a>
+
+        <div class="c-header__search">
+          <img src="https://apex-esa.drupal.int.vito.be/themes/custom/vitotheme/dist/img/icons/icon-search.svg" alt="Icon search">
+        </div>
+
+        <a class="c-header__esa-text" href="https://apex-esa.drupal.int.vito.be/#">
+          <img src="https://apex-esa.drupal.int.vito.be/themes/custom/vitotheme/dist/img/logos/text-esa.svg" alt="The European Space Agency">
+        </a>
+      </div>
+
+      <div>
+        <div class="c-header__esa">
+            <div class="region region-nav-branding">
+    <div id="block-vitotheme-branding" class="block block-system block-system-branding-block">
+  
+    
+  <div class="navbar-brand d-flex align-items-center">
+
+    <a href="https://apex-esa.drupal.int.vito.be/" title="Home" rel="home" class="site-logo d-block">
+    <img src="https://apex-esa.drupal.int.vito.be/themes/custom/vitotheme/dist/img/logos/logo-esa.svg" alt="Home" fetchpriority="high">
+  </a>
+  
+  <div>
+    
+      </div>
+</div>
+</div>
+
+  </div>
+
+        </div>
+      </div>
     </div>
-    <div class="flex border-b border-brand-teal-70 text-white">
-        <div class="flex-none flex flex-col justify-center">
-            <p class="text-2xl font-semibold">{title}</p>
-        </div>
-        <ul class="flex-1 flex gap-8 items-center justify-center py-8">
-            {menu.map((item) => (
-                <li>
-                    <span class="flex gap-1 items-center">
-                        {item.title}
-                        {item.submenu && (
-                            <svg class="text-brand-teal-50 w-4 h-4" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        )}
-                    </span>
-                </li>
-            ))}
-        </ul>
-        <div class="flex-none flex flex-col justify-center">
-            <button class="bg-brand-teal-50 text-white font-semibold rounded-3xl px-6 py-2">Contact us</button>
-        </div>
+
+    <div class="c-header__bottom">
+      <a href="https://apex-esa.drupal.int.vito.be/" class="c-header__logo">
+        APEx
+      </a>
+
+      <div class="c-header__nav">
+          <div class="region region-nav-main">
+    <nav role="navigation" aria-labelledby="block-vitotheme-main-navigation-menu" id="block-vitotheme-main-navigation" class="block block-menu navigation menu--main">
+            
+  <h5 class="visually-hidden" id="block-vitotheme-main-navigation-menu">Main navigation</h5>
+  
+
+        
+<!-- Desktop Menu -->
+<div class="navbar-nav navbar-nav-hover align-items-lg-center nav navbar-main d-none d-lg-block">
+  <span class="mobile-menu-trigger" data-bs-toggle="modal" data-bs-target="#mobileMenuModal">
+    <span class="icon-menu"></span>
+  </span>
+  <span class="overlay-gradient-white"></span>
+                      <ul data-block="nav_main" class="menu menu-bar d-flex nav-level-0">
+                                  
+            
+    <li class="has-children">
+              <a href="https://apex-esa.drupal.int.vito.be/services" class="menu-link menu-bar-link" data-drupal-link-system-path="node/4">Services</a>
+      
+                <div class="c-sub-menu js-mega-menu" data-once="megaMenu">
+  <div class="c-sub-menu__left">
+    <h4>Services</h4>
+    <div class="c-sub-menu__topics">
+              <h5 class="js-mega-menu-topic" data-index="1" data-once="megaMenuTopic">Algorithm services</h5>
+              <h5 class="js-mega-menu-topic" data-index="2" data-once="megaMenuTopic">Tool creation</h5>
+          </div>
+  </div>
+  <div class="c-sub-menu__right">
+          <div class="c-sub-menu__content js-mega-menu-content" aria-hidden="false" data-index="1" data-once="megaMenuContent">
+        <h4>Algorithm services</h4>
+                              <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-cloud-code-4432145-F47920.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/algorithm-hosting" class="stretched-link">
+                  Algorithm Hosting
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-code-processor-7154480-FBAB18.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/algorithm-enhancement" class="stretched-link">
+                  Algorithm Enhancement
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/Algorithm%20Upscaling%20%20_%20noun-upscale-6292345-008E7A.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/algorithm-upscaling" class="stretched-link">
+                  Algorithm Upscaling
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-comparison-6476897-00619E.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/algorithm-intercomparison" class="stretched-link">
+                  Algorithm Intercomparison
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-cloud-tool-5172299-00AE9D.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/toolbox-cloudification" class="stretched-link">
+                  Toolbox Cloudification
+                </a>
+              </h6>
+            </div>
+                        </div>
+          <div class="c-sub-menu__content js-mega-menu-content" aria-hidden="true" data-index="2" data-once="megaMenuContent">
+        <h4>Tool creation</h4>
+                              <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-internet-forum-6263703-FBAB18.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/user-form" class="stretched-link">
+                  User form
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/Geospatial%20Explorer%20_%20noun-planet-5054191-008E7A.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/geospatial-explorer" class="stretched-link">
+                  Geospatial Explorer
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-manual-book-4118546-00619E.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/documentation-hub" class="stretched-link">
+                  Documentation hub
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/Catalogue%20_%20noun-course-catalogue-5992577-008E7A.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/product-catalogue" class="stretched-link">
+                  Product catalogue
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-cloud-configure-2513279-00619E.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/user-workspace" class="stretched-link">
+                  User workspace
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-coding-7221629-F47920.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/interactive-development-environment" class="stretched-link">
+                  Interactive Development Environment
+                </a>
+              </h6>
+            </div>
+                      <div class="c-sub-menu__item">
+              
+           
+
+                <img alt="" src="https://apex-esa.drupal.int.vito.be/sites/apex/files/2024-10/noun-internet-7110830-FBAB18.svg">
+
+        
+
+
+
+      
+              <h6>
+                <a href="https://apex-esa.drupal.int.vito.be/services/web-portal" class="stretched-link">
+                  Web portal
+                </a>
+              </h6>
+            </div>
+                        </div>
+      </div>
+</div>
+
+          
+
+    </li>
+  
+                                  
+            
+    <li>
+              <a href="https://esa-apex.github.io/apex_documentation/" class="menu-link menu-bar-link">Documentation</a>
+      
+          
+
+    </li>
+  
+                                  
+            
+    <li>
+              <a href="https://apex-esa.drupal.int.vito.be/frequently-asked-questions" class="menu-link menu-bar-link" data-drupal-link-system-path="node/9">FAQ</a>
+      
+          
+
+    </li>
+  
+                                  
+            
+    <li>
+              <a href="https://apex-esa.drupal.int.vito.be/about-apex" class="menu-link menu-bar-link" data-drupal-link-system-path="node/5">About APEx</a>
+      
+          
+
+    </li>
+  
+              </ul>
+      
+
+  
+  </div>
+
+
+  </nav>
+
+  </div>
+
+      </div>
+
+      <div class="c-header__contact">
+        <a href="https://apex-esa.drupal.int.vito.be/contact" class="btn btn-primary">Contact us</a>
+      </div>
+
+      <div class="c-hamburger__wrapper">
+                <div class="c-hamburger js-hamburger" data-once="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
     </div>
+  </div>
 </nav>
