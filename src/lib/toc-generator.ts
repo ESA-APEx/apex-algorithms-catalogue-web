@@ -18,7 +18,7 @@ function tocCompiler() {
     visit(tree, 'heading', (node: any) => {
         const depth = node.depth;
 
-        if (depth === 1) {
+        if (depth <= 2) {
             const title = node.children
                 .filter((child: any) => child.type === 'text')
                 .map((child: any) => child.value)
