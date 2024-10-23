@@ -1,23 +1,30 @@
+import path from 'path';
 import { defineConfig, passthroughImageService } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
+import markdownIntegration from '@astropub/md';
+import { RemarkLinkRewrite } from './src/remark-plugins/link-rewrite';
+import type { NodeType } from './src/remark-plugins/link-rewrite';
 
 const config = {
   staging: {
     SITE_URL: "https://algorithms-catalogue.apex.esa.int",
-    BASE_PATH: "/algorithms-catalogue"
+    BASE_PATH: "/algorithms-catalogue",
+    BASE_IMAGE_DESCRIPTION_URL: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/"
   },
   production: {
     SITE_URL: "https://apex.com",
-    BASE_PATH: "/algorithms-catalogue"
+    BASE_PATH: "/algorithms-catalogue",
+    BASE_IMAGE_DESCRIPTION_URL: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/"
   }
 };
 
 const buildTarget = (process.env.BUILD_TARGET ?? "staging") as keyof typeof config;
 const {
   SITE_URL,
-  BASE_PATH
+  BASE_PATH,
+  BASE_IMAGE_DESCRIPTION_URL,
 } = config[buildTarget];
 
 // https://astro.build/config
@@ -32,8 +39,27 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }), 
-    react()
+    markdownIntegration(),
+    react(), 
   ],
+  markdown: {
+    shikiConfig: {
+      theme: 'github-light-default',
+    },
+    remarkPlugins: [
+      [
+        RemarkLinkRewrite,
+        {
+          replacer: (nodeType: NodeType, url: string) => {
+            if (nodeType === 'image' && !url.startsWith('https://')) {
+              return path.join(BASE_IMAGE_DESCRIPTION_URL, url);
+            }
+            return url;
+          }
+        }
+      ]
+    ]
+  },
   adapter: node({
     mode: "standalone"
   })

@@ -1,4 +1,4 @@
-export interface CatalogueDetail {
+export interface UDP {
   description: string
   id: string
   links: Link[]

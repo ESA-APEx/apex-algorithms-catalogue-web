@@ -131,12 +131,12 @@
     width: 1430px;
     aspect-ratio: 2;
     right: 0;
-    top: 100%;
+    top: 1000px;
     transform: translateX(15%) translateY(-15%) rotate(-10deg);
     border-radius: 100%;
     mix-blend-mode: normal;
     filter: blur(336.075px);
-    background-color: #00AE9D;
+    background-color: var(--apex-lightgreen);
     z-index: -1;
     opacity: 0.6;
   }

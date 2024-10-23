@@ -25,7 +25,7 @@ export const Card = ({ title, body, href, labels }: CardProps) => {
                     labels?.length && (
                         <div className="card-labels">
                             <hr className="text-brand-teal-20 border my-3" />
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 {
                                     labels.map((label) => (
                                         <span className="text-sm px-2 py-1 text-brand-teal-80 bg-white">{label}</span>

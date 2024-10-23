@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import type { Algorithm } from '../types/models/algorithm';
 import type { Catalogue } from '../types/models/catalogue';
-import type { CatalogueDetail } from '../types/models/catalogue-detail';
+import type { UDP } from '../types/models/udp';
 
 const CATALOGUE_JSON_DIR = 'contents/apex_algorithms-main/algorithm_catalog'
 
@@ -36,7 +37,7 @@ export const loadCatalogueData = () => {
         fs.readdirSync(CATALOGUE_JSON_DIR)
             .filter(file => path.extname(file) === '.json');    
    
-    const data: Catalogue[] = [];
+    const data: Algorithm[] = [];
 
     jsonsInDir.forEach(file => {
         const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
@@ -52,15 +53,18 @@ export const loadCatalogueDetailData = async () => {
         fs.readdirSync(CATALOGUE_JSON_DIR)
             .filter(file => path.extname(file) === '.json');
 
-    const data: CatalogueDetail[] = [];
+    const data: Catalogue[] = [];
 
     for (const file of jsonsInDir) {
         try {
-            const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Catalogue;
+            const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Algorithm;
             const udpUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
             if (udpUrl) {
-                const catalogueDetail = await fetchJson(udpUrl) as CatalogueDetail;
-                data.push(catalogueDetail)
+                const udp = await fetchJson(udpUrl) as UDP;
+                data.push({
+                  algorithm,
+                  udp,
+                })
             }
         } catch (_err) {
             // do nothing

@@ -1,8 +1,10 @@
 ---
-import { marked } from 'marked';
+import { Markdown } from '@astropub/md';
+import { Badge } from '../../components/react/Badge';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import { loadCatalogueDetailData } from '../../lib/load-catalogue'
+import { getDate } from '../../lib/utils';
 
 import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
 
@@ -11,7 +13,7 @@ export const prerender = true;
 export const getStaticPaths = (async () => { 
     const data = await loadCatalogueDetailData()
     return data.map((item) => ({
-        params: { id: item.id },
+        params: { id: item.algorithm.id },
         props: {
             data: item, 
         }
@@ -21,13 +23,48 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { data } = Astro.props;
-const content = marked.parse(data.description)
+const { udp, algorithm } = data;
 ---
 
-<Layout title={data.id}>
-	<div class="flex-1 max-w-screen-xl mx-auto px-4 mt-8">
-        <Prose>
-            <article set:html={content}/>
-        </Prose>
-    </div>
+<Layout title={algorithm.id}>
+	<article class="flex-1 max-w-screen-lg mx-auto px-4 my-14">
+        <div class="flex flex-col-reverse lg:flex-row gap-12">
+            <section class="flex-1">
+                <header>
+                    <p class="text-brand-teal-50 mb-6">OpenEO</p>
+                    <h1 class="text-3xl md:text-5xl mb-12 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50">
+                        {algorithm.properties.title}
+                    </h1>
+                </header>
+                <Prose>
+                    <Markdown of={udp.description} />
+                </Prose>
+            </section>
+            <aside class="w-full lg:max-w-64 lg:sticky top-0">
+                <h3 class="text-white mb-1 hidden md:block">About</h3>
+                <p class="text-brand-gray-50 mb-6">{algorithm.properties.description}</p>
+                <ul class="flex flex-wrap gap-2 mb-6">
+                    {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
+                </ul>
+                <ul class="flex flex-col gap-4 text-brand-gray-50">
+                    <li>
+                        <div class="text-white mb-1">Cost estimation</div>
+                        <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>
+                    </li>
+                    <li>
+                        <div class="text-white mb-1">Format</div>
+                        <div>{algorithm.properties.formats.join(', ')}</div>
+                    </li>
+                    <li>
+                        <div class="text-white mb-1">License</div>
+                        <div>{algorithm.properties.license}</div>
+                    </li>
+                    <li>
+                        <div class="text-white mb-1">Last updated</div>
+                        <div>{getDate(algorithm.properties.updated)}</div>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+    </article>
 </Layout>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FilterIcon } from 'lucide-react'
+import { FilterIcon, SearchIcon } from 'lucide-react'
 import { Card } from './Card'
 import { Input } from './Input'
 import { Badge } from './Badge'
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from './Select'
 import { Popover, PopoverTrigger, PopoverContent } from './Popover'
-import type { Catalogue } from '../../types/models/catalogue'
+import type { Algorithm } from '../../types/models/algorithm'
 import {
   MultiSelector,
   MultiSelectorTrigger,
@@ -24,7 +24,7 @@ import {
 }  from './MultiSelect'
 
 interface CatalogueListProps {
-    catalogues: Catalogue[]
+    catalogues: Algorithm[]
 }
 
 const sortOptions = [
@@ -47,7 +47,7 @@ interface SearchAndSortFilterParams {
         labels: string[]
         licenses: string[]
     }
-    catalogues: Catalogue[]
+    catalogues: Algorithm[]
 }
 
 const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: SearchAndSortFilterParams) => {
@@ -82,7 +82,7 @@ const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: 
     return catalogues;
 }
 
-const getCataloguesLabels = (catalogues: Catalogue[]) => {
+const getCataloguesLabels = (catalogues: Algorithm[]) => {
     let labels: string[] = []
     for (const catalogue of catalogues) {
         labels = [...labels, ...catalogue.properties.keywords.map(keyword => keyword.toLowerCase())] 
@@ -95,7 +95,7 @@ const getCataloguesLabels = (catalogues: Catalogue[]) => {
         }))
 }
 
-const getCataloguesLicenses = (catalogues: Catalogue[]) => {
+const getCataloguesLicenses = (catalogues: Algorithm[]) => {
     let licenses: string[] = []
     for (const catalogue of catalogues) {
         licenses.push(catalogue.properties.license) 
@@ -132,8 +132,10 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
 
     return 	(
         <>
-            <div className="max-w-screen-sm mx-auto mb-6">
+            <div className="relative max-w-screen-sm mx-auto mb-6">
+                <SearchIcon className="absolute w-5 h-5 left-2 top-2 text-brand-gray-50" />
                 <Input 
+                    className="pl-10"
                     type="text" 
                     placeholder="Search algorithms..." 
                     value={query} 
@@ -211,7 +213,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                     </Popover>
                 </div>
             </div>
-            <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="apps">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="apps">
                 {data.map((item, id) => (
                     <li key={id} data-testid="apps-item">
                         <Card
