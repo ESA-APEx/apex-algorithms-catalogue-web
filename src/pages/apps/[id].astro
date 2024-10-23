@@ -1,52 +1,93 @@
 ---
 import { Markdown } from '@astropub/md';
+import { Info } from 'lucide-react';
 import { Badge } from '../../components/react/Badge';
+import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
-import { loadCatalogueDetailData } from '../../lib/load-catalogue'
+import { loadCatalogueDetailData } from '../../lib/load-catalogue';
 import { getDate } from '../../lib/utils';
+import { generateToC } from '../../lib/toc-generator';
 
 import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
+import type { ToCElement } from '../../types/models/catalogue';
 
 export const prerender = true;
 
 export const getStaticPaths = (async () => { 
     const data = await loadCatalogueDetailData()
-    return data.map((item) => ({
-        params: { id: item.algorithm.id },
-        props: {
-            data: item, 
-        }
-    }));
+    const result = []
+
+    for (const item of data) {
+        result.push({
+            params: { id: item.algorithm.id },
+            props: {
+                data: item, 
+                toc: (await generateToC(item.udp.description)).result as ToCElement[],
+            }
+        })
+    }
+
+    return result;
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data } = Astro.props;
+const { data, toc } = Astro.props;
 const { udp, algorithm } = data;
+
+const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
+
+const executionInfoLabels = {
+    service: 'openEO Backend'
+}
+
 ---
 
-<Layout title={algorithm.id}>
-	<article class="flex-1 max-w-screen-lg mx-auto px-4 my-14">
+<Layout title={`${algorithm.properties.title} | APEx`}>
+	<article class="flex-1 max-w-screen-sm md:max-w-screen-2xl mx-auto px-4 my-14">
         <div class="flex flex-col-reverse lg:flex-row gap-12">
             <section class="flex-1">
-                <header>
+                <header class="mb-12">
                     <p class="text-brand-teal-50 mb-6">OpenEO</p>
-                    <h1 class="text-3xl md:text-5xl mb-12 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50">
+                    <h1 class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50">
                         {algorithm.properties.title}
                     </h1>
+                    <CatalogueDetailActions data={algorithm} toc={toc} client:idle />
                 </header>
                 <Prose>
                     <Markdown of={udp.description} />
                 </Prose>
+                <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white">
+                    <h2 class="text-xl md:text-2xl mb-4 relative inline-flex" id="execution-information">
+                        Execution information                             
+                        <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
+                            <a href={UDP_DOCS_URL} target="__blank" >
+                                <Info className="w-4 h-4" />
+                            </a>
+                        </div>
+                    </h2>
+                    <ul class="flex flex-col gap-2">
+                        {algorithm.links.filter(link => link.rel !== 'example').map(link => (
+                            <li>
+                                    <span class="text-white">{executionInfoLabels[link.rel] || link.title}</span><br />
+                                    <span><a class="text-brand-gray-50 break-words" href={link.href}>{link.href}</a></span>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
             </section>
-            <aside class="w-full lg:max-w-64 lg:sticky top-0">
-                <h3 class="text-white mb-1 hidden md:block">About</h3>
-                <p class="text-brand-gray-50 mb-6">{algorithm.properties.description}</p>
-                <ul class="flex flex-wrap gap-2 mb-6">
-                    {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
-                </ul>
+            <aside class="w-full lg:max-w-80 lg:sticky top-0">
                 <ul class="flex flex-col gap-4 text-brand-gray-50">
+                    <li>
+                        <div class="text-white mb-1">About</div>
+                        <div>{algorithm.properties.description}</div>
+                    </li>
+                    <li>
+                        <ul class="flex flex-wrap gap-2">
+                            {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
+                        </ul>
+                    </li>
                     <li>
                         <div class="text-white mb-1">Cost estimation</div>
                         <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>

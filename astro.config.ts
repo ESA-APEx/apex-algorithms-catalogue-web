@@ -1,4 +1,3 @@
-import path from 'path';
 import { defineConfig, passthroughImageService } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
@@ -52,7 +51,7 @@ export default defineConfig({
         {
           replacer: (nodeType: NodeType, url: string) => {
             if (nodeType === 'image' && !url.startsWith('https://')) {
-              return path.join(BASE_IMAGE_DESCRIPTION_URL, url);
+              return new URL(url, BASE_IMAGE_DESCRIPTION_URL).href;
             }
             return url;
           }

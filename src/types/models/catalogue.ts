@@ -5,3 +5,9 @@ export interface Catalogue {
     algorithm: Algorithm
     udp: UDP
 }
+
+export interface ToCElement {
+    depth: number
+    title: string
+    id: string
+}
