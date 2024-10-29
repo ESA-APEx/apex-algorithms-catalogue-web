@@ -1,6 +1,6 @@
-# APEx Algorithms Catalogue Web
+# APEx Algorithm Catalogue Web
 
-A portal website for discovering APEx Algorithms.
+A portal website for discovering algorithms onboarded onto APEx.
 
 ## Development
 
