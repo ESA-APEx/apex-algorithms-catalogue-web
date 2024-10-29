@@ -28,7 +28,7 @@ export const Card = ({ title, body, href, labels }: CardProps) => {
                             <div className="flex flex-wrap gap-2">
                                 {
                                     labels.map((label) => (
-                                        <span className="text-sm px-2 py-1 text-brand-teal-80 bg-white">{label}</span>
+                                        <span key={label} className="text-sm px-2 py-1 text-brand-teal-80 bg-white">{label}</span>
                                     ))
                                 }
                             </div>

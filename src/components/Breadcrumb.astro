@@ -1,0 +1,107 @@
+---
+import { removeStripes } from "../lib/utils";
+import { linkTo } from "../lib/utils";
+import { MAIN_SITE_URL } from "../config";
+
+interface BreadcrumbItems {
+  slug: string;
+  label: string;
+}
+
+interface Props {
+  path: string;
+  class?: string;
+  enableHome?: boolean;
+}
+
+const { path, class: customClass = "", enableHome = true } = Astro.props;
+
+const items = generateItems(path);
+const otherItems = items.slice(1, items.length - 1);
+const activeItem = items[items.length - 1];
+
+function generateItems(path: string): BreadcrumbItems[] {
+  let slug = "";
+  const items: BreadcrumbItems[] = [];
+
+  path.split("/").forEach((part) => {
+    const label = removeStripes(part);
+    slug += `${part}/`;
+    items.push({ slug, label });
+  });
+
+  return items;
+}
+---
+
+<nav class:list={["flex", customClass]} aria-label="Breadcrumb">
+  <ol
+    class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse whitespace-nowrap text-ellipsis overflow-x-auto"
+  >
+    <li class="inline-flex items-center">
+        <div class="flex items-center">
+            <a
+            href={MAIN_SITE_URL}
+            class="inline-flex items-center font-medium text-white capitalize me-1 md:me-2"
+            >
+            APEx
+            </a>
+            <span class="text-brand-teal-50">/</span>
+        </div>
+    </li>
+    {
+      enableHome && (
+        <li class="inline-flex items-center">
+          <a
+            href={linkTo("")}
+            class="inline-flex items-center font-medium text-white capitalize"
+          >
+            Algorithm Catalogue
+          </a>
+        </li>
+      )
+    }
+
+    {
+      otherItems.map((item, index) => (
+        <li class:list={[{ "hidden md:block": index == 0 }]}>
+          <div class="flex items-center">
+            {(enableHome || index != 0) && (
+              <svg
+                class="rtl:rotate-180 w-3 h-3 text-white mx-1"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 9 4-4-4-4"
+                />
+              </svg>
+            )}
+            <a
+              href={linkTo(item.slug)}
+              class="ms-1 font-medium text-white md:ms-2 capitalize"
+              data-link-search
+            >
+              {item.label}
+            </a>
+          </div>
+        </li>
+      ))
+    }
+
+    <li aria-current="page">
+      <div class="flex items-center text-brand-gray-50">
+        <span class="text-brand-teal-50">/</span>
+        <span class="ms-1 font-medium md:ms-2 capitalize"
+          >{activeItem.label}</span
+        >
+      </div>
+    </li>
+  </ol>
+</nav>

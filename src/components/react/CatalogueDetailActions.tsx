@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { clsx } from "clsx";
 import Sticky from 'react-stickynode';
 import { TableOfContents, Globe, ChevronDown } from 'lucide-react';
 import { Button } from './Button';
@@ -38,11 +39,11 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
     const exampleLinks = data.links.filter(item => item.rel === 'example');
 
     const onChangeSection = (value: string) => {
-        const target = document.getElementById(selectedSection);
+        const target = document.getElementById(value);
 
         if (target) {
             target.scrollIntoView();
-            window.location.hash = selectedSection;
+            window.location.hash = value;
             setSelectedSection(value);
         }
     }
@@ -61,8 +62,8 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
                         <SelectContent>
                             { 
                                 sections.map(
-                                    ({ id, title }) => 
-                                        <SelectItem key={id} value={id}>{title}</SelectItem>
+                                    ({ id, title, depth }) => 
+                                        <SelectItem key={id} value={id} className={clsx([{ 'pl-10': depth === 2, 'pl-12': depth >= 2 }])}>{title}</SelectItem>
                                 ) 
                             }
                         </SelectContent>

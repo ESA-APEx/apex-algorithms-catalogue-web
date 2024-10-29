@@ -179,7 +179,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             <div className="flex flex-col mb-4">
                                 {
                                     licenses.map(({ label, value }) => (
-                                        <label className="flex items-center gap-1">
+                                        <label key={value} className="flex items-center gap-1">
                                             <Checkbox 
                                                 key={value} 
                                                 checked={filterByLicenses.includes(value)} 

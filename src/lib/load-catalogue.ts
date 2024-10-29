@@ -1,11 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import { SOURCE_BRANCH } from '../config';
 import type { Algorithm } from '../types/models/algorithm';
 import type { Catalogue } from '../types/models/catalogue';
 import type { UDP } from '../types/models/udp';
 
-const CATALOGUE_JSON_DIR = 'contents/apex_algorithms-main/algorithm_catalog'
+const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
 
 const fetchJson = (url: string) => {
   return new Promise<any>((resolve, reject) => {
@@ -60,7 +61,7 @@ export const loadCatalogueDetailData = async () => {
             const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Algorithm;
             const udpUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
             if (udpUrl) {
-                const udp = await fetchJson(udpUrl) as UDP;
+                const udp = await fetchJson(udpUrl.replace('main', SOURCE_BRANCH)) as UDP;
                 data.push({
                   algorithm,
                   udp,

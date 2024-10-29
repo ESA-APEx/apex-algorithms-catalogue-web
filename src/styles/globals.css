@@ -142,6 +142,24 @@
   }
 }
 
+.sticky-inner-wrapper {
+  @apply z-10;
+}
+
+.sticky-outer-wrapper.active .sticky-inner-wrapper {
+  @apply bg-[#043346]/30 backdrop-blur-sm px-4 py-2;
+}
+
+article :target {
+  scroll-margin-top: 4rem;
+}
+
+/* Navbar and footer styling (taken from the APEx's main website) */
+
+.c-header__search {
+  @apply hidden;
+}
+
 .visually-hidden {
   @apply hidden;
 }

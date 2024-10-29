@@ -5,6 +5,7 @@ import { Badge } from '../../components/react/Badge';
 import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { loadCatalogueDetailData } from '../../lib/load-catalogue';
 import { getDate } from '../../lib/utils';
 import { generateToC } from '../../lib/toc-generator';
@@ -19,11 +20,12 @@ export const getStaticPaths = (async () => {
     const result = []
 
     for (const item of data) {
+        const toc = (await generateToC(item.udp.description)).result as ToCElement[]
         result.push({
             params: { id: item.algorithm.id },
             props: {
                 data: item, 
-                toc: (await generateToC(item.udp.description)).result as ToCElement[],
+                toc,
             }
         })
     }
@@ -38,6 +40,7 @@ const { udp, algorithm } = data;
 
 const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
 
+const executionInfoLinksRel = ['openeo-process', 'service']
 const executionInfoLabels: Record<string, string> = {
     service: 'openEO Backend'
 }
@@ -45,8 +48,12 @@ const executionInfoLabels: Record<string, string> = {
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
+    <aside class="px-4 sm:px-0 w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto my-8">
+        <Breadcrumb path={`/${data.algorithm.id}`} />
+    </aside>
+ 
 	<article class="flex-1 px-4 my-14">
-        <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto">
+       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto">
             <section class="flex-1">
                 <header class="mb-12">
                     <p class="text-brand-teal-50 mb-6">OpenEO</p>
@@ -68,7 +75,7 @@ const executionInfoLabels: Record<string, string> = {
                         </div>
                     </h2>
                     <ul class="flex flex-col gap-2">
-                        {algorithm.links.filter(link => link.rel !== 'example').map(link => (
+                        {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
                                     <span class="text-white">{executionInfoLabels[link.rel] || link.title}</span><br />
                                     <span><a class="text-brand-gray-50 break-words" href={link.href}>{link.href}</a></span>
