@@ -5,7 +5,7 @@ test.describe('HomePage', () => {
     test('HomePage is rendered correctly', async ({ page }) => {
         await page.goto('/');
         await expect(page).toHaveTitle('Algorithms Catalogue | APEx');
-        await expect(page.getByRole('heading', { level: 1 })).toContainText('Algorithms Catalogue');
+        await expect(page.getByRole('heading', { level: 1 })).toContainText('Algorithm Catalogue');
 
         const card = page.getByText('ESA worldcereal global maize detector')
         await expect(card.first()).toBeVisible()
