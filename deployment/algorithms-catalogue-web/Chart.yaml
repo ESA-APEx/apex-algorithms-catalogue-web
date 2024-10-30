@@ -3,4 +3,4 @@ version: 0.1.0
 name: algorithms-catalogue-web
 description: A K8s Helm chart for algorithms-catalogue-web service
 type: application
-appVersion: "0.4.3"
+appVersion: "0.4.4"
