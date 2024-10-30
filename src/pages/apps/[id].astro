@@ -65,7 +65,7 @@ const executionInfoLabels: Record<string, string> = {
                 <Prose>
                     <Markdown of={udp.description} />
                 </Prose>
-                <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white">
+                <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-4 relative inline-flex" id="execution-information">
                         Execution information                             
                         <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
@@ -79,6 +79,32 @@ const executionInfoLabels: Record<string, string> = {
                             <li>
                                     <span class="text-white">{executionInfoLabels[link.rel] || link.title}</span><br />
                                     <span><a class="text-brand-gray-50 break-words" href={link.href}>{link.href}</a></span>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+                <section>
+                    <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
+                        Contact
+                    </h2>
+                    <ul class="flex flex-wrap gap-4 text-brand-gray-50">
+                        {algorithm.properties.contacts.map(contact => (
+                            <li class="w-1/2 md:w-1/4">
+                                <div>
+                                    <p class="text-white text-lg">{contact.name}</p>
+                                    <div class="flex gap-1">
+                                        {contact.organization && (
+                                            <Fragment>
+                                                <p class="text-white">{contact.organization}</p>
+                                                <span class="text-brand-teal-50">•</span>
+                                            </Fragment>
+                                        )}
+                                        {contact.position && (<p>{contact.position}</p>)}
+                                    </div>
+                                    <p class="mt-1 text-sm">{contact.roles.join(', ')}</p>
+                                    <div>
+                                    </div>
+                                </div>
                             </li>
                         ))}
                     </ul>

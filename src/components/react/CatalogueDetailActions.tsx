@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { clsx } from "clsx";
 import Sticky from 'react-stickynode';
 import { TableOfContents, Globe, ChevronDown } from 'lucide-react';
@@ -37,6 +37,31 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
     ]
     const [selectedSection, setSelectedSection] = useState<string>(sections[0].id);
     const exampleLinks = data.links.filter(item => item.rel === 'example');
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    window.location.hash = entry.target.id;
+                    setSelectedSection(entry.target.id);
+                }
+            })
+        }, {
+            rootMargin: '-25%',
+        });
+
+        sections.forEach((section) => {
+            const headingEl = document.querySelector(`#${section.id}`)
+            if (headingEl) {
+                observer.observe(headingEl)
+            }
+        });
+
+        return () => {
+            // Cleanup: disconnect observer on component unmount
+            observer.disconnect();
+        };
+    }, [])
 
     const onChangeSection = (value: string) => {
         const target = document.getElementById(value);
