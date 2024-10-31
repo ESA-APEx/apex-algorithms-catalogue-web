@@ -9,6 +9,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import { loadCatalogueDetailData } from '../../lib/load-catalogue';
 import { getDate } from '../../lib/utils';
 import { generateToC } from '../../lib/toc-generator';
+import { CatalogueDetailParametersTable } from '../../components/react/CatalogueDetailParametersTable';
 
 import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
 import type { ToCElement } from '../../types/models/catalogue';
@@ -70,7 +71,7 @@ const executionInfoLabels: Record<string, string> = {
                         Execution information                             
                         <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
                             <a href={UDP_DOCS_URL} target="__blank" >
-                                <Info className="w-4 h-4" />
+                                <Info className="w-4 h-4 text-brand-teal-50" />
                             </a>
                         </div>
                     </h2>
@@ -82,45 +83,7 @@ const executionInfoLabels: Record<string, string> = {
                             </li>
                         ))}
                     </ul>
-
-                    <div class="relative overflow-x-auto">
-                        <table class="w-full text-left bg-white/10 text-white rounded-sm">
-                            <thead>
-                                <tr class="border-b border-brand-teal-70">
-                                    <th scope="col" class="px-4 py-3 w-2/3 font-normal">
-                                        Parameter
-                                    </th>
-                                    <th scope="col" class="px-4 py-3 font-normal">
-                                        Type
-                                    </th>
-                                    <th scope="col" class="px-4 py-3 font-normal">
-                                        Default
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {udp.parameters.map((parameter) => (
-                                    <tr>
-                                        <td class="px-4 py-4 text-white">
-                                            <p class="mb-1">{parameter.name} {!parameter?.optional && <span>(required)</span>}</p>
-                                            <p class="text-sm text-gray-300">{parameter.description}</p>
-                                        </td>
-                                        <td class="px-4 py-4">
-                                            {parameter.schema.type}
-                                        </td>
-                                        <td class="px-4 py-4">
-                                            {
-                                                parameter.hasOwnProperty('default') && typeof parameter.default === 'object' ? 
-                                                JSON.stringify(parameter.default) : 
-                                                parameter.default
-                                            }
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
+                    <CatalogueDetailParametersTable udp={udp} is:idle />
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">

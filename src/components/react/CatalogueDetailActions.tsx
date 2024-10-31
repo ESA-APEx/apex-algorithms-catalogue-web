@@ -51,7 +51,7 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
         });
 
         sections.forEach((section) => {
-            const headingEl = document.querySelector(`#${section.id}`)
+            const headingEl = document.getElementById(section.id)
             if (headingEl) {
                 observer.observe(headingEl)
             }
