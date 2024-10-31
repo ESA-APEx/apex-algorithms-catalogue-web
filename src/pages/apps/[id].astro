@@ -3,6 +3,7 @@ import { Markdown } from '@astropub/md';
 import { Info, Globe, Github } from 'lucide-react';
 import { Badge } from '../../components/react/Badge';
 import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
+import { ClipboardButton } from '../../components/react/ClipboardButton';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -78,12 +79,15 @@ const executionInfoLabels: Record<string, string> = {
                     <ul class="flex flex-col gap-2 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
-                                    <span class="text-white">{executionInfoLabels[link.rel] || link.title}</span><br />
-                                    <span><a class="text-gray-400 break-words" href={link.href}>{link.href}</a></span>
+                                    <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
+                                    <p>
+                                        <a class="text-gray-400 break-words" href={link.href}>{link.href}</a>
+                                        <ClipboardButton text={link.href} client:idle />
+                                    </p>
                             </li>
                         ))}
                     </ul>
-                    <CatalogueDetailParametersTable udp={udp} is:idle />
+                    <CatalogueDetailParametersTable udp={udp} />
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
