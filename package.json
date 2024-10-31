@@ -1,7 +1,7 @@
 {
   "name": "apex-algorithms-catalogue-web",
   "type": "module",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "scripts": {
     "dev": "npm run download-source && astro dev",
     "build": "astro check && npm run download-source && astro build",
