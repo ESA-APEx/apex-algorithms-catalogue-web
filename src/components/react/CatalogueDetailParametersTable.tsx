@@ -16,7 +16,7 @@ export interface CatalogueDetailParametersTableProps {
 export const CatalogueDetailParametersTable = ({ udp }: CatalogueDetailParametersTableProps) => {
     return (
         <>
-            <Table>
+            <Table className="bg-white bg-opacity-5 rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-2/3">Parameter</TableHead>
