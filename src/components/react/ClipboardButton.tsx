@@ -22,9 +22,9 @@ export const ClipboardButton = ({ text, resetDelay = 1000 }: ClipboardIconProps)
     };
 
     return (
-        <button className="p-1 rounded-sm hover:bg-brand-teal-50/20" onClick={handleCopy}>
+        <button className="p-1 rounded-sm text-white hover:bg-brand-teal-50/20" onClick={handleCopy}>
             {
-                copied ?  <Check className="w-4 h-4 text-brand-teal-50" /> : <Clipboard className="w-4 h-4 text-brand-teal-50" />
+                copied ?  <Check className="w-4 h-4" /> : <Clipboard className="w-4 h-4" />
             }
         </button>
     )
