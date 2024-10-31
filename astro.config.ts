@@ -9,13 +9,13 @@ import type { NodeType } from './src/remark-plugins/link-rewrite';
 
 const config = {
   staging: {
-    SITE_URL: "https://algorithms-catalogue.apex.esa.int",
-    BASE_PATH: "/algorithms-catalogue",
+    SITE_URL: "https://algorithm-catalogue.apex.esa.int",
+    BASE_PATH: "",
     BASE_IMAGE_DESCRIPTION_URL: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/",
   },
   production: {
-    SITE_URL: "https://apex.com",
-    BASE_PATH: "/algorithms-catalogue",
+    SITE_URL: "https://algorithm-catalogue.apex.esa.int",
+    BASE_PATH: "",
     BASE_IMAGE_DESCRIPTION_URL: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/",
   }
 };

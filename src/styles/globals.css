@@ -6,28 +6,28 @@
   font-family: 'NotesEsa';
   font-style: normal;
   font-weight: 400;
-  src: url('/algorithms-catalogue/fonts/NotesEsa.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa.woff') format('woff');
+  src: url('/fonts/NotesEsa.woff2') format('woff2'), url('/fonts/NotesEsa.woff') format('woff');
   font-display: swap;
 }
 @font-face {
   font-family: 'NotesEsa';
   font-style: italic;
   font-weight: 400;
-  src: url('/algorithms-catalogue/fonts/NotesEsa-Italic.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-Italic.woff') format('woff');
+  src: url('/fonts/NotesEsa-Italic.woff2') format('woff2'), url('/fonts/NotesEsa-Italic.woff') format('woff');
   font-display: swap;
 }
 @font-face {
   font-family: 'NotesEsa';
   font-style: bold;
   font-weight: 700;
-  src: url('/algorithms-catalogue/fonts/NotesEsa-Bold.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-Bold.woff') format('woff');
+  src: url('/fonts/NotesEsa-Bold.woff2') format('woff2'), url('/fonts/NotesEsa-Bold.woff') format('woff');
   font-display: swap;
 }
 @font-face {
   font-family: 'NotesEsa';
   font-style: italic;
   font-weight: 700;
-  src: url('/algorithms-catalogue/fonts/NotesEsa-BoldItalic.woff2') format('woff2'), url('/algorithms-catalogue/fonts/NotesEsa-BoldItalic.woff') format('woff');
+  src: url('/fonts/NotesEsa-BoldItalic.woff2') format('woff2'), url('/fonts/NotesEsa-BoldItalic.woff') format('woff');
   font-display: swap;
 }
 
