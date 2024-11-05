@@ -107,12 +107,25 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
                                             {
                                                 exampleLinks.map(link => (
                                                     <DropdownMenuItem key={link.href}>
-                                                        <a 
-                                                            href={new URL(link.href.replace('https://', '/external/'), BASE_STAC_BROWSER_URL).href} 
-                                                            target="__blank" 
-                                                            className="font-normal text-md">
-                                                            {link.title}
-                                                        </a>
+                                                        {
+                                                            link.type === 'application/json' && link.href.includes('.json') ? (
+                                                                <a 
+                                                                    href={new URL(link.href.replace('https://', '/external/'), BASE_STAC_BROWSER_URL).href} 
+                                                                    target="__blank" 
+                                                                    className="font-normal text-md">
+                                                                    {link.title}
+                                                                </a>
+                                                            ) :
+                                                            (
+                                                                <a 
+                                                                    href={link.href} 
+                                                                    target="__blank" 
+                                                                    download
+                                                                    className="font-normal text-md">
+                                                                    {link.title}
+                                                                </a>
+                                                            )
+                                                        }
                                                     </DropdownMenuItem>
                                                 ))
 
