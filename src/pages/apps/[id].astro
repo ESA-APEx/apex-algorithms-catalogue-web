@@ -50,12 +50,12 @@ const executionInfoLabels: Record<string, string> = {
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
-    <aside class="px-4 sm:px-0 w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto my-8">
-        <Breadcrumb path={`/${data.algorithm.id}`} />
+    <aside class="block px-4 my-8">
+        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto" />
     </aside>
  
 	<article class="flex-1 px-4 my-14">
-       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto">
+       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
             <section class="flex-1">
                 <header class="mb-12">
                     <p class="text-brand-teal-50 mb-6">OpenEO</p>
@@ -125,7 +125,7 @@ const executionInfoLabels: Record<string, string> = {
                     </ul>
                 </section>
             </section>
-            <aside class="w-full lg:w-56 xl:w-64">
+            <aside class="w-full lg:w-64">
                 <ul class="flex flex-col gap-4 text-brand-gray-50">
                     <li>
                         <div class="text-white mb-1">About</div>

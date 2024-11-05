@@ -3,26 +3,32 @@ import path from 'path';
 import { chromium } from "@playwright/test";
 import * as cheerio from 'cheerio';
 
-const MAIN_SITE_URL = 'https://apex-esa.drupal.int.vito.be/';
+const MAIN_SITE_URL = 'https://apex.staging.vito.be/';
 const HEADER_SELECTOR = 'header';
 const FOOTER_SELECTOR = 'footer';
+const HAMBURGER_MENU_SELECTOR = '.js-hamburger-menu';
 const HEADER_FILENAME = 'NavBar.astro';
 const FOOTER_FILENAME = 'Footer.astro';
+const HAMBURGER_MENU_FILENAME = 'HamburgerMenu.astro';
 const DOWNLOAD_DIR = 'src/components/';
+const BASIC_AUTH = 'apex:apex';
 
 await main();
 
 async function main() {
     const browser = await chromium.launch();
     const page = await browser.newPage();
+    const { host } = new URL(MAIN_SITE_URL)
 
-    await page.goto(MAIN_SITE_URL);
+    await page.goto(`https://${BASIC_AUTH}@${host}`);
     
     const header = await page.locator(HEADER_SELECTOR).first().innerHTML();
     const footer = await page.locator(FOOTER_SELECTOR).first().innerHTML();
+    const menu = await page.locator(HAMBURGER_MENU_SELECTOR).first().innerHTML();
 
-    writeToFile(`<nav class="text-white w-full max-w-screen-2xl mx-auto px-4">${resolveExternalUrls(header, MAIN_SITE_URL)}</nav>`, HEADER_FILENAME);
-    writeToFile(`<footer class="text-white w-full max-w-screen-2xl mx-auto px-4">${resolveExternalUrls(footer, MAIN_SITE_URL)}</footer>`, FOOTER_FILENAME);
+    writeToFile(`<nav class="text-white w-full max-w-screen-2xl mx-auto"><div class="px-4 2xl:px-0">${resolveExternalUrls(header, MAIN_SITE_URL)}</div></nav>`, HEADER_FILENAME);
+    writeToFile(`<aside class="c-sidebar js-hamburger-menu" data-once="hamburgerMenu">${resolveExternalUrls(menu, MAIN_SITE_URL)}</aside>`, HAMBURGER_MENU_FILENAME)
+    writeToFile(`<footer class="text-white w-full max-w-screen-2xl mx-auto"><div class="px-4 2xl:px-0">${resolveExternalUrls(footer, MAIN_SITE_URL)}</div></footer>`, FOOTER_FILENAME);
 
     await browser.close();
 }
