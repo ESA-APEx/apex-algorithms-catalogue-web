@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { clsx } from "clsx";
 import Sticky from 'react-stickynode';
 import { TableOfContents, Globe, ChevronDown } from 'lucide-react';
@@ -36,18 +36,19 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
         },
     ]
     const [selectedSection, setSelectedSection] = useState<string>(sections[0].id);
+    const ref = useRef({ isScrollIntoView: false });
     const exampleLinks = data.links.filter(item => item.rel === 'example');
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    window.location.hash = entry.target.id;
+                if (entry.isIntersecting && !ref.current.isScrollIntoView) {
+                    window.history.replaceState({}, "", `#${entry.target.id}`);
                     setSelectedSection(entry.target.id);
                 }
             })
         }, {
-            rootMargin: '-25%',
+            rootMargin: '-100px',
         });
 
         sections.forEach((section) => {
@@ -67,9 +68,15 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
         const target = document.getElementById(value);
 
         if (target) {
+            ref.current.isScrollIntoView = true;
+
             target.scrollIntoView();
-            window.location.hash = value;
+            window.history.replaceState({}, "", `#${value}`);
             setSelectedSection(value);
+
+            window.setTimeout(() => {
+                ref.current.isScrollIntoView = false;
+            }, 1000);
         }
     }
 
