@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { clsx } from "clsx";
 import Sticky from 'react-stickynode';
-import { TableOfContents, Globe, ChevronDown } from 'lucide-react';
+import { TableOfContents, Files, ChevronDown, Download, Eye } from 'lucide-react';
 import { Button } from './Button';
 import {
   DropdownMenu,
@@ -104,33 +104,39 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
                         exampleLinks.length > 0 && (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="secondary" className="text-md font-normal">
-                                            <Globe /> 
-                                            <span>Preview example outputs</span>
+                                        <Button variant="secondary" className="text-md font-normal flex-1 max-w-44">
+                                            <Files /> 
+                                            <span>Example outputs</span>
                                             <ChevronDown className="opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56">
+                                    <DropdownMenuContent className="w-54" align="end">
                                             {
                                                 exampleLinks.map(link => (
                                                     <DropdownMenuItem key={link.href}>
                                                         {
                                                             link.type === 'application/json' && link.href.includes('.json') ? (
-                                                                <a 
-                                                                    href={new URL(link.href.replace('https://', '/external/'), BASE_STAC_BROWSER_URL).href} 
-                                                                    target="__blank" 
-                                                                    className="font-normal text-md">
-                                                                    {link.title}
-                                                                </a>
+                                                                <>
+                                                                    <Eye className="w-4 h-4" />
+                                                                    <a 
+                                                                        href={new URL(link.href.replace('https://', '/external/'), BASE_STAC_BROWSER_URL).href} 
+                                                                        target="__blank" 
+                                                                        className="font-normal text-md">
+                                                                        Preview <span className="lowercase">{link.title}</span>
+                                                                    </a>
+                                                                </>
                                                             ) :
                                                             (
-                                                                <a 
-                                                                    href={link.href} 
-                                                                    target="__blank" 
-                                                                    download
-                                                                    className="font-normal text-md">
-                                                                    {link.title}
-                                                                </a>
+                                                                <>
+                                                                    <Download className="w-4 h-4" />
+                                                                    <a 
+                                                                        href={link.href} 
+                                                                        target="__blank" 
+                                                                        download
+                                                                        className="font-normal text-md">
+                                                                        Download output
+                                                                    </a>
+                                                                </>
                                                             )
                                                         }
                                                     </DropdownMenuItem>
