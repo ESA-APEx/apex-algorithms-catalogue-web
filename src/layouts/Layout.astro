@@ -22,11 +22,13 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="flex flex-col overflow-x-hidden">
-		<NavBar />
-		<slot />
+	<body>
+		<div class="bg-container">
+			<NavBar />
+			<slot />
+			<Footer />
+		</div>
 		<HamburgerMenu />
-		<Footer />
 		<script is:inline>
 			document.addEventListener('DOMContentLoaded', () => {
 				'use strict';
