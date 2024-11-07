@@ -24,7 +24,7 @@ export interface CatalogueDetailActions {
     toc: ToCElement[]
 }
 
-const BASE_STAC_BROWSER_URL = 'https://browser.apex.apex.esa.int/external/';
+const BASE_STAC_BROWSER_URL = 'https://browser.apex.esa.int/external/';
 
 export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) => {
     const sections: ToCElement[] = [
