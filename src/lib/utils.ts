@@ -33,3 +33,15 @@ export function resolveImageUrlsFromMarkdown(text: string, algorithmId: string) 
         return `![${normalizedPath}](${url})`;
     })
 }
+
+export function generateWebEditorUrl(algorithmId: string, udpUrl: string) {
+  const baseUrl = 'https://editor.openeo.org';
+
+  const url = new URL(baseUrl);
+  url.searchParams.set('server', 'https://openeofed.dataspace.copernicus.eu');
+  url.searchParams.set('wizard', 'UDP');
+  url.searchParams.set('wizard~process', algorithmId);
+  url.searchParams.set('wizard~processUrl', udpUrl);
+
+  return url.href;
+}

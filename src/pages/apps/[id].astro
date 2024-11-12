@@ -1,6 +1,6 @@
 ---
 import { Markdown } from '@astropub/md';
-import { Info, Globe } from 'lucide-react';
+import { Info, Globe, SquareArrowOutUpRight } from 'lucide-react';
 import { Badge } from '../../components/react/Badge';
 import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
 import { ClipboardButton } from '../../components/react/ClipboardButton';
@@ -8,7 +8,7 @@ import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { loadCatalogueDetailData } from '../../lib/load-catalogue';
-import { getDate, resolveImageUrlsFromMarkdown } from '../../lib/utils';
+import { getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl } from '../../lib/utils';
 import { generateToC } from '../../lib/toc-generator';
 import { CatalogueDetailParametersTable } from '../../components/react/CatalogueDetailParametersTable';
 
@@ -54,6 +54,10 @@ const executionInfoLinksRel = ['openeo-process', 'service']
 const executionInfoLabels: Record<string, string> = {
     service: 'openEO Backend'
 }
+
+const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')
+
+const webEditorUrl = processUrl ? generateWebEditorUrl(algorithm.id, processUrl.href) : null
 
 ---
 
@@ -160,6 +164,14 @@ const executionInfoLabels: Record<string, string> = {
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
                     </li>
+                    { webEditorUrl && (
+                        <li class="mt-2">
+                            <a class="btn btn-secondary !flex items-center justify-center gap-2" href={webEditorUrl} target="__blank">
+                                Execute in web editor
+                                <SquareArrowOutUpRight className="w-4 h-4" />
+                            </a>
+                        </li>
+                    )}
                 </ul>
             </aside>
         </div>
