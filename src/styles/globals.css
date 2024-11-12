@@ -1374,6 +1374,33 @@ fieldset:disabled .btn {
   background-color: var(--apex-green);
 }
 
+.btn-secondary {
+  --apex-bs-btn-color: #fff;
+  --apex-bs-btn-bg: #6c757d;
+  --apex-bs-btn-border-color: #6c757d;
+  --apex-bs-btn-hover-color: #fff;
+  --apex-bs-btn-hover-bg: #5c636a;
+  --apex-bs-btn-hover-border-color: #565e64;
+  --apex-bs-btn-focus-shadow-rgb: 130, 138, 145;
+  --apex-bs-btn-active-color: #fff;
+  --apex-bs-btn-active-bg: #565e64;
+  --apex-bs-btn-active-border-color: #51585e;
+  --apex-bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --apex-bs-btn-disabled-color: #fff;
+  --apex-bs-btn-disabled-bg: #6c757d;
+  --apex-bs-btn-disabled-border-color: #6c757d;
+}
+.btn-secondary {
+  padding: 1rem 1.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--apex-white);
+  font-size: var(--apex-text-base);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .btn-link {
   --apex-bs-btn-font-weight: 400;
   --apex-bs-btn-color: var(--apex-bs-link-color);

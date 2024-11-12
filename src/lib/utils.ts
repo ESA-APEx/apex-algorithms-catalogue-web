@@ -33,3 +33,15 @@ export function resolveImageUrlsFromMarkdown(text: string, algorithmId: string) 
         return `![${normalizedPath}](${url})`;
     })
 }
+
+export function generateWebEditorUrl(algorithmId: string, processUrl: string, backendServer: string) {
+  const baseUrl = 'https://editor.openeo.org';
+
+  const url = new URL(baseUrl);
+  url.searchParams.set('wizard', 'UDP');
+  url.searchParams.set('wizard~process', algorithmId);
+  url.searchParams.set('wizard~processUrl', processUrl);
+  url.searchParams.set('server', backendServer);
+
+  return url.href;
+}
