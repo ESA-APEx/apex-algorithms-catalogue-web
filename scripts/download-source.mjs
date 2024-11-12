@@ -5,7 +5,7 @@ import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import unzipper from 'unzipper';
 
-const SOURCE_BRANCH = 'fix-udp-description';
+const SOURCE_BRANCH = 'main';
 const REPO_URL = `https://github.com/ESA-APEx/apex_algorithms/archive/refs/heads/${SOURCE_BRANCH}.zip`;
 const DOWNLOAD_DIR = 'contents';
 const REPO_FILENAME = 'apex_algorithms-main.zip';

@@ -3,5 +3,6 @@
 export const SITE_URL = import.meta.env.SITE;
 export const BASE_PATH =
   import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL;
-export const SOURCE_BRANCH = "fix-udp-description"
+export const SOURCE_BRANCH = "main"
 export const MAIN_SITE_URL = "https://apex.staging.vito.be";
+export const BASE_IMAGE_DESCRIPTION_URL = "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/";

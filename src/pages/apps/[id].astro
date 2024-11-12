@@ -1,6 +1,6 @@
 ---
 import { Markdown } from '@astropub/md';
-import { Info, Globe, Github } from 'lucide-react';
+import { Info, Globe } from 'lucide-react';
 import { Badge } from '../../components/react/Badge';
 import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
 import { ClipboardButton } from '../../components/react/ClipboardButton';
@@ -8,7 +8,7 @@ import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { loadCatalogueDetailData } from '../../lib/load-catalogue';
-import { getDate } from '../../lib/utils';
+import { getDate, resolveImageUrlsFromMarkdown } from '../../lib/utils';
 import { generateToC } from '../../lib/toc-generator';
 import { CatalogueDetailParametersTable } from '../../components/react/CatalogueDetailParametersTable';
 
@@ -22,11 +22,19 @@ export const getStaticPaths = (async () => {
     const result = []
 
     for (const item of data) {
-        const toc = (await generateToC(item.udp.description)).result as ToCElement[]
+        const { algorithm, udp } = item
+        const description = resolveImageUrlsFromMarkdown(udp.description, algorithm.id)
+        const toc = (await generateToC(description)).result as ToCElement[]
         result.push({
             params: { id: item.algorithm.id },
             props: {
-                data: item, 
+                data: {
+                    algorithm,
+                    udp: {
+                        ...udp,
+                        description,
+                    }
+                }, 
                 toc,
             }
         })
