@@ -55,9 +55,9 @@ const executionInfoLabels: Record<string, string> = {
     service: 'openEO Backend'
 }
 
-const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')
-
-const webEditorUrl = processUrl ? generateWebEditorUrl(algorithm.id, processUrl.href) : null
+const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
+const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
+const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
 
 ---
 
