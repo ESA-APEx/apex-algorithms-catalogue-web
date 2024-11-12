@@ -3,7 +3,7 @@ namespace: algorithms-catalogue
 
 image:
   repository: swr.eu-nl.otc.t-systems.com/vito/apex-algorithms-catalogue-web
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: latest
 
 imagePullSecrets:
