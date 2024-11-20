@@ -42,7 +42,10 @@ export const loadCatalogueData = () => {
 
     jsonsInDir.forEach(file => {
         const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
-        const json = JSON.parse(fileData.toString());
+        const json: Algorithm = JSON.parse(fileData.toString());
+
+        json.type = !!json.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
+
         data.push(json)
     });
 

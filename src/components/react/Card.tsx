@@ -1,16 +1,17 @@
 interface CardProps {
 	title: string;
+    type: string;
 	body: string;
 	href: string;
 	labels?: string[];
 }
 
-export const Card = ({ title, body, href, labels }: CardProps) => {
+export const Card = ({ title, type,  body, href, labels }: CardProps) => {
     return (
         <a href={href}>
             <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10">
                 <div className="card-header mb-2">
-                    <span className="text-sm">OpenEO</span>
+                    <span className="text-sm">{type}</span>
                 </div>
 
                 <h2 className="card-title text-lg font-extrabold text-brand-teal-80">

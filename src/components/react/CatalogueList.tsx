@@ -219,6 +219,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                         <Card
                             key={id}
                             href={`/apps/${item.id}`}
+                            type={item.type}
                             title={item.properties.title}
                             body={item.properties.description}
                             labels={item.properties.keywords}
