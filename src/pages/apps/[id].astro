@@ -65,7 +65,7 @@ const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/ud
 
 const executionInfoLinksRel = ['openeo-process', 'service']
 const executionInfoLabels: Record<string, string> = {
-    service: 'openEO Backend'
+    service: udp ? 'openEO Backend' : 'OGC API Process'
 }
 
 const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
@@ -94,12 +94,12 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                 </Prose>
                 <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
-                        Execution information                             
-                        <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
+                        Execution information
+                        { udp && <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
                             <a href={UDP_DOCS_URL} target="__blank" class="text-white inline-block rounded-full hover:bg-brand-teal-50/20" >
                                 <Info className="w-4 h-4" />
                             </a>
-                        </div>
+                        </div> }
                     </h2>
                     <ul class="flex flex-col gap-2 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
