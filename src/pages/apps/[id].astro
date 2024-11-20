@@ -63,9 +63,10 @@ const { udp, algorithm } = data;
 
 const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
 
-const executionInfoLinksRel = ['openeo-process', 'service']
+const executionInfoLinksRel = ['openeo-process', 'service', 'application']
 const executionInfoLabels: Record<string, string> = {
-    service: udp ? 'openEO Backend' : 'OGC API Process'
+    service: udp ? 'openEO Backend' : 'OGC API Process',
+    application: udp ? '' : 'CWL definition'
 }
 
 const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
