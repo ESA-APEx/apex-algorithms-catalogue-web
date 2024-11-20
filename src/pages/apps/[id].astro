@@ -78,7 +78,7 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
     <aside class="block px-4 my-8">
         <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto" />
     </aside>
- 
+
 	<article class="flex-1 px-4 my-14">
        <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
             <section class="flex-1">
@@ -123,15 +123,8 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                             <li class="w-full md:w-1/4">
                                 <div>
                                     <p class="text-white text-lg">{contact.name}</p>
-                                    <div class="flex gap-1">
-                                        {contact.organization && (
-                                            <Fragment>
-                                                <p class="text-white">{contact.organization}</p>
-                                                <span class="text-brand-teal-50">•</span>
-                                            </Fragment>
-                                        )}
-                                        {contact.position && (<p>{contact.position}</p>)}
-                                    </div>
+                                    {contact.organization && (<p class="text-white">{contact.organization}</p>)}
+                                    {contact.position && (<p>{contact.position}</p>)}
                                     <p class="mt-1 text-sm mb-2">{contact.roles.join(', ')}</p>
                                     <div class="flex gap-2">
                                         {contact.links.map(link => (
