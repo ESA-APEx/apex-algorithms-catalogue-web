@@ -46,6 +46,7 @@ interface SearchAndSortFilterParams {
     filterBy: {
         labels: string[]
         licenses: string[]
+        types: string[]
     }
     catalogues: Algorithm[]
 }
@@ -55,7 +56,7 @@ const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: 
         const normalizedQuery = query.toLowerCase()
         return catalogues
             .filter(
-                ({ properties }) => {
+                ({ type, properties }) => {
                     const hitSearch = properties.title.toLowerCase().includes(normalizedQuery) || 
                         properties.description.toLowerCase().includes(normalizedQuery)
 
@@ -68,8 +69,9 @@ const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: 
                     }
                     const hitFilterByLabels = filterBy.labels.length ? hitLabels.length : true
                     const hitFilterByLicense = filterBy.licenses.length ? filterBy.licenses.includes(properties.license) : true
+                    const hitFilterByTypes = filterBy.types.length ? filterBy.types.includes(type) : true
 
-                    return hitSearch && hitFilterByLabels && hitFilterByLicense
+                    return hitSearch && hitFilterByLabels && hitFilterByLicense && hitFilterByTypes
                 }
             )
             .sort((a, b) => {
@@ -108,26 +110,43 @@ const getCataloguesLicenses = (catalogues: Algorithm[]) => {
         }))
 }
 
+const getCataloguesTypes = (catalogues: Algorithm[]) => {
+    let types: string[] = []
+    for (const catalogue of catalogues) {
+        types.push(catalogue.type)
+    }
+    return types
+        .filter((value, index, arr) => arr.indexOf(value) === index)
+        .map(label => ({
+            label: label,
+            value: label,
+        }))
+}
+
 export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     const [query, setQuery] = useState<string>('')
     const [sortBy, setSortBy] = useState<SortOption>('name')
     const [filterByLabels, setFilterByLabels] = useState<string[]>([])
     const [filterByLicenses, setFilterByLicenses] = useState<string[]>([])
+    const [filterByTypes, setFilterByTypes] = useState<string[]>([])
     const labels = getCataloguesLabels(catalogues)
     const licenses = getCataloguesLicenses(catalogues)
-    const data = searchAndSortFilterCatalogues({ 
+    const types = getCataloguesTypes(catalogues)
+    const data = searchAndSortFilterCatalogues({
         query, 
         sortBy, 
         catalogues, 
         filterBy: {
             labels: filterByLabels,
             licenses: filterByLicenses,
+            types: filterByTypes,
         } 
     })
     const filterCounts = filterByLabels.length + filterByLicenses.length
     const clearFilters = () => {
         setFilterByLabels([])
         setFilterByLicenses([])
+        setFilterByTypes([])
     }
 
     return 	(
@@ -169,25 +188,44 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent align="end" className="relative">
-                            <Button 
-                                variant="link" 
+                            <Button
+                                variant="link"
                                 onClick={clearFilters}
                                 className="absolute right-0 top-2">
                                 Reset
                             </Button>
+                            <p className="mb-1">Type</p>
+                            <div className="flex flex-col mb-4">
+                                {
+                                    types.map(({label, value}) => (
+                                        <label key={value} className="flex items-center gap-1">
+                                            <Checkbox
+                                                key={value}
+                                                checked={filterByTypes.includes(value)}
+                                                onCheckedChange={(checked) => {
+                                                    return checked ?
+                                                        setFilterByTypes([...filterByTypes, value]) :
+                                                        setFilterByTypes(filterByTypes.filter(item => item != value))
+                                                }}
+                                            />
+                                            <span>{label}</span>
+                                        </label>
+                                    ))
+                                }
+                            </div>
                             <p className="mb-1">Licenses</p>
                             <div className="flex flex-col mb-4">
                                 {
-                                    licenses.map(({ label, value }) => (
+                                    licenses.map(({label, value}) => (
                                         <label key={value} className="flex items-center gap-1">
-                                            <Checkbox 
-                                                key={value} 
-                                                checked={filterByLicenses.includes(value)} 
+                                            <Checkbox
+                                                key={value}
+                                                checked={filterByLicenses.includes(value)}
                                                 onCheckedChange={(checked) => {
                                                     return checked ?
                                                         setFilterByLicenses([...filterByLicenses, value]) :
                                                         setFilterByLicenses(filterByLicenses.filter(item => item != value))
-                                                }} 
+                                                }}
                                             />
                                             <span>{label}</span>
                                         </label>
@@ -197,15 +235,15 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             <p>Labels</p>
                             <MultiSelector values={filterByLabels} onValuesChange={setFilterByLabels} loop={false}>
                                 <MultiSelectorTrigger>
-                                    <MultiSelectorInput placeholder="Select labels" />
+                                    <MultiSelectorInput placeholder="Select labels"/>
                                 </MultiSelectorTrigger>
                                 <MultiSelectorContent>
                                     <MultiSelectorList>
-                                    {labels.map((option, i) => (
-                                        <MultiSelectorItem key={i} value={option.value}>
-                                        {option.label}
-                                        </MultiSelectorItem>
-                                    ))}
+                                        {labels.map((option, i) => (
+                                            <MultiSelectorItem key={i} value={option.value}>
+                                                {option.label}
+                                            </MultiSelectorItem>
+                                        ))}
                                     </MultiSelectorList>
                                 </MultiSelectorContent>
                             </MultiSelector>
