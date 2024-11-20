@@ -71,6 +71,8 @@ const executionInfoLabels: Record<string, string> = {
 const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
 const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
 const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
+const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
+const documentationUrl = algorithm.links.find(link => link.rel === 'documentation')?.href
 
 ---
 
@@ -170,6 +172,22 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
                     </li>
+                    { documentationUrl && (
+                            <li class="mt-2">
+                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={documentationUrl} target="__blank">
+                                    Open documentation
+                                    <SquareArrowOutUpRight className="w-4 h-4" />
+                                </a>
+                            </li>
+                    )}
+                    { orderUrl && (
+                            <li class="mt-2">
+                                <a class="btn btn-primary !flex items-center justify-center gap-2" href={orderUrl} target="__blank">
+                                    Get access
+                                    <SquareArrowOutUpRight className="w-4 h-4" />
+                                </a>
+                            </li>
+                    )}
                     { webEditorUrl && (
                         <li class="mt-2">
                             <a class="btn btn-primary !flex items-center justify-center gap-2" href={webEditorUrl} target="__blank">
