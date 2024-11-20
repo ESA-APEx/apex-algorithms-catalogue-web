@@ -1,43 +1,56 @@
 ---
-import { Markdown } from '@astropub/md';
-import { Info, Globe, SquareArrowOutUpRight } from 'lucide-react';
-import { Badge } from '../../components/react/Badge';
-import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
-import { ClipboardButton } from '../../components/react/ClipboardButton';
+import {Markdown} from '@astropub/md';
+import {Info, Globe, SquareArrowOutUpRight} from 'lucide-react';
+import {Badge} from '../../components/react/Badge';
+import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
+import {ClipboardButton} from '../../components/react/ClipboardButton';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { loadCatalogueDetailData } from '../../lib/load-catalogue';
-import { getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl } from '../../lib/utils';
-import { generateToC } from '../../lib/toc-generator';
-import { CatalogueDetailParametersTable } from '../../components/react/CatalogueDetailParametersTable';
+import {loadCatalogueDetailData} from '../../lib/load-catalogue';
+import {getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl} from '../../lib/utils';
+import {generateToC} from '../../lib/toc-generator';
+import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
 
-import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
-import type { ToCElement } from '../../types/models/catalogue';
+import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
+import type {ToCElement} from '../../types/models/catalogue';
 
 export const prerender = true;
 
-export const getStaticPaths = (async () => { 
+export const getStaticPaths = (async () => {
     const data = await loadCatalogueDetailData()
     const result = []
 
     for (const item of data) {
-        const { algorithm, udp } = item
-        const description = resolveImageUrlsFromMarkdown(udp.description, algorithm.id)
-        const toc = (await generateToC(description)).result as ToCElement[]
-        result.push({
-            params: { id: item.algorithm.id },
-            props: {
-                data: {
-                    algorithm,
-                    udp: {
-                        ...udp,
-                        description,
-                    }
-                }, 
-                toc,
-            }
-        })
+        const {algorithm, udp} = item
+        if (udp) {
+            const description = resolveImageUrlsFromMarkdown(udp.description, algorithm.id);
+            const toc = (await generateToC(description)).result as ToCElement[]
+            result.push({
+                params: {id: item.algorithm.id},
+                props: {
+                    data: {
+                        algorithm,
+                        udp,
+                    },
+                    description,
+                    toc,
+                }
+            })
+        } else {
+            const description = algorithm.properties.description;
+            const toc = (await generateToC(description)).result as ToCElement[]
+            result.push({
+                params: {id: item.algorithm.id},
+                props: {
+                    data: {
+                        algorithm,
+                    },
+                    description,
+                    toc
+                }
+            })
+        }
     }
 
     return result;
@@ -45,7 +58,7 @@ export const getStaticPaths = (async () => {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data, toc } = Astro.props;
+const { data, toc, description } = Astro.props;
 const { udp, algorithm } = data;
 
 const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
@@ -77,7 +90,7 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                     <CatalogueDetailActions data={algorithm} toc={toc} client:idle />
                 </header>
                 <Prose>
-                    <Markdown of={udp.description} />
+                    <Markdown of={description}/>
                 </Prose>
                 <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
@@ -99,7 +112,7 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                             </li>
                         ))}
                     </ul>
-                    <CatalogueDetailParametersTable udp={udp} />
+                    {udp && <CatalogueDetailParametersTable udp={udp}/> }
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">

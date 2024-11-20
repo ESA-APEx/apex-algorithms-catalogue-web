@@ -3,7 +3,7 @@ import type { UDP } from "./udp";
 
 export interface Catalogue {
     algorithm: Algorithm
-    udp: UDP
+    udp?: UDP
 }
 
 export interface ToCElement {

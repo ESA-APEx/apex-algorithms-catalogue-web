@@ -69,6 +69,10 @@ export const loadCatalogueDetailData = async () => {
                   algorithm,
                   udp,
                 })
+            } else {
+                data.push({
+                    algorithm
+                })
             }
         } catch (_err) {
             // do nothing
