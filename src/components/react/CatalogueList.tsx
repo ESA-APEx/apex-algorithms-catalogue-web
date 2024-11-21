@@ -22,6 +22,7 @@ import {
   MultiSelectorList,
   MultiSelectorItem,
 }  from './MultiSelect'
+import { generateUniqueOptions } from '../../lib/utils'
 
 interface CatalogueListProps {
     catalogues: Algorithm[]
@@ -84,43 +85,22 @@ const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: 
     return catalogues;
 }
 
-const getCataloguesLabels = (catalogues: Algorithm[]) => {
+const getCataloguesFilterList = (catalogues: Algorithm[]) => {
     let labels: string[] = []
+    const licenses: string[] = []
+    const types: string[] = []
+
     for (const catalogue of catalogues) {
         labels = [...labels, ...catalogue.properties.keywords.map(keyword => keyword.toLowerCase())] 
-    }
-    return labels
-        .filter((value, index, arr) => arr.indexOf(value) === index)
-        .map(label => ({
-            label: label,
-            value: label,
-        }))
-}
-
-const getCataloguesLicenses = (catalogues: Algorithm[]) => {
-    let licenses: string[] = []
-    for (const catalogue of catalogues) {
         licenses.push(catalogue.properties.license) 
-    }
-    return licenses
-        .filter((value, index, arr) => arr.indexOf(value) === index)
-        .map(label => ({
-            label: label,
-            value: label,
-        }))
-}
-
-const getCataloguesTypes = (catalogues: Algorithm[]) => {
-    let types: string[] = []
-    for (const catalogue of catalogues) {
         types.push(catalogue.type)
     }
-    return types
-        .filter((value, index, arr) => arr.indexOf(value) === index)
-        .map(label => ({
-            label: label,
-            value: label,
-        }))
+
+    return {
+        labels: generateUniqueOptions(labels),
+        licenses: generateUniqueOptions(licenses),
+        types: generateUniqueOptions(types),
+    }
 }
 
 export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
@@ -129,9 +109,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     const [filterByLabels, setFilterByLabels] = useState<string[]>([])
     const [filterByLicenses, setFilterByLicenses] = useState<string[]>([])
     const [filterByTypes, setFilterByTypes] = useState<string[]>([])
-    const labels = getCataloguesLabels(catalogues)
-    const licenses = getCataloguesLicenses(catalogues)
-    const types = getCataloguesTypes(catalogues)
+    const {labels, licenses, types} = getCataloguesFilterList(catalogues)
+
     const data = searchAndSortFilterCatalogues({
         query, 
         sortBy, 
