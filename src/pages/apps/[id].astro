@@ -23,34 +23,23 @@ export const getStaticPaths = (async () => {
 
     for (const item of data) {
         const {algorithm, udp} = item
-        if (udp) {
-            const description = resolveImageUrlsFromMarkdown(udp.description, algorithm.id);
-            const toc = (await generateToC(description)).result as ToCElement[]
-            result.push({
-                params: {id: item.algorithm.id},
-                props: {
-                    data: {
-                        algorithm,
-                        udp,
-                    },
-                    description,
-                    toc,
-                }
-            })
-        } else {
-            const description = algorithm.properties.description;
-            const toc = (await generateToC(description)).result as ToCElement[]
-            result.push({
-                params: {id: item.algorithm.id},
-                props: {
-                    data: {
-                        algorithm,
-                    },
-                    description,
-                    toc
-                }
-            })
-        }
+
+        const description = !!udp ? 
+            resolveImageUrlsFromMarkdown(udp.description, algorithm.id) : 
+            algorithm.properties.description;
+
+        const toc = (await generateToC(description)).result as ToCElement[]
+        result.push({
+            params: {id: item.algorithm.id},
+            props: {
+                data: {
+                    algorithm,
+                    udp,
+                },
+                description,
+                toc,
+            }
+        })
     }
 
     return result;
