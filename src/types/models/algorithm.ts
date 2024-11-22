@@ -20,7 +20,7 @@ export interface Properties {
   languages: Language2[]
   contacts: Contact[]
   themes: Theme[]
-  formats: string[]
+  formats: Format[]
   license: string
 }
 
@@ -52,6 +52,10 @@ export interface Link {
 export interface Theme {
   concepts: Concept[]
   scheme: string
+}
+
+export interface Format {
+  name: string;
 }
 
 export interface Concept {

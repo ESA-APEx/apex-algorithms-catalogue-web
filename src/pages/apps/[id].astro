@@ -152,7 +152,7 @@ const documentationUrl = algorithm.links.find(link => link.rel === 'documentatio
                     </li>
                     <li>
                         <div class="text-white mb-1">Format</div>
-                        <div>{algorithm.properties.formats.join(', ')}</div>
+                        <div>{algorithm.properties.formats.map(f => f.name).join(', ')}</div>
                     </li>
                     <li>
                         <div class="text-white mb-1">License</div>
