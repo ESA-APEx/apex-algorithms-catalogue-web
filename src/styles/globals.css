@@ -85,7 +85,7 @@
     --apex-text-2xl: 1.75rem;
     --apex-text-xl: 1.5rem;
     --apex-text-lg: 1.25rem;
-    --apex-text-base: 1rem;
+    --apex-text-base: 1.1rem;
     --apex-text-sm: 0.875rem;
     --apex-text-xs: 0.75rem;
 
@@ -198,10 +198,6 @@ body.has-hamburger-open {
 }
 
 /* Navbar and footer styling (taken from the APEx's main website) */
-
-.c-header__search {
-  @apply hidden;
-}
 
 .visually-hidden {
   @apply hidden;
@@ -432,7 +428,7 @@ body.has-hamburger-open {
   padding: 0;
   margin: 0;
 }
-.c-header__nav a {
+.c-header__nav a.menu-link {
   position: relative;
   display: block;
   padding-inline: 1rem;
@@ -651,6 +647,14 @@ body.has-hamburger-open {
 }
 .c-footer__legal a:hover {
   opacity: 1;
+}
+.c-footer__legal ul {
+  display: flex;
+  align-items: left;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .navbar {
@@ -1240,10 +1244,6 @@ li.has-children:hover > .c-sub-menu.c-sub-menu--basic {
   border-radius: .25rem;
   transition: all .2s;
 
-  @include media-breakpoint-up(xl) {
-    grid-column: span 3;
-  }
-
   &:hover {
     box-shadow: .15rem .15rem .6rem rgba(0, 0, 0, .15);
   }
@@ -1275,6 +1275,12 @@ li.has-children:hover > .c-sub-menu.c-sub-menu--basic {
     margin-block-end: 0;
     opacity: .5;
   }
+}
+
+@media (min-width: 1200px) {
+    .c-sub-menu__item {
+        grid-column: span 3;
+    }
 }
 
 .btn {
@@ -1400,7 +1406,19 @@ fieldset:disabled .btn {
   font-weight: 700;
   line-height: 1.2;
 }
-
+.btn--arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn--arrow::after {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 10px;
+  background-repeat: no-repeat;
+  background-image: url(/icons/arrow_right_alt.svg);
+}
 .btn-link {
   --apex-bs-btn-font-weight: 400;
   --apex-bs-btn-color: var(--apex-bs-link-color);
