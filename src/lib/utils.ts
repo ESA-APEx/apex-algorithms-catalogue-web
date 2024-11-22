@@ -24,6 +24,14 @@ export function linkTo(slug: string) {
   return `${BASE_PATH}/${slug}`;
 }
 
+export function generateUniqueOptions(arr: string[]) {
+  return arr.filter((value, index, arr) => arr.indexOf(value) === index)
+    .map(label => ({
+        label: label,
+        value: label,
+    }))
+}
+
 export function resolveImageUrlsFromMarkdown(text: string, algorithmId: string) {
     const imagePattern = /!\[.*?\]\((\.?\.?\/?\S+)\.(jpg|jpeg|png|gif|bmp|svg|webp)\)/gi;
 

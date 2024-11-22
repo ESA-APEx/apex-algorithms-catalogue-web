@@ -16,6 +16,6 @@ test.describe('HomePage', () => {
 
         const card = page.getByText('ESA worldcereal global maize detector').first()
         await card.click()
-        await page.waitForURL('**/apps/worldcereal_inference');
+        await page.waitForURL('**/apps/worldcereal_crop_extent');
     })
 })

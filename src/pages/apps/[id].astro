@@ -1,40 +1,42 @@
 ---
-import { Markdown } from '@astropub/md';
-import { Info, Globe, SquareArrowOutUpRight } from 'lucide-react';
-import { Badge } from '../../components/react/Badge';
-import { CatalogueDetailActions } from '../../components/react/CatalogueDetailActions';
-import { ClipboardButton } from '../../components/react/ClipboardButton';
+import {Markdown} from '@astropub/md';
+import {Info, Globe, SquareArrowOutUpRight} from 'lucide-react';
+import {Badge} from '../../components/react/Badge';
+import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
+import {ClipboardButton} from '../../components/react/ClipboardButton';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { loadCatalogueDetailData } from '../../lib/load-catalogue';
-import { getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl } from '../../lib/utils';
-import { generateToC } from '../../lib/toc-generator';
-import { CatalogueDetailParametersTable } from '../../components/react/CatalogueDetailParametersTable';
+import {loadCatalogueDetailData} from '../../lib/load-catalogue';
+import {getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl} from '../../lib/utils';
+import {generateToC} from '../../lib/toc-generator';
+import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
 
-import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
-import type { ToCElement } from '../../types/models/catalogue';
+import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
+import type {ToCElement} from '../../types/models/catalogue';
 
 export const prerender = true;
 
-export const getStaticPaths = (async () => { 
+export const getStaticPaths = (async () => {
     const data = await loadCatalogueDetailData()
     const result = []
 
     for (const item of data) {
-        const { algorithm, udp } = item
-        const description = resolveImageUrlsFromMarkdown(udp.description, algorithm.id)
+        const {algorithm, udp} = item
+
+        const description = !!udp ? 
+            resolveImageUrlsFromMarkdown(udp.description, algorithm.id) : 
+            algorithm.properties.description;
+
         const toc = (await generateToC(description)).result as ToCElement[]
         result.push({
-            params: { id: item.algorithm.id },
+            params: {id: item.algorithm.id},
             props: {
                 data: {
                     algorithm,
-                    udp: {
-                        ...udp,
-                        description,
-                    }
-                }, 
+                    udp,
+                },
+                description,
                 toc,
             }
         })
@@ -45,19 +47,22 @@ export const getStaticPaths = (async () => {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data, toc } = Astro.props;
+const { data, toc, description } = Astro.props;
 const { udp, algorithm } = data;
 
 const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
 
-const executionInfoLinksRel = ['openeo-process', 'service']
+const executionInfoLinksRel = ['openeo-process', 'service', 'application']
 const executionInfoLabels: Record<string, string> = {
-    service: 'openEO Backend'
+    service: udp ? 'openEO Backend' : 'OGC API Process',
+    application: udp ? '' : 'CWL definition'
 }
 
 const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
 const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
 const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
+const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
+const documentationUrl = algorithm.links.find(link => link.rel === 'documentation')?.href
 
 ---
 
@@ -65,28 +70,28 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
     <aside class="block px-4 my-8">
         <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto" />
     </aside>
- 
+
 	<article class="flex-1 px-4 my-14">
        <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
             <section class="flex-1">
                 <header class="mb-12">
-                    <p class="text-brand-teal-50 mb-6">OpenEO</p>
+                    <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
                     <h1 class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50 break-words text-balance">
                         {algorithm.properties.title}
                     </h1>
                     <CatalogueDetailActions data={algorithm} toc={toc} client:idle />
                 </header>
                 <Prose>
-                    <Markdown of={udp.description} />
+                    <Markdown of={description}/>
                 </Prose>
                 <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
-                        Execution information                             
-                        <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
+                        Execution information
+                        { udp && <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
                             <a href={UDP_DOCS_URL} target="__blank" class="text-white inline-block rounded-full hover:bg-brand-teal-50/20" >
                                 <Info className="w-4 h-4" />
                             </a>
-                        </div>
+                        </div> }
                     </h2>
                     <ul class="flex flex-col gap-2 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
@@ -99,7 +104,7 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                             </li>
                         ))}
                     </ul>
-                    <CatalogueDetailParametersTable udp={udp} />
+                    {udp && <CatalogueDetailParametersTable udp={udp}/> }
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
@@ -110,15 +115,8 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                             <li class="w-full md:w-1/4">
                                 <div>
                                     <p class="text-white text-lg">{contact.name}</p>
-                                    <div class="flex gap-1">
-                                        {contact.organization && (
-                                            <Fragment>
-                                                <p class="text-white">{contact.organization}</p>
-                                                <span class="text-brand-teal-50">•</span>
-                                            </Fragment>
-                                        )}
-                                        {contact.position && (<p>{contact.position}</p>)}
-                                    </div>
+                                    {contact.organization && (<p class="text-white">{contact.organization}</p>)}
+                                    {contact.position && (<p>{contact.position}</p>)}
                                     <p class="mt-1 text-sm mb-2">{contact.roles.join(', ')}</p>
                                     <div class="flex gap-2">
                                         {contact.links.map(link => (
@@ -164,6 +162,22 @@ const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algo
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
                     </li>
+                    { documentationUrl && (
+                            <li class="mt-2">
+                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={documentationUrl} target="__blank">
+                                    Open documentation
+                                    <SquareArrowOutUpRight className="w-4 h-4" />
+                                </a>
+                            </li>
+                    )}
+                    { orderUrl && (
+                            <li class="mt-2">
+                                <a class="btn btn-primary !flex items-center justify-center gap-2" href={orderUrl} target="__blank">
+                                    Request access
+                                    <SquareArrowOutUpRight className="w-4 h-4" />
+                                </a>
+                            </li>
+                    )}
                     { webEditorUrl && (
                         <li class="mt-2">
                             <a class="btn btn-primary !flex items-center justify-center gap-2" href={webEditorUrl} target="__blank">

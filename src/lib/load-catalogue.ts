@@ -33,6 +33,10 @@ const fetchJson = (url: string) => {
   });
 }
 
+const getAlgorithmType = (algorithm: Algorithm) => {
+   return !!algorithm.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
+}
+
 export const loadCatalogueData = () => {
     const jsonsInDir = 
         fs.readdirSync(CATALOGUE_JSON_DIR)
@@ -42,7 +46,10 @@ export const loadCatalogueData = () => {
 
     jsonsInDir.forEach(file => {
         const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
-        const json = JSON.parse(fileData.toString());
+        const json: Algorithm = JSON.parse(fileData.toString());
+
+        json.type = getAlgorithmType(json);
+
         data.push(json)
     });
 
@@ -60,11 +67,18 @@ export const loadCatalogueDetailData = async () => {
         try {
             const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Algorithm;
             const udpUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
+
+            algorithm.type = getAlgorithmType(algorithm);
+
             if (udpUrl) {
                 const udp = await fetchJson(udpUrl.replace('main', SOURCE_BRANCH)) as UDP;
                 data.push({
                   algorithm,
                   udp,
+                })
+            } else {
+                data.push({
+                    algorithm
                 })
             }
         } catch (_err) {
