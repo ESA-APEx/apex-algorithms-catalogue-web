@@ -28,7 +28,7 @@ export const getStaticPaths = (async () => {
             resolveImageUrlsFromMarkdown(udp.description, algorithm.id) : 
             algorithm.properties.description;
 
-        const toc = (await generateToC(description)).result as ToCElement[]
+        const toc = (await generateToC(description, algorithm.links)) as ToCElement[]
         result.push({
             params: {id: item.algorithm.id},
             props: {
@@ -63,6 +63,7 @@ const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
 const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
 const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
 const documentationUrl = algorithm.links.find(link => link.rel === 'documentation')?.href
+const previews = algorithm.links.filter(link => link.rel === 'preview');
 
 ---
 
@@ -84,6 +85,20 @@ const documentationUrl = algorithm.links.find(link => link.rel === 'documentatio
                 <Prose>
                     <Markdown of={description}/>
                 </Prose>
+                { previews && <section class="text-white mb-8">
+                    <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="preview-information">
+                       Preview
+                    </h2>
+                    <ul class="flex flex-col gap-2 mb-6">
+                        {previews.filter(link => ['image/png'].includes(link.type || '')).map(link => (
+                                <div class="mb-5">
+                                    <img src={link.href}  alt={link.title}/>
+                                    <p class="text-sm text-gray-400 mt-2 text-center"> {link.title}</p>
+                                </div>
+                        ))}
+                    </ul>
+                </section>
+                }
                 <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
                         Execution information
