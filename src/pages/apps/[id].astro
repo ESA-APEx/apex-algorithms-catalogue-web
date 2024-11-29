@@ -85,7 +85,7 @@ const previews = algorithm.links.filter(link => link.rel === 'preview');
                 <Prose>
                     <Markdown of={description}/>
                 </Prose>
-                { previews && <section class="text-white mb-8">
+                { previews.length > 0 && <section class="text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="preview-information">
                        Preview
                     </h2>
