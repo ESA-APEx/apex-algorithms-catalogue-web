@@ -1268,7 +1268,7 @@ li.has-children:hover > .c-sub-menu.c-sub-menu--basic {
     position: static;
     padding: 0;
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 400;
   }
 
   p {
