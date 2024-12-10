@@ -63,6 +63,7 @@ const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
 const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
 const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
 const documentationUrl = algorithm.links.find(link => link.rel === 'documentation')?.href
+const eulaUrl = algorithm.links.find(link => link.rel === 'eula')?.href
 const previews = algorithm.links.filter(link => link.rel === 'preview');
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || webEditorUrl;
 
@@ -174,6 +175,11 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || w
                         <div class="text-white mb-1">License</div>
                         <div>{algorithm.properties.license}</div>
                     </li>
+                    { eulaUrl && <li>
+                        <div class="text-white mb-1">Legal</div>
+                        <div><a class="underline" href={eulaUrl} target="__blank">License Agreement</a></div>
+                    </li>
+                    }
                     <li>
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
