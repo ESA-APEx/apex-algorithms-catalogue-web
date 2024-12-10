@@ -20,7 +20,7 @@ export const Card = ({ title, type,  body, href, labels }: CardProps) => {
     const truncatedBody = truncateBody(body);
     return (
         <a href={href}>
-            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10">
+            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-96">
                 <div className="card-header mb-2">
                     <span className="text-sm">{type}</span>
                 </div>
