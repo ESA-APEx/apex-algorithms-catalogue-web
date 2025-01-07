@@ -35,4 +35,4 @@ jobs:
           tofu init
           tofu apply -auto-approve
       - name: Deploy
-        run: helm upgrade algorithms-catalogue-web . --install --namespace="$NAMESPACE"
+        run: helm --insecure-skip-tls-verify upgrade algorithms-catalogue-web . --install --namespace="$NAMESPACE"
