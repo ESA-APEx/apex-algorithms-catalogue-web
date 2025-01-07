@@ -11,6 +11,13 @@ export default {
 			'2xl': '1440px',
 		},
     	extend: {
+			typography: (theme) => ({
+				DEFAULT: {
+					css: {
+						lineHeight: '1.5rem'
+					},
+				},
+			}),
     		colors: {
     			'brand-teal': {
     				'10': '#f3f7f8',
