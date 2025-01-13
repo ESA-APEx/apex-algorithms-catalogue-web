@@ -28,7 +28,7 @@ async function main() {
 
     writeToFile(`<nav class="text-white w-full max-w-screen-2xl mx-auto px-3">${resolveExternalUrls(header, MAIN_SITE_URL)}</nav>`, HEADER_FILENAME);
     writeToFile(`<aside class="c-sidebar js-hamburger-menu" data-once="hamburgerMenu">${resolveExternalUrls(menu, MAIN_SITE_URL)}</aside>`, HAMBURGER_MENU_FILENAME)
-    writeToFile(`<footer class="text-white w-full max-w-screen-2xl mx-auto"><div class="px-4 2xl:px-0">${resolveExternalUrls(footer, MAIN_SITE_URL)}</div></footer>`, FOOTER_FILENAME);
+    writeToFile(`<footer class="text-white w-full max-w-screen-2xl mx-auto px-3">${resolveExternalUrls(footer, MAIN_SITE_URL)}</footer>`, FOOTER_FILENAME);
 
     await browser.close();
 }
