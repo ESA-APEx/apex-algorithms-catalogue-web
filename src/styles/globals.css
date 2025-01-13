@@ -452,7 +452,7 @@ body.has-hamburger-open {
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  background-image: url("https://apex-esa.drupal.int.vito.be/themes/custom/vitotheme/dist/img/icons/icon-caret-down-blue.svg");
+  background-image: url("/icons/icon-caret-down-blue.svg");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
