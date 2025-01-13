@@ -73,7 +73,6 @@ jobs:
         with:
           token: ${{ github.token }}
           fromTag: ${{ steps.semver.outputs.current }}
-          toTag: ${{ steps.semver.outputs.next }}
       - name: Create release tag
         uses: ncipollo/release-action@v1.12.0
         if: ${{ steps.semver.outputs.next != null }}
