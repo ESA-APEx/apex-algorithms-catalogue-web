@@ -141,7 +141,9 @@
     @apply overflow-x-hidden;
     font-family: "NotesEsa", system-ui, sans-serif;
     background: #043346;
-    font-size: 16px;
+    font-size: var(--apex-text-base);
+    padding-top: 16px;
+    line-height: 1.25;
   }
   .bg-container {
     @apply flex flex-col relative w-full overflow-hidden;
@@ -1204,6 +1206,7 @@ li.has-children:hover > .c-sub-menu.c-sub-menu--basic {
   display: grid;
   background-color: var(--apex-white);
   padding: 4.5rem 2.5rem;
+  width: 100%;
 }
 
 .c-sub-menu__content {
@@ -1373,7 +1376,6 @@ fieldset:disabled .btn {
   background-color: var(--apex-lightgreen);
   color: var(--apex-white);
   font-size: var(--apex-text-base);
-  font-weight: 700;
   line-height: 1.2;
 }
 .btn-primary:hover {
