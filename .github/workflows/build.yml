@@ -59,6 +59,12 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
       - name: Get next version
         id: semver
         uses: ietf-tools/semver-action@v1
@@ -75,8 +81,14 @@ jobs:
           draft: false
           makeLatest: true
           tag: ${{ steps.semver.outputs.next }}
-          body: Changelog Contents
+          body: ${{ steps.changelog.outputs.changes }}
           token: ${{ github.token }}
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
 
   build-docker:
     needs: [release]
