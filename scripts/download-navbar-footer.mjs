@@ -3,7 +3,7 @@ import path from 'path';
 import { chromium } from "@playwright/test";
 import * as cheerio from 'cheerio';
 
-const MAIN_SITE_URL = 'https://apex.staging.vito.be/';
+const MAIN_SITE_URL = 'https://apex.esa.int/';
 const HEADER_SELECTOR = 'header';
 const FOOTER_SELECTOR = 'footer';
 const HAMBURGER_MENU_SELECTOR = '.js-hamburger-menu';
