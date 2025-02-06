@@ -5,7 +5,7 @@ provider "opentelekomcloud" {
 }
 
 data "opentelekomcloud_cce_cluster_v3" "cluster" {
-  name = "development"
+  name = "production"
 }
 
 data "opentelekomcloud_cce_cluster_kubeconfig_v3" "this" {
