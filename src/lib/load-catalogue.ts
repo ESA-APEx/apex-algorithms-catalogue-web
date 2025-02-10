@@ -39,8 +39,8 @@ const getAlgorithmType = (algorithm: Algorithm) => {
 
 export const loadCatalogueData = () => {
     const jsonsInDir = 
-        fs.readdirSync(CATALOGUE_JSON_DIR)
-            .filter(file => path.extname(file) === '.json');    
+        fs.readdirSync(CATALOGUE_JSON_DIR, { recursive: true})
+            .filter(file => file.toString().endsWith('.json') && file.toString().includes('/records'));
    
     const data: Algorithm[] = [];
 
