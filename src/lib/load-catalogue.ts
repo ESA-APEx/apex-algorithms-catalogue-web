@@ -1,47 +1,50 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-import { SOURCE_BRANCH } from '../config';
-import type { Algorithm } from '../types/models/algorithm';
-import type { Catalogue } from '../types/models/catalogue';
-import type { UDP } from '../types/models/udp';
+import {SOURCE_BRANCH} from '../config';
+import type {Algorithm} from '../types/models/algorithm';
+import type {Catalogue} from '../types/models/catalogue';
+import type {UDP} from '../types/models/udp';
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
 
 const fetchJson = (url: string) => {
-  return new Promise<any>((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = '';
+    return new Promise<any>((resolve, reject) => {
+        https.get(url, (res) => {
+            let data = '';
 
-      // Collect data chunks
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
+            // Collect data chunks
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
 
-      // On end, resolve the promise with parsed JSON
-      res.on('end', () => {
-        try {
-          const jsonData = JSON.parse(data);
-          resolve(jsonData);
-        } catch (error) {
-          reject(`Error parsing JSON: ${error}`);
-        }
-      });
-    }).on('error', (err) => {
-      reject(`Error fetching JSON: ${err.message}`);
+            // On end, resolve the promise with parsed JSON
+            res.on('end', () => {
+                try {
+                    const jsonData = JSON.parse(data);
+                    resolve(jsonData);
+                } catch (error) {
+                    reject(`Error parsing JSON: ${error}`);
+                }
+            });
+        }).on('error', (err) => {
+            reject(`Error fetching JSON: ${err.message}`);
+        });
     });
-  });
 }
 
 const getAlgorithmType = (algorithm: Algorithm) => {
-   return !!algorithm.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
+    return !!algorithm.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
 }
 
+const getServiceRecords = () =>
+    fs.readdirSync(CATALOGUE_JSON_DIR, {recursive: true})
+        .filter(file => file.toString().endsWith('.json') && file.toString().includes('/records'));
+
+
 export const loadCatalogueData = () => {
-    const jsonsInDir = 
-        fs.readdirSync(CATALOGUE_JSON_DIR, { recursive: true})
-            .filter(file => file.toString().endsWith('.json') && file.toString().includes('/records'));
-   
+    const jsonsInDir = getServiceRecords();
+
     const data: Algorithm[] = [];
 
     jsonsInDir.forEach(file => {
@@ -57,9 +60,7 @@ export const loadCatalogueData = () => {
 }
 
 export const loadCatalogueDetailData = async () => {
-    const jsonsInDir = 
-        fs.readdirSync(CATALOGUE_JSON_DIR)
-            .filter(file => path.extname(file) === '.json');
+    const jsonsInDir = getServiceRecords();
 
     const data: Catalogue[] = [];
 
@@ -73,8 +74,8 @@ export const loadCatalogueDetailData = async () => {
             if (udpUrl) {
                 const udp = await fetchJson(udpUrl.replace('main', SOURCE_BRANCH)) as UDP;
                 data.push({
-                  algorithm,
-                  udp,
+                    algorithm,
+                    udp,
                 })
             } else {
                 data.push({
@@ -82,7 +83,7 @@ export const loadCatalogueDetailData = async () => {
                 })
             }
         } catch (_err) {
-            // do nothing
+            console.error(`Could not load data for ${file}`, _err);
         }
     }
 
