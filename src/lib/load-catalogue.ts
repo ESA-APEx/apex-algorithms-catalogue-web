@@ -37,9 +37,10 @@ const getAlgorithmType = (algorithm: Algorithm) => {
     return !!algorithm.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
 }
 
-const getServiceRecords = () =>
+const getServiceRecords = (): string[] =>
     fs.readdirSync(CATALOGUE_JSON_DIR, {recursive: true})
-        .filter(file => file.toString().endsWith('.json') && file.toString().includes('/records'));
+        .map((file: string | Buffer) => file.toString())
+        .filter((file: string) => file.toString().endsWith('.json') && file.toString().includes('/records'));
 
 
 export const loadCatalogueData = () => {
