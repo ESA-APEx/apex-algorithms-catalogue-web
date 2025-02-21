@@ -8,25 +8,46 @@ import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import {loadCatalogueDetailData} from '../../lib/load-catalogue';
-import {getDate, resolveImageUrlsFromMarkdown, generateWebEditorUrl} from '../../lib/utils';
+import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
 import type {ToCElement} from '../../types/models/catalogue';
+import {AlgorithmType} from "../../types/models/algorithm";
 
 export const prerender = true;
+
+export const getExecutionInfo = (type: AlgorithmType) => {
+    switch (type) {
+
+        case AlgorithmType.OPENEO:
+            return {
+                service: 'openEO Backend',
+                application: 'openEO Process'
+            }
+        case AlgorithmType.OGC_API_PROCESS:
+            return {
+                service: 'OGC API Process',
+                application: 'CWL Definition'
+            }
+        default:
+            return {
+                service: 'Unknown',
+                application: 'Unknown'
+
+            }
+    }
+}
 
 export const getStaticPaths = (async () => {
     const data = await loadCatalogueDetailData()
     const result = []
 
     for (const item of data) {
-        const {algorithm, udp} = item
+        const {algorithm, applicationDetails} = item
 
-        const description = !!udp ? 
-            resolveImageUrlsFromMarkdown(udp.description, algorithm.id) : 
-            algorithm.properties.description;
+        const description = applicationDetails?.description || algorithm.properties.description;
 
         const toc = (await generateToC(description, algorithm.links)) as ToCElement[]
         result.push({
@@ -34,7 +55,7 @@ export const getStaticPaths = (async () => {
             props: {
                 data: {
                     algorithm,
-                    udp,
+                    applicationDetails
                 },
                 description,
                 toc,
@@ -47,25 +68,20 @@ export const getStaticPaths = (async () => {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data, toc, description } = Astro.props;
-const { udp, algorithm } = data;
+const {data, toc, description} = Astro.props;
+const {applicationDetails, algorithm} = data;
 
 const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
 
-const executionInfoLinksRel = ['openeo-process', 'service', 'application']
-const executionInfoLabels: Record<string, string> = {
-    service: udp ? 'openEO Backend' : 'OGC API Process',
-    application: udp ? '' : 'CWL definition'
-}
+const executionInfoLinksRel = ['service', 'application'];
+const executionInfoLabels: Record<string, string> = getExecutionInfo(algorithm.type);
 
-const processUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
-const backendServer = algorithm.links.find(link => link.rel === 'service')?.href
-const webEditorUrl = !!processUrl && !!backendServer ? generateWebEditorUrl(algorithm.id, processUrl, backendServer) : null
 const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
-const documentationUrl = algorithm.links.find(link => link.rel === 'documentation')?.href
-const eulaUrl = algorithm.links.find(link => link.rel === 'eula')?.href
+const documentationUrl = algorithm.links.find(link => link.rel === 'about')?.href
+const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
+const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
 const previews = algorithm.links.filter(link => link.rel === 'preview');
-const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || webEditorUrl;
+const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 
 ---
 
@@ -104,13 +120,13 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || w
                 <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
                     <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
                         Execution information
-                        { udp && <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
+                        { applicationDetails && algorithm.type === AlgorithmType.OPENEO && <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
                             <a href={UDP_DOCS_URL} target="__blank" class="text-white inline-block rounded-full hover:bg-brand-teal-50/20" >
                                 <Info className="w-4 h-4" />
                             </a>
                         </div> }
                     </h2>
-                    <ul class="flex flex-col gap-2 mb-6">
+                    <ul class="flex flex-col gap-5 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
                                     <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
@@ -121,7 +137,7 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || w
                             </li>
                         ))}
                     </ul>
-                    {udp && <CatalogueDetailParametersTable udp={udp}/> }
+                    {applicationDetails && <CatalogueDetailParametersTable details={applicationDetails}/> }
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
@@ -192,6 +208,14 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || w
                                 </a>
                             </li>
                     )}
+                    { codeUrl && (
+                            <li class="mt-2">
+                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={codeUrl} target="__blank">
+                                    Show code repository
+                                    <SquareArrowOutUpRight className="w-4 h-4" />
+                                </a>
+                            </li>
+                    )}
                     { orderUrl && (
                             <li class="mt-2">
                                 <a class="btn btn-secondary !flex items-center justify-center gap-2" href={orderUrl} target="__blank">
@@ -206,7 +230,7 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href || w
                                     Execute service
                                     <SquareArrowOutUpRight className="w-4 h-4" />
                                 </a>
-                                { orderUrl && <div class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md">
+                                { orderUrl && <div class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md" data-testid="service-access-warning">
                                     <p class="flex items-center font-bold mb-2"><TriangleAlert className="w-4 h-4 mr-1" />Warning</p>
                                     <p>Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.</p>
                                 </div>

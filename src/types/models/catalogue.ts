@@ -1,9 +1,9 @@
 import type { Algorithm } from "./algorithm";
-import type { UDP } from "./udp";
+import type {ApplicationDetails} from "@/types/models/application.ts";
 
 export interface Catalogue {
     algorithm: Algorithm
-    udp?: UDP
+    applicationDetails?: ApplicationDetails;
 }
 
 export interface ToCElement {
