@@ -34,7 +34,20 @@ const fetchJson = (url: string) => {
 }
 
 const getAlgorithmType = (algorithm: Algorithm) => {
-    return !!algorithm.links.find(l => l.rel === 'openeo-process') ? 'openEO' : 'OGC API Process'
+    const applicationLink =  algorithm.links.find(l => l.rel === 'application')
+
+    if (!applicationLink) {
+        return 'Unknown';
+    }
+
+    switch (applicationLink.type){
+        case 'application/cwl+yaml':
+            return 'OGC API Process';
+        case 'application/vnd.openeo+json;type=process':
+            return 'openEO';
+        default:
+            return 'Unkown';
+    }
 }
 
 const getServiceRecords = (): string[] =>
