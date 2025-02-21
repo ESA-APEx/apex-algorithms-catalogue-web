@@ -126,7 +126,7 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                             </a>
                         </div> }
                     </h2>
-                    <ul class="flex flex-col gap-2 mb-6">
+                    <ul class="flex flex-col gap-5 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
                                     <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
