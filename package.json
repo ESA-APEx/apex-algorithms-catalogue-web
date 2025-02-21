@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "npm run build && playwright test",
+    "test:ui": "npm run build && playwright test --ui",
     "download-source": "node ./scripts/download-source.mjs",
     "download-navbar-footer": "node ./scripts/download-navbar-footer.mjs"
   },
