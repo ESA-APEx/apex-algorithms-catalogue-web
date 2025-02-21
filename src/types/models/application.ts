@@ -4,7 +4,7 @@ export interface Parameter {
     description: string
     schema: string;
     optional?: boolean
-    default?: string[]
+    default?: string | string[];
 }
 export interface ApplicationDetails {
     id: string

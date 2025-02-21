@@ -8,6 +8,7 @@ import {
 } from "./Table";
 
 import type {ApplicationDetails} from "@/types/models/application.ts";
+import {Markdown} from "@astropub/md";
 
 export interface CatalogueDetailParametersTableProps {
     details: ApplicationDetails
@@ -29,7 +30,7 @@ export const CatalogueDetailParametersTable = ({ details }: CatalogueDetailParam
                         <TableRow key={parameter.name}>
                             <TableCell>
                                 <p className="mb-1">{parameter.name} {!parameter?.optional && <span>(required)</span>}</p>
-                                <p className="text-sm text-gray-300">{parameter.description}</p>
+                                <p className="text-sm text-gray-300" dangerouslySetInnerHTML={{__html: parameter.description}}></p>
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-1">

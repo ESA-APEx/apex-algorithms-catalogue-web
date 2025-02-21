@@ -11,7 +11,7 @@ export interface Parameter {
   description: string
   schema: Schema
   optional?: boolean
-  default?: string[]
+  default?: string | string[]
 }
 
 export interface Schema {

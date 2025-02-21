@@ -7,6 +7,7 @@ import type {Catalogue} from '../types/models/catalogue';
 import type {UDP} from '../types/models/udp';
 import type {ApplicationDetails} from "@/types/models/application.ts";
 import { isArray } from 'util';
+import {markdown} from "@astropub/md";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
 
@@ -86,12 +87,14 @@ export const fetchOpenEOApplicationDetails = async (url: string): Promise<undefi
         id: udp.id,
         summary: udp.summary,
         description: udp.description,
-        parameters: udp.parameters.map(p => ({
+        parameters:udp.parameters.map(p => ({
             name: p.name,
-            description: p.description,
-            schema: Array.isArray(p.schema)? p.schema.filter(s => s.type && s.type !== 'null').map(s => !s.subtype ? s.type :  `${s.type}/${s.subtype}`).join(', ') : p.schema.type,
+            description: p.description.replaceAll('\\n', '<br/>'),
+            schema: Array.isArray(p.schema) ?
+                p.schema.filter(s => s.type && s.type !== 'null').map(s => !s.subtype ? s.type : `${s.type}/${s.subtype}`).join(', ') :
+                (p.schema.subtype ? `${p.schema.type}/${p.schema.subtype}` : p.schema.type),
             optional: p.optional,
-            default: p.default
+            default: !p.default ? undefined : p.default
         }))
     }
 }
