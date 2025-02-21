@@ -6,8 +6,6 @@ import {type Algorithm, AlgorithmType} from '../types/models/algorithm';
 import type {Catalogue} from '../types/models/catalogue';
 import type {UDP} from '../types/models/udp';
 import type {ApplicationDetails} from "@/types/models/application.ts";
-import { isArray } from 'util';
-import {markdown} from "@astropub/md";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
 

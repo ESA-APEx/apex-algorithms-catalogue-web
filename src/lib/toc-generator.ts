@@ -2,7 +2,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { visit } from "unist-util-visit";
 import type { ToCElement } from '../types/models/catalogue';
-import type {Link2} from "@/types/models/algorithm.ts";
+import type {Link} from "@/types/models/algorithm.ts";
 
 export async function generateContentToC(markdown: string) {
     const processor = unified()
@@ -12,7 +12,7 @@ export async function generateContentToC(markdown: string) {
     return await processor.process(markdown);
 }
 
-export function getLinksToc(links: Link2[]): ToCElement[] {
+export function getLinksToc(links: Link[]): ToCElement[] {
     const elements: ToCElement[] = [];
 
     if (links.find(link => link.rel === 'preview')) {
@@ -23,7 +23,7 @@ export function getLinksToc(links: Link2[]): ToCElement[] {
     return elements;
 }
 
-export async function generateToC(markdown: string, links: Link2[]): Promise<ToCElement[]> {
+export async function generateToC(markdown: string, links: Link[]): Promise<ToCElement[]> {
    const contentToc = (await generateContentToC(markdown)).result as ToCElement[];
    return [...contentToc, ...getLinksToc(links)];
 }
