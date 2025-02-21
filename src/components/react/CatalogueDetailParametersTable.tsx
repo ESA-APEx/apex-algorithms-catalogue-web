@@ -8,7 +8,6 @@ import {
 } from "./Table";
 
 import type {ApplicationDetails} from "@/types/models/application.ts";
-import {Markdown} from "@astropub/md";
 
 export interface CatalogueDetailParametersTableProps {
     details: ApplicationDetails
