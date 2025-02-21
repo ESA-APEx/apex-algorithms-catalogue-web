@@ -2,9 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 import {SOURCE_BRANCH} from '../config';
-import type {Algorithm} from '../types/models/algorithm';
+import {type Algorithm, AlgorithmType} from '../types/models/algorithm';
 import type {Catalogue} from '../types/models/catalogue';
 import type {UDP} from '../types/models/udp';
+import type {ApplicationDetails} from "@/types/models/application.ts";
+import { isArray } from 'util';
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
 
@@ -33,20 +35,21 @@ const fetchJson = (url: string) => {
     });
 }
 
-const getAlgorithmType = (algorithm: Algorithm) => {
-    const applicationLink =  algorithm.links.find(l => l.rel === 'application')
+
+const getAlgorithmType = (algorithm: Algorithm): AlgorithmType => {
+    const applicationLink = algorithm.links.find(l => l.rel === 'application')
 
     if (!applicationLink) {
-        return 'Unknown';
+        return AlgorithmType.NONE
     }
 
-    switch (applicationLink.type){
+    switch (applicationLink.type) {
         case 'application/cwl+yaml':
-            return 'OGC API Process';
+            return AlgorithmType.OGC_API_PROCESS;
         case 'application/vnd.openeo+json;type=process':
-            return 'openEO';
+            return AlgorithmType.OPENEO;
         default:
-            return 'Unkown';
+            return AlgorithmType.NONE
     }
 }
 
@@ -73,7 +76,45 @@ export const loadCatalogueData = () => {
     return data;
 }
 
-export const loadCatalogueDetailData = async () => {
+export const fetchOpenEOApplicationDetails = async (url: string): Promise<undefined | ApplicationDetails> => {
+    if (!url) {
+        return undefined;
+    }
+
+    const udp = await fetchJson(url) as UDP;
+    return {
+        id: udp.id,
+        summary: udp.summary,
+        description: udp.description,
+        parameters: udp.parameters.map(p => ({
+            name: p.name,
+            description: p.description,
+            schema: Array.isArray(p.schema)? p.schema.filter(s => s.type && s.type !== 'null').map(s => !s.subtype ? s.type :  `${s.type}/${s.subtype}`).join(', ') : p.schema.type,
+            optional: p.optional,
+            default: p.default
+        }))
+    }
+}
+
+export const fetchApplicationDetails = async (type: AlgorithmType, url: string): Promise<undefined | ApplicationDetails> => {
+    if (!url) {
+        return undefined;
+    }
+
+    try {
+        if (type === AlgorithmType.OPENEO) {
+            return fetchOpenEOApplicationDetails(url);
+        }  else {
+            return undefined;
+        }
+    } catch (e) {
+        console.error(`Could not retrieve application details for ${url} (${type})`, e);
+        return undefined;
+    }
+
+}
+
+export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
     const jsonsInDir = getServiceRecords();
 
     const data: Catalogue[] = [];
@@ -81,15 +122,15 @@ export const loadCatalogueDetailData = async () => {
     for (const file of jsonsInDir) {
         try {
             const algorithm = JSON.parse(fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()) as Algorithm;
-            const udpUrl = algorithm.links.find(link => link.rel === 'openeo-process')?.href
+            const applicationUrl = algorithm.links.find(link => link.rel === 'application')?.href
 
             algorithm.type = getAlgorithmType(algorithm);
 
-            if (udpUrl) {
-                const udp = await fetchJson(udpUrl.replace('main', SOURCE_BRANCH)) as UDP;
+            if (applicationUrl) {
+                const applicationDetails = await fetchApplicationDetails(algorithm.type, applicationUrl);
                 data.push({
                     algorithm,
-                    udp,
+                    applicationDetails,
                 })
             } else {
                 data.push({

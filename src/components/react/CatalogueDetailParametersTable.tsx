@@ -7,13 +7,13 @@ import {
   TableRow,
 } from "./Table";
 
-import type { UDP } from '../../types/models/udp';
+import type {ApplicationDetails} from "@/types/models/application.ts";
 
 export interface CatalogueDetailParametersTableProps {
-    udp: UDP
+    details: ApplicationDetails
 }
 
-export const CatalogueDetailParametersTable = ({ udp }: CatalogueDetailParametersTableProps) => {
+export const CatalogueDetailParametersTable = ({ details }: CatalogueDetailParametersTableProps) => {
     return (
         <>
             <Table className="bg-white bg-opacity-5 rounded-lg">
@@ -25,7 +25,7 @@ export const CatalogueDetailParametersTable = ({ udp }: CatalogueDetailParameter
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {udp.parameters.map((parameter) => (                           
+                    {details.parameters.map((parameter) => (
                         <TableRow key={parameter.name}>
                             <TableCell>
                                 <p className="mb-1">{parameter.name} {!parameter?.optional && <span>(required)</span>}</p>
@@ -33,7 +33,7 @@ export const CatalogueDetailParametersTable = ({ udp }: CatalogueDetailParameter
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-1">
-                                    <span>{parameter.schema.type}</span> 
+                                    <span>{parameter.schema}</span>
                                 </div>
                             </TableCell>
                             <TableCell>

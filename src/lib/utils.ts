@@ -31,25 +31,3 @@ export function generateUniqueOptions(arr: string[]) {
         value: label,
     }))
 }
-
-export function resolveImageUrlsFromMarkdown(text: string, algorithmId: string) {
-    const imagePattern = /!\[.*?\]\((\.?\.?\/?\S+)\.(jpg|jpeg|png|gif|bmp|svg|webp)\)/gi;
-
-    return text.replace(imagePattern, (_, path, extension) => {
-        const normalizedPath = path.replace('.', '').replace('/', '');
-        const url = new URL(`${algorithmId}_files/${normalizedPath}.${extension}`, `${BASE_IMAGE_DESCRIPTION_URL}`).href;
-        return `![${normalizedPath}](${url})`;
-    })
-}
-
-export function generateWebEditorUrl(algorithmId: string, processUrl: string, backendServer: string) {
-  const baseUrl = 'https://editor.openeo.org';
-
-  const url = new URL(baseUrl);
-  url.searchParams.set('wizard', 'UDP');
-  url.searchParams.set('wizard~process', algorithmId);
-  url.searchParams.set('wizard~processUrl', processUrl);
-  url.searchParams.set('server', backendServer);
-
-  return url.href;
-}

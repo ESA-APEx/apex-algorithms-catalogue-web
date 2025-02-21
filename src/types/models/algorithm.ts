@@ -1,10 +1,16 @@
+export enum AlgorithmType {
+  NONE = 'Unknown',
+  OPENEO = 'openEO',
+  OGC_API_PROCESS = 'OGC API Process',
+}
+
 export interface Algorithm {
   id: string
-  type: string
+  type: AlgorithmType
   conformsTo: string[]
   properties: Properties
   linkTemplates: any[]
-  links: Link2[]
+  links: Link[]
 }
 
 export interface Properties {
@@ -47,6 +53,7 @@ export interface Link {
   href: string
   rel: string
   type: string
+  title: string
 }
 
 export interface Theme {
@@ -60,11 +67,4 @@ export interface Format {
 
 export interface Concept {
   id: string
-}
-
-export interface Link2 {
-  rel: string
-  type?: string
-  title?: string
-  href: string
 }

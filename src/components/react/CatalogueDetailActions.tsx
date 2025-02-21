@@ -37,7 +37,7 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
     ]
     const [selectedSection, setSelectedSection] = useState<string>(sections[0].id);
     const ref = useRef({ isScrollIntoView: false });
-    const exampleLinks = data.links.filter(item => item.rel === 'example');
+    const exampleLinks = data.links.filter(item => item.rel === 'example-output');
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -122,7 +122,7 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
                                                                         href={new URL(link.href.replace('https://', '/external/'), BASE_STAC_BROWSER_URL).href} 
                                                                         target="__blank" 
                                                                         className="font-normal text-md">
-                                                                        Preview <span className="lowercase">{link.title}</span>
+                                                                        Preview - {link.title}
                                                                     </a>
                                                                 </>
                                                             ) :
@@ -134,7 +134,7 @@ export const CatalogueDetailActions = ({ data, toc }: CatalogueDetailActions) =>
                                                                         target="__blank" 
                                                                         download
                                                                         className="font-normal text-md">
-                                                                        Download output
+                                                                        Download - {link.title}
                                                                     </a>
                                                                 </>
                                                             )
