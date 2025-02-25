@@ -61,6 +61,9 @@ To deploy the website, follow these steps:
 - Change the image version here https://github.com/ESA-APEx/Terraform-Projects/blob/main/algorithms-catalogue-web/locals.tf. You can specify different versions for dev and prod envs.
 - Push the changes to the main branch. The deployment workflow will be running automatically.
 
+> - Prod url: https://algorithm-catalogue.apex.esa.int/
+> - Dev url: https://algorithm-catalogue.dev.apex.esa.int/ 
+
 ## Commands
 
 All commands are run from the root of the project, from a terminal:
