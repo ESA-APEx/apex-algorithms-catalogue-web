@@ -57,8 +57,9 @@ The [`Test & build`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/a
 
 To deploy the website, follow these steps:
 
-- Update the [`appVersion`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/blob/main/deployment/algorithms-catalogue-web/Chart.yaml#L6) and [version on `package.json`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/blob/main/package.json#L4) to the correct image version
-- Run the [`Deployment`](https://github.com/ESA-APEx/apex-algorithms-catalogue-web/actions/workflows/deployment.yml) workflow manually. The site URL is https://algorithms-catalogue.apex.esa.int/.
+- Go to this repo https://github.com/ESA-APEx/Terraform-Projects/.
+- Change the image version here https://github.com/ESA-APEx/Terraform-Projects/blob/main/algorithms-catalogue-web/locals.tf. You can specify different versions for dev and prod envs.
+- Push the changes to the main branch. The deployment workflow will be running automatically.
 
 ## Commands
 
