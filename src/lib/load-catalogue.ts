@@ -55,7 +55,10 @@ const getAlgorithmType = (algorithm: Algorithm): AlgorithmType => {
 const getServiceRecords = (): string[] =>
     fs.readdirSync(CATALOGUE_JSON_DIR, {recursive: true})
         .map((file: string | Buffer) => file.toString())
-        .filter((file: string) => file.endsWith('.json') && file.includes('/records'));
+        .filter((file: string) => 
+            file.endsWith('.json') && 
+            (file.includes('/records/') || file.includes('\\records\\')) // support linux and windows based path
+        );
 
 
 export const loadCatalogueData = () => {
