@@ -1,5 +1,5 @@
 export interface BenchmarkDetails {
-    scenario: string;
+    scenario_id: string;
     data: BenchmarkData[]
 }
 
@@ -9,18 +9,14 @@ export interface BenchmarkData {
     memory: number;
     duration: number;
     start_time: string;
+    input_pixel: number;
+    max_executor_memory: number;
+    network_received: number;
 }
 
 export interface BenchmarkSummary {
     runs: number;
-    cpu_avg: number;
-    cpu_stddev_samp: number;
-    cpu_stddev_pop: number;
-    duration_avg: number;
-    cost_avg: number;
     scenario_id: string;
-    network_received_avg: number;
     success_count: number;
     failed_count: number;
-    input_pixels: number;
 }

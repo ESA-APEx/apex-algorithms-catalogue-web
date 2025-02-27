@@ -78,3 +78,96 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro -- --help` | Get help using the Astro CLI                                                                       |
 | `npm run test`            | Run UI test using Playwright                                                                       |
 | `npm run download-source` | Download contents from ESA-APEx/apex_algorithms repository, and store them in `./contents/` folder |
+
+## API Documentation
+
+### Endpoints
+
+#### `GET /api/services/benchmarks.json`
+
+##### Description
+
+Retrieves aggregated benchmark statistics from all services, grouped by service ID or scenario ID.
+
+##### Response
+
+- **200 OK**: Returns a JSON array of benchmark statistics.
+- **500 Internal Server Error**: Error fetching benchmark data.
+
+##### Example Response
+
+```json
+[
+  {
+    "runs": 100,
+    "scenario_id": "service_1",
+    "success_count": 90,
+    "failed_count": 10
+  }
+]
+```
+
+##### Response Fields
+
+- `runs` (number): The total number of test runs.
+- `scenario_id` (string): The unique identifier of the service or scenario.
+- `success_count` (number): The total count of successful runs.
+- `failed_count` (number): The total count of failed runs.
+
+#### `GET /api/services/{id}/benchmarks.json`
+
+##### Description
+
+Retrieves aggregated benchmark statistics from a specified service.
+
+#### Parameters
+
+- `id` (path parameter): The unique identifier of the service or scenario.
+
+##### Response
+
+- **200 OK**: Returns a JSON object of benchmark statistics.
+- **500 Internal Server Error**: Error fetching benchmark data.
+
+##### Example Response
+
+```json
+{
+  "scenario": "service_1",
+  "data": [
+    {
+      "cpu": 107,
+      "memory": 390564,
+      "costs": 4,
+      "duration": 195.48,
+      "input_pixel": 2.95,
+      "max_executor_memory": 1.54,
+      "network_received": 7047668,
+      "start_time": "2024-11-24T16:47:28.000Z"
+    },
+    {
+      "cpu": 174,
+      "memory": 602696,
+      "costs": 4,
+      "duration": 155.36,
+      "input_pixel": 2.95,
+      "max_executor_memory": 1.57,
+      "network_received": 1414923468,
+      "start_time": "2024-11-19T20:44:02.000Z"
+    }
+  ]
+}
+```
+
+##### Response Fields
+
+- `scenario_id` (string): The ID of the scenario for which data is retrieved.
+- `data` (array): An array of benchmarking data objects, each containing:
+  - `cpu` (number): CPU usage in seconds.
+  - `costs` (number): Costs associated with the benchmark.
+  - `memory` (number): Memory usage in MB-seconds.
+  - `duration` (number): Duration of the test in seconds.
+  - `start_time` (string): The start time of the test in ISO 8601 format.
+  - `input_pixel` (number): Input pixel usage in mega-pixels.
+  - `max_executor_memory` (number): Maximum executor memory used in GB.
+  - `network_received` (number): Amount of data received over the network in bytes.
