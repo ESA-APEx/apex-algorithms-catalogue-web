@@ -76,7 +76,9 @@ All commands are run from the root of the project, from a terminal:
 | `npm run preview`         | Preview your build locally, before deploying                                                       |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check`                                                   |
 | `npm run astro -- --help` | Get help using the Astro CLI                                                                       |
-| `npm run test`            | Run UI test using Playwright                                                                       |
+| `npm run test`            | Run all tests                                                                                      |
+| `npm run test-unit`       | Run unit tests using Vitest                                                                        |
+| `npm run test-e2e`        | Run E2E tests using Playwright                                                                     |
 | `npm run download-source` | Download contents from ESA-APEx/apex_algorithms repository, and store them in `./contents/` folder |
 
 ## API Documentation

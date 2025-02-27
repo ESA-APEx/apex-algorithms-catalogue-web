@@ -1,9 +1,9 @@
-import {type ClassValue, clsx} from "clsx"
-import {twMerge} from "tailwind-merge"
-import {BASE_PATH} from "../config";
+import {type ClassValue, clsx} from 'clsx';
+import {twMerge} from 'tailwind-merge';
+import {BASE_PATH} from '@/config';
 
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
+    return twMerge(clsx(inputs));
 }
 
 export function getDate(date: string) {
@@ -12,8 +12,8 @@ export function getDate(date: string) {
         month: 'long',
         year: 'numeric'
     };
-    const locale = new Intl.DateTimeFormat('en', options)
-    return locale.format(new Date(date))
+    const locale = new Intl.DateTimeFormat('en', options);
+    return locale.format(new Date(date));
 }
 
 export function removeStripes(str: string) {
@@ -29,5 +29,5 @@ export function generateUniqueOptions(arr: string[]) {
         .map(label => ({
             label: label,
             value: label,
-        }))
+        }));
 }

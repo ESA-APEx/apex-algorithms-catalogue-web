@@ -37,17 +37,17 @@ import { getUrls } from '@/lib/api';
  *       - Benchmark
  */
 export const GET: APIRoute = async () => {
-    const query = `
-        SELECT count()::INTEGER                                                                                                 as "runs",
-               "scenario_id",
-               SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER                                              as "success_count",
-               SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER                                             as "failed_count",
-        FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
-        WHERE "scenario_id" IS NOT NULL
-        GROUP BY "scenario_id"; 
-    `; 
-
     try {
+        const query = `
+            SELECT count()::INTEGER                                                                                                 as "runs",
+                "scenario_id",
+                SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER                                              as "success_count",
+                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER                                             as "failed_count",
+            FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
+            WHERE "scenario_id" IS NOT NULL
+            GROUP BY "scenario_id"; 
+        `; 
+
         const data = (await executeQuery(query) as BenchmarkSummary[]);
         return Response.json(
             data.sort(
@@ -56,6 +56,6 @@ export const GET: APIRoute = async () => {
         );
     } catch (error) {
         console.error("Error fetching full overview:", error);
-        return Response.error();
+        return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
     }
 }

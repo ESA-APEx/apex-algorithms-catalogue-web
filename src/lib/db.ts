@@ -1,9 +1,9 @@
 import { Database } from 'duckdb-async';
 
-let db: Database | null = null;
-let dbInitPromise: Promise<Database> | null = null;
+global.db = null;
+global.dbInitPromise = null;
 
-const initDb = async () => {
+export const initDb = async () => {
 
     if (db) {
         return db;
@@ -33,6 +33,7 @@ const initDb = async () => {
     return await dbInitPromise;
 
 }
+
 export const executeQuery = async (query: string): Promise<any[]> => {
     if (!db) {
         db = await initDb();
