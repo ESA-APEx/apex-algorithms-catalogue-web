@@ -3,7 +3,7 @@ import { formatDate, compareAsc, add as addDate } from 'date-fns';
 const start = '2024-08-01';
 const PARQUET_FILE_TEMPLATE = 'https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet';
 
-let cached_urls: string[] = [];
+let cachedUrls: string[] = [];
 
 const urlExists = async (url: string) => {
     const result = await fetch(url, {method: 'HEAD'});
@@ -11,8 +11,8 @@ const urlExists = async (url: string) => {
 }
 
 export const getUrls = async (): Promise<string[]> => {
-    if (cached_urls.length > 0) {
-        return cached_urls;
+    if (cachedUrls.length > 0) {
+        return cachedUrls;
     }
 
     if (PARQUET_FILE_TEMPLATE) {
@@ -34,7 +34,7 @@ export const getUrls = async (): Promise<string[]> => {
             cursor = addDate(cursor, { months: 1 });
         }
 
-        cached_urls = urls;
+        cachedUrls = urls;
         return urls;
     } else {
         return [];
