@@ -39,10 +39,10 @@ import { getUrls } from '@/lib/api';
 export const GET: APIRoute = async () => {
     try {
         const query = `
-            SELECT count()::INTEGER                                                                                                 as "runs",
+            SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
-                SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER                                              as "success_count",
-                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER                                             as "failed_count",
+                SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
+                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
             FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
             WHERE "scenario_id" IS NOT NULL
             GROUP BY "scenario_id"; 
