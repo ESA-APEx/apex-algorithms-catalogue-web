@@ -45,15 +45,12 @@ export const GET: APIRoute = async () => {
                 SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
             FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
             WHERE "scenario_id" IS NOT NULL
-            GROUP BY "scenario_id"; 
+            GROUP BY "scenario_id"
+            ORDER BY "scenario_id"; 
         `; 
 
         const data = (await executeQuery(query) as BenchmarkSummary[]);
-        return Response.json(
-            data.sort(
-                (s1: BenchmarkSummary, s2: BenchmarkSummary) => (s1.scenario_id || '').localeCompare(s2.scenario_id || '')
-            )
-        );
+        return Response.json(data);
     } catch (error) {
         console.error("Error fetching full overview:", error);
         return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });

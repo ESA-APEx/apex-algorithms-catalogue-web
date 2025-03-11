@@ -29,6 +29,7 @@ describe('API Route: GET /benchmarks/:id', () => {
                 max_executor_memory: 600,
                 network_received: 700,
                 start_time: '2024-02-27T12:00:00Z',
+                status: 'success'
             },
         ];
 

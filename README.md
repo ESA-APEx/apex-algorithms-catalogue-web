@@ -145,7 +145,8 @@ Retrieves aggregated benchmark statistics from a specified service.
       "input_pixel": 2.95,
       "max_executor_memory": 1.54,
       "network_received": 7047668,
-      "start_time": "2024-11-24T16:47:28.000Z"
+      "start_time": "2024-11-24T16:47:28.000Z",
+      "status": "success",
     },
     {
       "cpu": 174,
@@ -155,7 +156,8 @@ Retrieves aggregated benchmark statistics from a specified service.
       "input_pixel": 2.95,
       "max_executor_memory": 1.57,
       "network_received": 1414923468,
-      "start_time": "2024-11-19T20:44:02.000Z"
+      "start_time": "2024-11-19T20:44:02.000Z",
+      "status": "success"
     }
   ]
 }
@@ -173,3 +175,4 @@ Retrieves aggregated benchmark statistics from a specified service.
   - `input_pixel` (number): Input pixel usage in mega-pixels.
   - `max_executor_memory` (number): Maximum executor memory used in GB.
   - `network_received` (number): Amount of data received over the network in bytes.
+  - `status` (string): Status of the benchmark ('success' or 'failed').

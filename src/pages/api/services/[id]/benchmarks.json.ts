@@ -58,6 +58,9 @@ import { getUrls } from '@/lib/parquet-datasource';
  *                       network_received:
  *                         type: number
  *                         description: Amount of data received over the network in bytes.
+ *                       status:
+ *                         type: string
+ *                         description: Status of the benchmark ('success' or 'failed').
  *       500:
  *         description: An error occurred while fetching the scenario data.
  */
@@ -65,17 +68,17 @@ export const GET: APIRoute = async ({ params }) => {
     const scenario = params.id
     try {
         const query = `
-            SELECT round("usage:cpu:cpu-seconds", 2)::INTEGER                     as cpu, 
+            SELECT round("usage:cpu:cpu-seconds", 2)::INTEGER                  as cpu, 
                 round("usage:memory:mb-seconds", 2)::INTEGER                   as memory, 
                 costs::INTEGER                                                 as costs, 
                 round("test:duration", 2)                                      as duration,
                 round("usage:input_pixel:mega-pixel", 2)                       as input_pixel,
                 round("usage:max_executor_memory:gb", 2)                       as max_executor_memory,
                 round("usage:network_received:b", 2)                           as network_received,
-                strptime("test:start:datetime", '%Y-%m-%dT%H:%M:%SZ')          as start_time
+                strptime("test:start:datetime", '%Y-%m-%dT%H:%M:%SZ')          as start_time,
+                "test:outcome"                                                 as status
             FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
             WHERE "scenario_id" = '${scenario}'
-            AND "test:outcome" = 'passed'
             ORDER BY "test:start:datetime" DESC
         `
         const data = await executeQuery(query) as BenchmarkData[];
