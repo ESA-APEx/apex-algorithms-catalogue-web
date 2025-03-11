@@ -10,6 +10,7 @@ env:
   DOCKER_REGISTRY_URL: swr.eu-nl.otc.t-systems.com
   DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 20.17.0
+  PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
 
 permissions:
   contents: write
