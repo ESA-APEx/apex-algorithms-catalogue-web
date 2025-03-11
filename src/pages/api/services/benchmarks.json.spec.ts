@@ -41,6 +41,6 @@ describe('API Route: GET', () => {
 
         const response = await GET({} as any);
         expect(response).toBeInstanceOf(Response);
-        expect(response?.status).not.toBe(200);
+        expect(response?.status).toBe(500);
     });
 });
