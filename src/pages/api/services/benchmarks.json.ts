@@ -52,7 +52,8 @@ export const GET: APIRoute = async () => {
         const data = (await executeQuery(query) as BenchmarkSummary[]);
         return Response.json(data);
     } catch (error) {
-        console.error("Error fetching full overview:", error);
-        return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+        const message = 'Fetching benchmark statistics from all services failed.';
+        console.error(message, error);
+        return new Response(JSON.stringify({ message }), { status: 500 });
     }
 }

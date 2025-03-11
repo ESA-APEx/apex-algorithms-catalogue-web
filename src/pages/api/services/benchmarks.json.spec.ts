@@ -42,5 +42,8 @@ describe('API Route: GET', () => {
         const response = await GET({} as any);
         expect(response).toBeInstanceOf(Response);
         expect(response?.status).toBe(500);
+
+        const jsonResponse = await response.json();
+        expect(jsonResponse).toEqual({ message: 'Fetching benchmark statistics from all services failed.' });
     });
 });

@@ -57,7 +57,7 @@ describe('API Route: GET /benchmarks/:id', () => {
         expect(response.status).toBe(500);
 
         const jsonResponse = await response.json();
-        expect(jsonResponse).toEqual({ error: 'Internal server error' });
+        expect(jsonResponse).toEqual({ message: 'Fetching benchmark data for service scenario-123 failed.' });
 
         expect(getUrls).toHaveBeenCalledOnce();
         expect(executeQuery).not.toHaveBeenCalled();
