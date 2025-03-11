@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import type { BenchmarkData } from '@/types/models/benchmark';
 
 import { executeQuery } from '@/lib/db';
-import { getUrls } from '@/lib/api';
+import { getUrls } from '@/lib/parquet-datasource';
 
 /**
  * @openapi
