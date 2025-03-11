@@ -10,7 +10,9 @@ test.describe('Catalog Tests', () => {
         await expect(page).toHaveTitle('Algorithm Services Catalogue | APEx');
         await expect(page.getByRole('heading', { level: 1 })).toContainText('Algorithm Services Catalogue');
 
-        const card = page.getByTestId('service-card').getByText('ESA worldcereal global maize detector').locator('..');
+        await page.getByRole('textbox', { name: /Search algorithms/i }).fill('ESA');
+
+        const card = page.getByTestId('service-card').getByText('ESA worldcereal global crop type detector').locator('..');
         await expect(card).toBeVisible()
 
         await expect(card.getByTestId('service-type')).toHaveText('openEO');
