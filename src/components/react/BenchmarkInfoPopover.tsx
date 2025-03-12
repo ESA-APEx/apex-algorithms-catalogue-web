@@ -15,7 +15,7 @@ export const BenchmarkInfoPopover = () => {
             <PopoverContent className="relative">
                 <article>
                     <p className="text-sm mb-2">
-                        The percentage of success executions is categorized into {numOfStatus} status:
+                        The percentage of successful executions is categorized into {numOfStatus} status:
                     </p>
                     <ul className="text-sm">
                         {Object.keys(STATUS_THRESHOLD).map((status) => (
