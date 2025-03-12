@@ -44,4 +44,27 @@ test.describe('Service Details Test', () => {
         await expect(page.getByTestId('service-access-warning')).not.toBeVisible();
     });
 
+    test("Should show benchmark status", async ({page}) => {
+        await openService(page, 'Sentinel-1 statistics');
+
+        await expect(page.getByText('Benchmark status')).toBeVisible();
+
+        const statusBadge = page.getByTestId('benchmark-status-badge');
+
+        await expect(statusBadge).toBeVisible({ timeout: 10000 });
+        await expect(statusBadge.getByText('Stable')).toBeVisible();
+    });
+
+    test("Should truncate the lengthy description and display 'read more' to show complete text", async ({page}) => {
+        await openService(page, 'Multi output gaussian process regression');
+
+        const desc = page.getByTestId('collapsible-text');
+        await expect(desc).toContainText('...');
+
+        const readMoreButton = desc.getByRole('button');
+        readMoreButton.click();
+
+        await expect(desc).not.toContainText('...');
+        await expect(readMoreButton).not.toBeVisible();
+    })
 })

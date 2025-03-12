@@ -21,7 +21,7 @@ const statusVariant = cva('inline-flex w-2 h-2 rounded-full', {
 
 export const BenchmarkStatusBadge = ({ status }: BenchmarkStatusBadgeProps) => {
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" data-testid="benchmark-status-badge">
             <span className={cn(statusVariant({ status }))}></span>
             <span className="capitalize">{status}</span>
         </div>

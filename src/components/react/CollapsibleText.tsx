@@ -10,7 +10,7 @@ export const CollapsibleText = ({ text, maxLength = 250 }: CollapsibleTextProps)
     const displayedText = showDetail ? text : `${text.slice(0, maxLength)}...`;
 
     return (
-        <p className="inline-block break-words">
+        <p className="inline-block break-words" data-testid="collapsible-text">
             {displayedText}
             {
                 showDetail ? 
