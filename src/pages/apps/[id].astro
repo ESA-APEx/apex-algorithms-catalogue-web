@@ -13,6 +13,7 @@ import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
 import {BenchmarkInfoPopover} from '../../components/react/BenchmarkInfoPopover';
+import {CollapsibleText} from '../../components/react/CollapsibleText';
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
 import type {ToCElement} from '../../types/models/catalogue';
@@ -174,7 +175,9 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                 <ul class="flex flex-col gap-4 text-brand-gray-50">
                     <li>
                         <div class="text-white mb-1">About</div>
-                        <div class="break-words">{algorithm.properties.description}</div>
+                        <div>
+                            <CollapsibleText text={algorithm.properties.description} client:idle />
+                        </div>
                     </li>
                     <li>
                         <ul class="flex flex-wrap gap-2">
