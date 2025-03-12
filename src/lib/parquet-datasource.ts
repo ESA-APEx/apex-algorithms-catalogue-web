@@ -2,6 +2,7 @@ import { formatDate, compareAsc, add as addDate } from 'date-fns';
 
 const start = '2024-08-01';
 const PARQUET_FILE_TEMPLATE = import.meta.env.PARQUET_FILE_TEMPLATE;
+const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || '1'; // in hours
 
 global.cachedUrls = [];
 
@@ -10,9 +11,19 @@ const urlExists = async (url: string) => {
     return result.ok;
 }
 
+const isCacheExpired = () => {
+    const now = new Date();
+    return !!global.cachedUrlsExpireTime && now >= global.cachedUrlsExpireTime;
+}
+
+const updateCacheExpiration = () => {
+    const now = new Date();
+    global.cachedUrlsExpireTime = addDate(now, { hours: PARQUET_FILE_EXPIRATION });
+}
+
 export const getUrls = async (): Promise<string[]> => {
-    if (cachedUrls.length > 0) {
-        return cachedUrls;
+    if (global.cachedUrls.length > 0 && !isCacheExpired()) {
+        return global.cachedUrls;
     }
 
     if (PARQUET_FILE_TEMPLATE) {
@@ -34,7 +45,9 @@ export const getUrls = async (): Promise<string[]> => {
             cursor = addDate(cursor, { months: 1 });
         }
 
-        cachedUrls = urls;
+        global.cachedUrls = urls;
+        updateCacheExpiration();
+
         return urls;
     } else {
         return [];
