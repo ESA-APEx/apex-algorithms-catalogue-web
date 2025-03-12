@@ -1,5 +1,6 @@
 import {expect, type Page, test} from '@playwright/test';
 
+
 const openService = async (page: Page, name: string) => {
     await page.getByTestId('service-card').getByText(name).first().click();
 }
@@ -12,8 +13,8 @@ test.describe('Service Details Test', () => {
 
     test("Should open the details page", async ({page}) => {
 
-        await openService(page, 'ESA worldcereal global maize detector');
-        await page.waitForURL('**/apps/worldcereal_crop_extent');
+        await openService(page, 'ESA worldcereal global crop type detector');
+        await page.waitForURL('**/apps/worldcereal_crop_type');
     });
 
     test("Should show the correct links for an openEO service", async ({page}) => {
