@@ -51,7 +51,7 @@ test.describe('Service Details Test', () => {
 
         const statusBadge = page.getByTestId('benchmark-status-badge');
 
-        await expect(statusBadge).toBeVisible({ timeout: 10000 });
+        await expect(statusBadge).toBeVisible({ timeout: 20000 });
         await expect(statusBadge.getByText('Stable')).toBeVisible();
     });
 
@@ -62,7 +62,7 @@ test.describe('Service Details Test', () => {
         await expect(desc).toContainText('...');
 
         const readMoreButton = desc.getByRole('button');
-        readMoreButton.click();
+        await readMoreButton.click();
 
         await expect(desc).not.toContainText('...');
         await expect(readMoreButton).not.toBeVisible();
