@@ -2,10 +2,8 @@ import { Popover, PopoverTrigger, PopoverContent } from './Popover';
 import { Info } from 'lucide-react';
 import { STATUS_THRESHOLD } from './BenchmarkStatus';
 import { BenchmarkStatusBadge } from './BenchmarkStatusBadge';
-import type { BenchmarkStatusKey } from '@/types/models/benchmark';
 
 export const BenchmarkInfoPopover = () => {
-    const numOfStatus = Object.keys(STATUS_THRESHOLD).length;
 
     return (
         <Popover>
@@ -15,19 +13,20 @@ export const BenchmarkInfoPopover = () => {
             <PopoverContent className="relative">
                 <article>
                     <p className="text-sm mb-2">
-                        The percentage of successful executions is categorized into {numOfStatus} status:
+                        The percentage of successful executions is categorized into three status:
                     </p>
                     <ul className="text-sm">
-                        {Object.keys(STATUS_THRESHOLD).map((status) => (
-                            <li key={status} className="flex items-center gap-1">
-                                <BenchmarkStatusBadge status={status as BenchmarkStatusKey} />
-                                { 
-                                    status === 'no benchmark' ? 
-                                    null :
-                                    <span>{`(success rate >= ${STATUS_THRESHOLD[status as BenchmarkStatusKey]})`}</span>
-                                }
-                            </li>
-                        ))}
+                        <li className="flex items-center gap-1 flex-wrap">
+                            <BenchmarkStatusBadge status="stable" />
+                            <span className="flex-1">{`(success rate >= ${STATUS_THRESHOLD.stable})`}</span>
+                        </li>
+                        <li className="flex items-center gap-1">
+                            <BenchmarkStatusBadge status="unstable" />
+                            <span className="flex-1">{`(${STATUS_THRESHOLD.unstable} <= success rate < ${STATUS_THRESHOLD.stable})`}</span>
+                        </li>
+                        <li className="flex items-center gap-1">
+                            <BenchmarkStatusBadge status="no benchmark" />
+                        </li>
                     </ul>
                 </article>
             </PopoverContent>
