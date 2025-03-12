@@ -1,8 +1,6 @@
 import { featureflag } from "@/featureflag.config";
 
-type FeatureKey = keyof typeof featureflag.default;
-
-export function isFeatureEnabled(url: string, feature: FeatureKey): boolean {    
+export function isFeatureEnabled(url: string, feature: string): boolean {    
     if (url.includes(import.meta.env.STAGING_BASE_URL)) {
         return featureflag.staging[feature] ?? featureflag.default[feature];
     }
