@@ -4,6 +4,7 @@ import {Info, Globe, SquareArrowOutUpRight, TriangleAlert} from 'lucide-react';
 import {Badge} from '../../components/react/Badge';
 import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
 import {ClipboardButton} from '../../components/react/ClipboardButton';
+import {BenchmarkStatus} from '../../components/react/BenchmarkStatus';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -87,11 +88,11 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
     <aside class="block px-4 my-8">
-        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto" />
+        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3" />
     </aside>
 
 	<article class="flex-1 px-4 my-14">
-       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
+       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3">
             <section class="flex-1">
                 <header class="mb-12">
                     <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
@@ -180,14 +181,15 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                         </ul>
                     </li>
                     <li>
-                        <div class="text-white mb-1">Cost estimation</div>
-                        <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>
+                        <div class="text-white mb-1">Benchmark status</div>
+                        <BenchmarkStatus scenarioId={algorithm.id} client:only />
                     </li>
+                    <li>
+                        <div class="text-white mb-1">Cost estimation</div>
                     <li>
                         <div class="text-white mb-1">Format</div>
                         <div>{algorithm.properties.formats.map(f => f.name).join(', ')}</div>
                     </li>
-                    <li>
                         <div class="text-white mb-1">License</div>
                         <div>{algorithm.properties.license}</div>
                     </li>

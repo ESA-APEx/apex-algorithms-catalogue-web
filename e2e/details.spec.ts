@@ -1,6 +1,5 @@
 import {expect, type Page, test} from '@playwright/test';
 
-
 const openService = async (page: Page, name: string) => {
     await page.getByTestId('service-card').getByText(name).first().click();
 }

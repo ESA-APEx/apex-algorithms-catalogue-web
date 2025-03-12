@@ -11,6 +11,8 @@ env:
   DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 20.17.0
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
+  STAGING_BASE_URL: https://algorithm-catalogue.dev.apex.esa.int
+  PRODUCTION_BASE_URL: https://algorithm-catalogue.apex.esa.int
 
 permissions:
   contents: write
