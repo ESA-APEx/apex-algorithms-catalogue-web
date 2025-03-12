@@ -36,19 +36,12 @@ const fetchJson = (url: string) => {
 
 
 const getAlgorithmType = (algorithm: Algorithm): AlgorithmType => {
-    const applicationLink = algorithm.links.find(l => l.rel === 'application')
-
-    if (!applicationLink) {
-        return AlgorithmType.NONE
-    }
-
-    switch (applicationLink.type) {
-        case 'application/cwl+yaml':
-            return AlgorithmType.OGC_API_PROCESS;
-        case 'application/vnd.openeo+json;type=process':
-            return AlgorithmType.OPENEO;
-        default:
-            return AlgorithmType.NONE
+    if (algorithm.conformsTo.includes('https://apex.esa.int/core/openeo-udp')) {
+        return AlgorithmType.OPENEO;
+    } else if (algorithm.conformsTo.includes('https://apex.esa.int/core/ogc-api-processes')) {
+        return AlgorithmType.OGC_API_PROCESS;
+    } else {
+        return AlgorithmType.NONE;
     }
 }
 
