@@ -14,6 +14,7 @@ import {
 } from './Select'
 import { Popover, PopoverTrigger, PopoverContent } from './Popover'
 import { BenchmarkStatus } from './BenchmarkStatus'
+import { Spinner } from './Spinner'
 import type { Algorithm } from '../../types/models/algorithm'
 import {
   MultiSelector,
@@ -263,12 +264,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                                 {
                                     benchmarkData ? 
                                     <BenchmarkStatus scenarioId={item.id} data={benchmarkData} /> :
-                                    (
-                                        <div className="flex items-center gap-2">
-                                            <img className="w-3 h-3 animate-spin" src="/icons/icon-spinner.svg" />
-                                            <span>loading...</span>
-                                        </div>
-                                    )
+                                    <Spinner />
                                 }
                             </div>
                         </Card>

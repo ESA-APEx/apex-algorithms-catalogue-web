@@ -3,28 +3,12 @@ import type { BenchmarkSummary, BenchmarkStatusKey } from '@/types/models/benchm
 import { isFeatureEnabled } from '@/lib/featureflag';
 import { getBenchmarkSummary } from '@/lib/api';
 import { BenchmarkStatusBadge } from './BenchmarkStatusBadge';
+import { getBenchmarkStatus } from '@/lib/benchmark-status';
+import { Spinner } from './Spinner';
 
 interface BenchmarkStatusProps {
     scenarioId: string;
     data?: BenchmarkSummary[];
-}
-
-export const STATUS_THRESHOLD = {
-    stable: 0.75,
-    unstable: 0,
-    'no benchmark': null,
-}
-
-export const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
-    if (data) {
-        const successRate = data.success_count / data.runs;
-
-        if (successRate >= STATUS_THRESHOLD.stable) {
-            return 'stable';
-        }
-        return 'unstable';
-    }
-    return 'no benchmark';
 }
 
 export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
@@ -65,10 +49,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
                     (
                         <BenchmarkStatusBadge status={status} />
                     ) : (
-                        <div className="flex items-center gap-2">
-                            <img className="w-3 h-3 animate-spin" src="/icons/icon-spinner.svg" />
-                            <span>loading...</span>
-                        </div>
+                        <Spinner />
                     )
             }
         </>

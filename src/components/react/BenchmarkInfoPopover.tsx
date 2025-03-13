@@ -1,6 +1,6 @@
 import { Popover, PopoverTrigger, PopoverContent } from './Popover';
 import { Info } from 'lucide-react';
-import { STATUS_THRESHOLD } from './BenchmarkStatus';
+import { STATUS_THRESHOLD } from '@/lib/benchmark-status';
 import { BenchmarkStatusBadge } from './BenchmarkStatusBadge';
 
 export const BenchmarkInfoPopover = () => {
