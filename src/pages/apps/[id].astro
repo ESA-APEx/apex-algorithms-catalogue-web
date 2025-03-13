@@ -189,7 +189,7 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                             <span>Benchmark status</span>
                             <BenchmarkInfoPopover client:idle />
                         </div>
-                        <BenchmarkStatus scenarioId={algorithm.id} client:only />
+                        <BenchmarkStatus scenarioId={algorithm.id} client:only="react" />
                     </li>
                     <li>
                         <div class="text-white mb-1">Cost estimation</div>
