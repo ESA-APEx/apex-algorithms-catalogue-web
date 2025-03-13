@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { BenchmarkSummary, BenchmarkStatusKey } from '@/types/models/benchmark';
 import { isFeatureEnabled } from '@/lib/featureflag';
+import { getBenchmarkSummary } from '@/lib/api';
 import { BenchmarkStatusBadge } from './BenchmarkStatusBadge';
 
 interface BenchmarkStatusProps {
     scenarioId: string;
-    data?: BenchmarkSummary;
+    data?: BenchmarkSummary[];
 }
 
 export const STATUS_THRESHOLD = {
@@ -14,7 +15,7 @@ export const STATUS_THRESHOLD = {
     'no benchmark': null,
 }
 
-const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
+export const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
     if (data) {
         const successRate = data.success_count / data.runs;
 
@@ -33,9 +34,8 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch('/api/services/benchmarks.json');
-            if (response.ok) {
-                const result = await response.json() as BenchmarkSummary[];
+            const result = await getBenchmarkSummary();
+            if (result) {
                 const summaryData = result.find(item => item.scenario_id === scenarioId);
                 setStatus(getBenchmarkStatus(summaryData));
             } else {
@@ -51,7 +51,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
     useEffect(() => {
         if (isEnabled) {
             if (data) {
-                setStatus(getBenchmarkStatus(data))
+                setStatus(getBenchmarkStatus(data.find(item => item.scenario_id === scenarioId)))
             } else {
                 fetchData();
             }
