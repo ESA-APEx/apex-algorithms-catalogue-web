@@ -20,7 +20,7 @@ export const Card = ({ title, type,  body, href, labels }: CardProps) => {
     const truncatedBody = truncateBody(body);
     return (
         <a href={href} data-testid='service-card'>
-            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-96">
+            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-64">
                 <div className="card-header mb-2">
                     <span className="text-sm" data-testid='service-type'>{type}</span>
                 </div>
@@ -37,10 +37,10 @@ export const Card = ({ title, type,  body, href, labels }: CardProps) => {
                     labels?.length && (
                         <div className="card-labels">
                             <hr className="text-brand-teal-20 border my-3" />
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-nowrap gap-2 overflow-hidden">
                                 {
                                     labels.map((label) => (
-                                        <span key={label} className="text-sm px-2 py-1 text-brand-teal-80 bg-white" data-testid='service-label'>{label}</span>
+                                        <span key={label} className="text-sm text-nowrap px-2 py-1 text-brand-teal-80 bg-white" data-testid='service-label'>{label}</span>
                                     ))
                                 }
                             </div>

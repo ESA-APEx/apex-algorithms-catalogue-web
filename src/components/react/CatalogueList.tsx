@@ -230,7 +230,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                     </Popover>
                 </div>
             </div>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="apps">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="apps">
                 {data.map((item, id) => (
                     <li key={id} data-testid="apps-item">
                         <Card
