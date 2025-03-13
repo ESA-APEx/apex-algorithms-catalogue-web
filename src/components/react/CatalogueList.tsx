@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FilterIcon, SearchIcon } from 'lucide-react'
 import { Card } from './Card'
 import { Input } from './Input'
@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from './Select'
 import { Popover, PopoverTrigger, PopoverContent } from './Popover'
+import { BenchmarkStatus } from './BenchmarkStatus'
 import type { Algorithm } from '../../types/models/algorithm'
 import {
   MultiSelector,
@@ -23,6 +24,8 @@ import {
   MultiSelectorItem,
 }  from './MultiSelect'
 import { generateUniqueOptions } from '../../lib/utils'
+import type { BenchmarkSummary } from '@/types/models/benchmark'
+import { getBenchmarkSummary } from '@/lib/api'
 
 interface CatalogueListProps {
     catalogues: Algorithm[]
@@ -109,6 +112,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     const [filterByLabels, setFilterByLabels] = useState<string[]>([])
     const [filterByLicenses, setFilterByLicenses] = useState<string[]>([])
     const [filterByTypes, setFilterByTypes] = useState<string[]>([])
+    const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>()
     const {labels, licenses, types} = getCataloguesFilterList(catalogues)
 
     const data = searchAndSortFilterCatalogues({
@@ -122,11 +126,25 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         } 
     })
     const filterCounts = filterByLabels.length + filterByLicenses.length
+
     const clearFilters = () => {
         setFilterByLabels([])
         setFilterByLicenses([])
         setFilterByTypes([])
     }
+    const fetchBenchmarkData = async () => {
+        try {
+            const result = await getBenchmarkSummary();
+            setBenchmarkData(result ?? []);
+        } catch (error) {
+            console.error(error);
+            setBenchmarkData([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchBenchmarkData();
+    }, [])
 
     return 	(
         <>
@@ -240,7 +258,20 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             title={item.properties.title}
                             body={item.properties.description}
                             labels={item.properties.keywords}
-                        />
+                        >
+                            <div className="text-brand-teal-80 text-sm mt-2">
+                                {
+                                    benchmarkData ? 
+                                    <BenchmarkStatus scenarioId={item.id} data={benchmarkData} /> :
+                                    (
+                                        <div className="flex items-center gap-2">
+                                            <img className="w-3 h-3 animate-spin" src="/icons/icon-spinner.svg" />
+                                            <span>loading...</span>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </Card>
                     </li>
                 ))}
             </ul>
