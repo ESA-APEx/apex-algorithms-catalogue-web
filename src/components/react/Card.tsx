@@ -1,9 +1,12 @@
+import * as React from 'react';
+
 interface CardProps {
 	title: string;
     type: string;
 	body: string;
 	href: string;
 	labels?: string[];
+    children?: React.ReactNode;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -16,7 +19,7 @@ const truncateBody = (text: string, wordLimit = 20) => {
 }
 
 
-export const Card = ({ title, type,  body, href, labels }: CardProps) => {
+export const Card = ({ title, type,  body, href, labels, children }: CardProps) => {
     const truncatedBody = truncateBody(body);
     return (
         <a href={href} data-testid='service-card'>
@@ -32,6 +35,8 @@ export const Card = ({ title, type,  body, href, labels }: CardProps) => {
                 <p className="card-content mt-2 text-brand-gray-50 flex-1">
                     {truncatedBody}
                 </p>
+
+                {children}
 
                 {
                     labels?.length && (
