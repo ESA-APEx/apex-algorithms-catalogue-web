@@ -25,8 +25,9 @@ import {
   MultiSelectorItem,
 }  from './MultiSelect'
 import { generateUniqueOptions } from '../../lib/utils'
-import type { BenchmarkSummary } from '@/types/models/benchmark'
+import type { BenchmarkStatusKey, BenchmarkSummary } from '@/types/models/benchmark'
 import { getBenchmarkSummary } from '@/lib/api'
+import { getBenchmarkStatus, STATUS_THRESHOLD } from '@/lib/benchmark-status'
 
 interface CatalogueListProps {
     catalogues: Algorithm[]
@@ -40,6 +41,10 @@ const sortOptions = [
     {
         value: 'last updated',
         label: 'Last updated'
+    },
+    {
+        value: 'benchmark status',
+        label: 'Benchmark status'
     }
 ] as const
 
@@ -52,16 +57,37 @@ interface SearchAndSortFilterParams {
         labels: string[]
         licenses: string[]
         types: string[]
+        benchmarkStatus: string[]
     }
     catalogues: Algorithm[]
+    benchmarkData?: BenchmarkSummary[]
 }
 
-const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: SearchAndSortFilterParams) => {
+const searchAndSortFilterCatalogues = ({ 
+    query, 
+    sortBy, 
+    catalogues, 
+    benchmarkData, 
+    filterBy 
+}: SearchAndSortFilterParams) => {
+    const statusOrder = {
+        stable: 0,
+        unstable: 1,
+        'no benchmark': 2,
+    }
     if (!!query || !!sortBy) {
         const normalizedQuery = query.toLowerCase()
+        const benchmarkStatusData: Record<string, BenchmarkSummary> = {}
+        benchmarkData?.forEach(data => {
+            benchmarkStatusData[data.scenario_id] = data;
+        })
+
         return catalogues
             .filter(
-                ({ type, properties }) => {
+                ({ type, properties, id }) => {
+                    const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id] ? 
+                        getBenchmarkStatus(benchmarkStatusData[id]) : 
+                        'no benchmark'
                     const hitSearch = properties.title.toLowerCase().includes(normalizedQuery) || 
                         properties.description.toLowerCase().includes(normalizedQuery)
 
@@ -75,15 +101,26 @@ const searchAndSortFilterCatalogues = ({ query, sortBy, catalogues, filterBy }: 
                     const hitFilterByLabels = filterBy.labels.length ? hitLabels.length : true
                     const hitFilterByLicense = filterBy.licenses.length ? filterBy.licenses.includes(properties.license) : true
                     const hitFilterByTypes = filterBy.types.length ? filterBy.types.includes(type) : true
+                    const hitFilterByBenchmarkStatus = filterBy.benchmarkStatus.length ? 
+                        filterBy.benchmarkStatus.includes(benchmarkStatus) : 
+                        true
 
-                    return hitSearch && hitFilterByLabels && hitFilterByLicense && hitFilterByTypes
+                    return hitSearch && hitFilterByLabels && hitFilterByLicense && hitFilterByTypes && hitFilterByBenchmarkStatus
                 }
             )
             .sort((a, b) => {
                 if (sortBy === 'last updated') {
-                    return new Date(b.properties.updated).getTime() - new Date(a.properties.updated).getTime()
+                    return new Date(b.properties.updated).getTime() - new Date(a.properties.updated).getTime();
+                } else if (sortBy === 'name') {
+                    return b.properties.title.toLowerCase() < a.properties.title.toLowerCase() ? 1 : -1;
                 }
-                return a.properties.title.toLowerCase() < b.properties.title.toLowerCase() ? -1 : 1;
+
+                const benchmarkStatusDataA = benchmarkStatusData[a.id] ? 
+                    getBenchmarkStatus(benchmarkStatusData[a.id]) : 'no benchmark'
+                const benchmarkStatusDataB = benchmarkStatusData[b.id] ? 
+                    getBenchmarkStatus(benchmarkStatusData[b.id]) : 'no benchmark'
+                    
+                return statusOrder[benchmarkStatusDataA] - statusOrder[benchmarkStatusDataB];
             })
     }
     return catalogues;
@@ -104,6 +141,7 @@ const getCataloguesFilterList = (catalogues: Algorithm[]) => {
         labels: generateUniqueOptions(labels),
         licenses: generateUniqueOptions(licenses),
         types: generateUniqueOptions(types),
+        benchmarkStatus: generateUniqueOptions(Object.keys(STATUS_THRESHOLD)),
     }
 }
 
@@ -113,25 +151,30 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     const [filterByLabels, setFilterByLabels] = useState<string[]>([])
     const [filterByLicenses, setFilterByLicenses] = useState<string[]>([])
     const [filterByTypes, setFilterByTypes] = useState<string[]>([])
+    const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<string[]>([])
     const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>()
-    const {labels, licenses, types} = getCataloguesFilterList(catalogues)
+    const {labels, licenses, types, benchmarkStatus} = getCataloguesFilterList(catalogues)
 
     const data = searchAndSortFilterCatalogues({
         query, 
         sortBy, 
         catalogues, 
+        benchmarkData,
         filterBy: {
             labels: filterByLabels,
             licenses: filterByLicenses,
             types: filterByTypes,
+            benchmarkStatus: filterByBenchmarkStatus,
         } 
     })
-    const filterCounts = filterByLabels.length + filterByLicenses.length
+    const filterCounts = filterByLabels.length + filterByLicenses.length + 
+        filterByTypes.length + filterByBenchmarkStatus.length
 
     const clearFilters = () => {
         setFilterByLabels([])
         setFilterByLicenses([])
         setFilterByTypes([])
+        setFilterByBenchmarkStatus([])
     }
     const fetchBenchmarkData = async () => {
         try {
@@ -159,23 +202,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                     onInput={(e) => setQuery(e.currentTarget.value)} 
                 />
             </div>
-            <div className="grid grid-cols-2 mb-6">
-                <div>
-                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-                        <SelectTrigger className="w-32">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            { 
-                                sortOptions.map(
-                                    ({ value, label }) => 
-                                        <SelectItem key={value} value={value}>{label}</SelectItem>
-                                ) 
-                            }
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="text-right">
+            <div className="flex flex-row-reverse gap-3 mb-6">
+                <div className="flex-none">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button variant="outline">
@@ -230,6 +258,25 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                                     ))
                                 }
                             </div>
+                            <p className="mb-1">Benchmark status</p>
+                            <div className="flex flex-col mb-4">
+                                {
+                                    benchmarkStatus.map(({label, value}) => (
+                                        <label key={value} className="flex items-center gap-1" data-testid='filter-benchmark-status'>
+                                            <Checkbox
+                                                key={value}
+                                                checked={filterByBenchmarkStatus.includes(value)}
+                                                onCheckedChange={(checked) => {
+                                                    return checked ?
+                                                        setFilterByBenchmarkStatus([...filterByBenchmarkStatus, value]) :
+                                                        setFilterByBenchmarkStatus(filterByBenchmarkStatus.filter(item => item != value))
+                                                }}
+                                            />
+                                            <span>{label}</span>
+                                        </label>
+                                    ))
+                                }
+                            </div>
                             <p>Labels</p>
                             <MultiSelector values={filterByLabels} onValuesChange={setFilterByLabels} loop={false}>
                                 <MultiSelectorTrigger>
@@ -248,6 +295,23 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                         </PopoverContent>
                     </Popover>
                 </div>
+
+                <div className="flex-none">
+                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+                        <SelectTrigger className="w-32">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            { 
+                                sortOptions.map(
+                                    ({ value, label }) => 
+                                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                                ) 
+                            }
+                        </SelectContent>
+                    </Select>
+                </div>
+
             </div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="apps">
                 {data.map((item, id) => (
@@ -263,7 +327,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             <div className="text-brand-teal-80 text-sm mt-2">
                                 {
                                     benchmarkData ? 
-                                    <BenchmarkStatus scenarioId={item.id} data={benchmarkData} /> :
+                                    <BenchmarkStatus key={`status-${id}`} scenarioId={item.id} data={benchmarkData} /> :
                                     <Spinner />
                                 }
                             </div>

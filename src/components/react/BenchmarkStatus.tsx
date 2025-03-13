@@ -40,7 +40,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
                 fetchData();
             }
         }
-    }, []);
+    }, [data, scenarioId]);
 
     return isEnabled && (
         <>

@@ -9,6 +9,7 @@ export const STATUS_THRESHOLD = {
 export const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
     if (data) {
         const successRate = data.success_count / data.runs;
+        console.log('data', successRate, data.scenario_id);
         if (successRate >= STATUS_THRESHOLD.stable) {
             return 'stable';
         } 
