@@ -7,6 +7,7 @@ interface CardProps {
 	href: string;
 	labels?: string[];
     children?: React.ReactNode;
+    maxDisplayedLabels?: number;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -19,8 +20,20 @@ const truncateBody = (text: string, wordLimit = 20) => {
 }
 
 
-export const Card = ({ title, type,  body, href, labels, children }: CardProps) => {
+export const Card = (
+    { 
+        title, 
+        type,  
+        body, 
+        href, 
+        labels, 
+        children,
+        maxDisplayedLabels = 3,
+    }: CardProps) => {
     const truncatedBody = truncateBody(body);
+    const displayedLabels = labels?.slice(0, maxDisplayedLabels);
+    const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
+
     return (
         <a href={href} data-testid='service-card'>
             <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-64">
@@ -39,14 +52,21 @@ export const Card = ({ title, type,  body, href, labels, children }: CardProps) 
                 {children}
 
                 {
-                    labels?.length && (
+                    displayedLabels?.length && (
                         <div className="card-labels">
                             <hr className="text-brand-teal-20 border my-3" />
                             <div className="flex flex-nowrap gap-2 overflow-hidden">
                                 {
-                                    labels.map((label) => (
+                                    displayedLabels.map((label) => (
                                         <span key={label} className="text-sm text-nowrap px-2 py-1 text-brand-teal-80 bg-white" data-testid='service-label'>{label}</span>
                                     ))
+                                }
+                                {
+                                    hiddenLabels?.length ? 
+                                    (
+                                        <span className="text-sm text-nowrap px-1 py-1 text-brand-teal-80" data-testid='service-hidden-label'>+{hiddenLabels.length}</span>
+                                    )
+                                    : null
                                 }
                             </div>
                         </div>
