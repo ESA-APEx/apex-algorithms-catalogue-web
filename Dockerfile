@@ -1,6 +1,7 @@
 FROM node:20.17-alpine AS base
 WORKDIR /app
 
+RUN apk add libc6-compat && apk add gcompat
 COPY package.json package-lock.json ./
 
 FROM base AS prod-deps
