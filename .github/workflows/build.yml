@@ -55,12 +55,12 @@ jobs:
     needs: [build]
     # if: github.ref == 'refs/heads/main'
     outputs:
-      version: v0.11.3
+      version: v0.11.4
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
         with:
-          ref: v0.11.3
+          ref: v0.11.4
       # - name: Get next version
       #   id: semver
       #   uses: ietf-tools/semver-action@v1
@@ -76,7 +76,7 @@ jobs:
           allowUpdates: true
           draft: false
           makeLatest: true
-          tag: v0.11.3
+          tag: v0.11.4
           token: ${{ github.token }}
 
   build-docker:
