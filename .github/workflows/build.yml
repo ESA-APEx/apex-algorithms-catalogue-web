@@ -85,10 +85,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: v0.11.4
+          ref: v0.11.5
       - name: Get release version
         env:
-          TAG_VERSION: v0.11.4
+          TAG_VERSION: v0.11.5
         run: |
           echo "RELEASE_VERSION=${TAG_VERSION#v*}" >> $GITHUB_ENV
           echo $RELEASE_VERSION
