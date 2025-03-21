@@ -50,37 +50,37 @@ jobs:
   #       path: playwright-report/
   #       retention-days: 30
 
-  release:
-    runs-on: ubuntu-latest
-    needs: [build]
-    # if: github.ref == 'refs/heads/main'
-    outputs:
-      version: v0.11.4
-    # steps:
-    #   - name: Checkout your repository using git
-    #     uses: actions/checkout@v4
-    #     with:
-    #       ref: v0.11.4
-    #   # - name: Get next version
-    #   #   id: semver
-    #   #   uses: ietf-tools/semver-action@v1
-    #   #   with:
-    #   #     token: ${{ github.token }}
-    #   #     branch: main
-    #   #     noVersionBumpBehavior: silent
-    #   #     noNewCommitBehavior: silent
-    #   - name: Create release tag
-    #     uses: ncipollo/release-action@v1.12.0
-    #     # if: ${{ steps.semver.outputs.next != null }}
-    #     with:
-    #       allowUpdates: true
-    #       draft: false
-    #       makeLatest: true
-    #       tag: v0.11.4
-    #       token: ${{ github.token }}
+  #release:
+  #  runs-on: ubuntu-latest
+  #  needs: [build]
+  #  # if: github.ref == 'refs/heads/main'
+  #  outputs:
+  #    version: v0.11.4
+  #  # steps:
+  #  #   - name: Checkout your repository using git
+  #  #     uses: actions/checkout@v4
+  #  #     with:
+  #  #       ref: v0.11.4
+  #  #   # - name: Get next version
+  #  #   #   id: semver
+  #  #   #   uses: ietf-tools/semver-action@v1
+  #  #   #   with:
+  #  #   #     token: ${{ github.token }}
+  #  #   #     branch: main
+  #  #   #     noVersionBumpBehavior: silent
+  #  #   #     noNewCommitBehavior: silent
+  #  #   - name: Create release tag
+  #  #     uses: ncipollo/release-action@v1.12.0
+  #  #     # if: ${{ steps.semver.outputs.next != null }}
+  #  #     with:
+  #  #       allowUpdates: true
+  #  #       draft: false
+  #  #       makeLatest: true
+  #  #       tag: v0.11.4
+  #  #       token: ${{ github.token }}
 
   build-docker:
-    needs: [release]
+    needs: [build]
     runs-on: ubuntu-latest
     if: ${{ needs.release.outputs.version != null }}
     steps:
