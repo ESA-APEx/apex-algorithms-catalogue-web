@@ -82,14 +82,13 @@ jobs:
   build-docker:
     needs: [build]
     runs-on: ubuntu-latest
-    if: ${{ needs.release.outputs.version != null }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release.outputs.version }}
+          ref: v0.11.4
       - name: Get release version
         env:
-          TAG_VERSION: ${{ needs.release.outputs.version }}
+          TAG_VERSION: v0.11.4
         run: |
           echo "RELEASE_VERSION=${TAG_VERSION#v*}" >> $GITHUB_ENV
           echo $RELEASE_VERSION
