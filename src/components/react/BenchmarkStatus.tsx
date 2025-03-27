@@ -41,8 +41,9 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
                 const summaryData = result.find(item => item.scenario_id === scenarioId);
                 setStatus(getBenchmarkStatus(summaryData));
             }
-        } catch (_error) {
+        } catch (error) {
             setStatus('no benchmark');
+            console.error('Failed to fetch benchmark status', error);
         }
     };
 
