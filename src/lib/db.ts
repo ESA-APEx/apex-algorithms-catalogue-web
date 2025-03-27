@@ -16,7 +16,7 @@ export const initDb = async () => {
 
         dbInitPromise = (async () => {
             console.log('Initializing DB');
-            const dbInstance = await Database.create('./tmp/database.duckdb');
+            const dbInstance = await Database.create(':memory:');
 
             console.log('Setting DuckDB home directory');
             await dbInstance.run(`SET home_directory='./tmp';`);

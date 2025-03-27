@@ -30,7 +30,7 @@ describe('Database Module', () => {
         const db = await initDb();
 
         expect(db).toBe(mockDbInstance);
-        expect(Database.create).toHaveBeenCalledWith('./tmp/database.duckdb');
+        expect(Database.create).toHaveBeenCalledWith(':memory:');
         expect(mockDbInstance.run).toHaveBeenCalledWith(`SET home_directory='./tmp';`);
         expect(mockDbInstance.run).toHaveBeenCalledWith(`INSTALL httpfs;`);
         expect(mockDbInstance.run).toHaveBeenCalledWith(`LOAD httpfs;`);
@@ -71,6 +71,6 @@ describe('Database Module', () => {
         const result = await executeQuery('SELECT * FROM test;');
 
         expect(result).toEqual(mockQueryResult);
-        expect(Database.create).toHaveBeenCalledWith('./tmp/database.duckdb');
+        expect(Database.create).toHaveBeenCalledWith(':memory:');
     });
 });
