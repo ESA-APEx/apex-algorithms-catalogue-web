@@ -33,18 +33,22 @@ export const initDb = async () => {
 
         return await dbInitPromise;
     } catch (error) {
-        console.log('Cannot connect to DB: ' + String(error));
-        throw error;
+        console.log('Cannot connect to DB: ' + String(error));        
+        return null;
     }
 }
 
-export const executeQuery = async (query: string): Promise<any[]> => {
+export const executeQuery = async (query: string): Promise<any[] | null> => {
     try {
         if (!db) {
             db = await initDb();
         }
-        const connection = await db.connect();
-        return (await connection.all(query)) as any[];
+        if (db) {
+            const connection = await db.connect();
+            return (await connection.all(query)) as any[];
+        }
+        console.log('Cannot execute query because DB is not initialized.');
+        return [];
     } catch (error) {
         console.log('Cannot execute query: ' + String(error));
         throw error;
