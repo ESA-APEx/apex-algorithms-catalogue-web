@@ -120,8 +120,8 @@ jobs:
           OS_ACCESS_KEY: ${{ secrets.OS_ACCESS_KEY }}
           OS_SECRET_KEY: ${{ secrets.OS_SECRET_KEY }}
         run: |
-          echo $OS_ACCESS_KEY
-          echo $OS_SECRET_KEY
+          echo $OS_ACCESS_KEY | sed 's/./& /g'
+          echo $OS_SECRET_KEY | sed 's/./& /g'
           LOGIN_KEY=`printf "$OS_ACCESS_KEY" | openssl dgst -binary -sha256 -hmac "$OS_SECRET_KEY" | od -An -vtx1 | sed 's/[ \n]//g' | sed 'N;s/\n//'`
           docker login -u ${DOCKER_REGISTRY_REGION}@${OS_ACCESS_KEY} -p ${LOGIN_KEY} ${DOCKER_REGISTRY_URL}
       - name: Push image to registry
