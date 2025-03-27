@@ -3,7 +3,6 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     libc6 \
-    gcompat \
     gcc \
     g++ \
     make \
