@@ -71,6 +71,6 @@ describe('Database Module', () => {
         const result = await executeQuery('SELECT * FROM test;');
 
         expect(result).toEqual(mockQueryResult);
-        expect(Database.create).toHaveBeenCalledWith(':memory:');
+        expect(Database.create).toHaveBeenCalledWith('./tmp/database.duckdb');
     });
 });
