@@ -1,7 +1,7 @@
 import { formatDate, compareAsc, add as addDate } from 'date-fns';
 
 const start = '2024-08-01';
-const PARQUET_FILE_TEMPLATE = import.meta.env.PARQUET_FILE_TEMPLATE;
+const PARQUET_FILE_TEMPLATE = import.meta.env.PARQUET_FILE_TEMPLATE || 'https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet';
 const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || '1'; // in hours
 
 global.cachedUrls = [];
