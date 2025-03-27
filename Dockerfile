@@ -1,7 +1,7 @@
 FROM node:20.17-alpine AS base
 WORKDIR /app
 
-RUN apk add libc6-compat && apk add gcompat
+RUN apk add --no-cache libc6-compat gcompat gcc g++ make python3
 COPY package.json package-lock.json ./
 
 FROM base AS prod-deps
@@ -19,7 +19,8 @@ FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 RUN mkdir -p ./tmp
-
+RUN chown -R node:node /app/tmp
+USER node
 ENV HOST=0.0.0.0
 ENV PORT=4321
 EXPOSE 4321
