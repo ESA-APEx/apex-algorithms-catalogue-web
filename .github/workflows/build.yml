@@ -11,8 +11,8 @@ env:
   DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 20.17.0
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
-  STAGING_BASE_URL: https://algorithm-catalogue.dev.apex.esa.int
-  PRODUCTION_BASE_URL: https://algorithm-catalogue.apex.esa.int
+  STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+  PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
 
 permissions:
   contents: write
@@ -49,6 +49,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+    - name: Install duckdb prequisites
+      run: apt-get install -y libc6
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
