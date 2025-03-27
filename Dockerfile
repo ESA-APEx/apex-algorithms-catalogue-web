@@ -1,7 +1,15 @@
-FROM node:20.17-bullseye-slim AS base
+FROM node:20.17-bullseye AS base
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat gcompat gcc g++ make python3
+RUN apt-get update && apt-get install -y \
+    libc6 \
+    gcompat \
+    gcc \
+    g++ \
+    make \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
 
 FROM base AS prod-deps
