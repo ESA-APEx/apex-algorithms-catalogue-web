@@ -78,6 +78,7 @@ jobs:
       - name: Get latest version
         run: |
           LATEST_TAG=$(git tag -l --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          echo $LATEST_TAG
           echo "tag=$LATEST_TAG" >> $GITHUB_ENV
       - name: Get next version
         id: semver
@@ -87,7 +88,7 @@ jobs:
           branch: main
           noVersionBumpBehavior: silent
           noNewCommitBehavior: silent
-          initialVersion: ${{ env.tag || '0.0.0' }}
+          fromTag: ${{ env.tag || '0.0.0' }}
       - name: Create release tag
         uses: ncipollo/release-action@v1.12.0
         if: ${{ steps.semver.outputs.next != null }}
