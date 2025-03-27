@@ -1,4 +1,4 @@
-FROM node:20.17-alpine AS base
+FROM node:20.17-bullseye-slim AS base
 WORKDIR /app
 
 RUN apk add --no-cache libc6-compat gcompat gcc g++ make python3
