@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.6.2",
   "scripts": {
-    "dev": "npm run make-dir ./tmp && npm run download-source && astro dev --force",
-    "build": "astro check && npm run download-source && astro build",
+    "dev": "make-dir ./tmp && astro dev --force",
+    "build": "make-dir ./tmp && astro check && npm run download-source && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "test": "npm run test-unit && npm run test-e2e",
