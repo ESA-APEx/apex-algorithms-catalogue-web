@@ -323,6 +323,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             title={item.properties.title}
                             body={item.properties.description}
                             labels={item.properties.keywords}
+                            thumbnail={item.links.find(link => link.rel === 'thumbnail')?.href}
                         >
                             <div className="text-brand-teal-80 text-sm mt-2">
                                 {

@@ -5,6 +5,7 @@ interface CardProps {
     type: string;
 	body: string;
 	href: string;
+    thumbnail?: string;
 	labels?: string[];
     children?: React.ReactNode;
     maxDisplayedLabels?: number;
@@ -23,6 +24,7 @@ const truncateBody = (text: string, wordLimit = 20) => {
 export const Card = (
     { 
         title, 
+        thumbnail,
         type,  
         body, 
         href, 
@@ -33,10 +35,14 @@ export const Card = (
     const truncatedBody = truncateBody(body);
     const displayedLabels = labels?.slice(0, maxDisplayedLabels);
     const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
+    const imageUrl = thumbnail || '/images/default-thumbnail.png';
 
     return (
         <a href={href} data-testid='service-card'>
             <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-64">
+                <div className="card-thumbnail -mx-4 -mt-3 rounded-t-lg mb-2 bg-gray-200 h-36 overflow-clip">
+                    <img className="w-full rounded-t-lg" src={imageUrl} alt="thumbnail" />
+                </div>
                 <div className="card-header mb-2">
                     <span className="text-sm" data-testid='service-type'>{type}</span>
                 </div>
