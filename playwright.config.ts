@@ -9,6 +9,7 @@ export default defineConfig({
   reporter: [[process.env.CI ? 'github' : 'line'], ['html']],
   use: {
     baseURL: 'http://localhost:4321/',
+    video: 'retain-on-failure',
   },
   projects: [
     {
