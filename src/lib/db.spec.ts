@@ -30,7 +30,7 @@ describe('Database Module', () => {
         const db = await initDb();
 
         expect(db).toBe(mockDbInstance);
-        expect(Database.create).toHaveBeenCalledWith(':memory:');
+        expect(Database.create).toHaveBeenCalledWith('./tmp/database.duckdb');
         expect(mockDbInstance.run).toHaveBeenCalledWith(`SET home_directory='./tmp';`);
         expect(mockDbInstance.run).toHaveBeenCalledWith(`INSTALL httpfs;`);
         expect(mockDbInstance.run).toHaveBeenCalledWith(`LOAD httpfs;`);
