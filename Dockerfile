@@ -1,4 +1,4 @@
-FROM node:20.17-bullseye AS base
+FROM node:20.17-bullseye-slim AS base
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
