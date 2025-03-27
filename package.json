@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.6.2",
   "scripts": {
-    "dev": "make-dir ./tmp && astro dev --force",
+    "dev": "make-dir ./tmp && npm run download-source && astro dev --force",
     "build": "make-dir ./tmp && astro check && npm run download-source && astro build",
     "preview": "astro preview",
     "astro": "astro",
