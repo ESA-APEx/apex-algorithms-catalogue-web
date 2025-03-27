@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.6.2",
   "scripts": {
-    "dev": "npm run download-source && astro dev --force",
+    "dev": "npm run make-dir ./tmp && npm run download-source && astro dev --force",
     "build": "astro check && npm run download-source && astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -51,6 +51,7 @@
     "@types/react-dom": "^18.3.0",
     "@types/react-stickynode": "^4.0.3",
     "cheerio": "^1.0.0",
+    "make-dir-cli": "^4.0.0",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
     "unzipper": "^0.12.3",
