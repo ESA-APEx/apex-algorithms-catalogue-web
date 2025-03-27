@@ -1,12 +1,8 @@
-FROM node:20.17-bullseye-slim AS base
+FROM node:20.17-bookworm-slim AS base
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     libc6 \
-    gcc \
-    g++ \
-    make \
-    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
