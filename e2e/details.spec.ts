@@ -49,10 +49,10 @@ test.describe('Service Details Test', () => {
 
         await expect(page.getByText('Benchmark status')).toBeVisible();
 
-        const statusBadge = page.getByTestId('benchmark-status-badge');
+        const statusBadge = page.getByTestId('benchmark-status-sidenav');
 
-        await expect(statusBadge).toBeVisible({ timeout: 20000 });
-        await expect(statusBadge.getByText('Stable')).toBeVisible();
+        await expect(statusBadge).toBeVisible();
+        await expect(statusBadge.getByText('Stable')).toBeVisible({ timeout: 50000 });
     });
 
     test("Should truncate the lengthy description and display 'read more' to show complete text", async ({page}) => {

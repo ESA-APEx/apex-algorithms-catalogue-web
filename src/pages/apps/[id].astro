@@ -4,7 +4,6 @@ import {Info, Globe, SquareArrowOutUpRight, TriangleAlert} from 'lucide-react';
 import {Badge} from '../../components/react/Badge';
 import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
 import {ClipboardButton} from '../../components/react/ClipboardButton';
-import {BenchmarkStatus} from '../../components/react/BenchmarkStatus';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -12,8 +11,9 @@ import {loadCatalogueDetailData} from '../../lib/load-catalogue';
 import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
-import {BenchmarkInfoPopover} from '../../components/react/BenchmarkInfoPopover';
 import {CollapsibleText} from '../../components/react/CollapsibleText';
+import { BenchmarkStatusSideNavItem } from '../../components/react/BenchmarkStatusSideNavItem';
+
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
 import type {ToCElement} from '../../types/models/catalogue';
@@ -184,13 +184,7 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                             {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
                         </ul>
                     </li>
-                    <li>
-                        <div class="text-white mb-1 flex items-center gap-2">
-                            <span>Benchmark status</span>
-                            <BenchmarkInfoPopover client:idle />
-                        </div>
-                        <BenchmarkStatus scenarioId={algorithm.id} client:only="react" />
-                    </li>
+                    <BenchmarkStatusSideNavItem scenarioId={algorithm.id} client:only="react" />
                     <li>
                         <div class="text-white mb-1">Cost estimation</div>
                     <li>
