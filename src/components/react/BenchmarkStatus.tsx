@@ -17,13 +17,11 @@ export const STATUS_THRESHOLD = {
 const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
     if (data) {
         const successRate = data.success_count / data.runs;
+
         if (successRate >= STATUS_THRESHOLD.stable) {
             return 'stable';
-        } 
-        if (successRate >= STATUS_THRESHOLD.unstable) {
-            return 'unstable';
         }
-        return  'no benchmark';
+        return 'unstable';
     }
     return 'no benchmark';
 }
@@ -42,6 +40,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
                 setStatus(getBenchmarkStatus(summaryData));
             } else {
                 setStatus('no benchmark');
+                console.error("The response is not ok, setting it to fallback 'no benchmark'.")
             }
         } catch (error) {
             setStatus('no benchmark');

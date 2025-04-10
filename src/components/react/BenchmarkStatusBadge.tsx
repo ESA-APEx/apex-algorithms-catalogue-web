@@ -1,6 +1,7 @@
 import type { BenchmarkStatusKey } from "@/types/models/benchmark";
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { isFeatureEnabled } from '@/lib/featureflag';
 
 interface BenchmarkStatusBadgeProps {
     status: BenchmarkStatusKey;
@@ -20,10 +21,13 @@ const statusVariant = cva('inline-flex w-2 h-2 rounded-full', {
 })
 
 export const BenchmarkStatusBadge = ({ status }: BenchmarkStatusBadgeProps) => {
-    return (
-        <div className="flex items-center gap-2" data-testid="benchmark-status-badge">
-            <span className={cn(statusVariant({ status }))}></span>
-            <span className="capitalize">{status}</span>
-        </div>
-    );
+    const isEnabled = isFeatureEnabled(window.location.href, 'benchmarkStatus');
+
+    return isEnabled ? 
+        (
+            <div className="flex items-center gap-2" data-testid="benchmark-status-badge">
+                <span className={cn(statusVariant({ status }))}></span>
+                <span className="capitalize">{status}</span>
+            </div>
+        ) : null;
 }
