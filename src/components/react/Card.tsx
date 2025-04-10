@@ -1,9 +1,14 @@
+import * as React from 'react';
+
 interface CardProps {
 	title: string;
     type: string;
 	body: string;
 	href: string;
+    thumbnail?: string;
 	labels?: string[];
+    children?: React.ReactNode;
+    maxDisplayedLabels?: number;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -16,11 +21,28 @@ const truncateBody = (text: string, wordLimit = 20) => {
 }
 
 
-export const Card = ({ title, type,  body, href, labels }: CardProps) => {
+export const Card = (
+    { 
+        title, 
+        thumbnail,
+        type,  
+        body, 
+        href, 
+        labels, 
+        children,
+        maxDisplayedLabels = 3,
+    }: CardProps) => {
     const truncatedBody = truncateBody(body);
+    const displayedLabels = labels?.slice(0, maxDisplayedLabels);
+    const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
+    const imageUrl = thumbnail || '/images/default-thumbnail.png';
+
     return (
         <a href={href} data-testid='service-card'>
-            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-96">
+            <div className="card flex flex-col w-full h-full px-4 py-3 rounded-lg text-brand-teal-30 bg-brand-teal-10 min-h-64">
+                <div className="card-thumbnail -mx-4 -mt-3 rounded-t-lg mb-2 bg-gray-200 h-36 overflow-clip">
+                    <img className="w-full rounded-t-lg" src={imageUrl} alt="thumbnail" />
+                </div>
                 <div className="card-header mb-2">
                     <span className="text-sm" data-testid='service-type'>{type}</span>
                 </div>
@@ -33,15 +55,24 @@ export const Card = ({ title, type,  body, href, labels }: CardProps) => {
                     {truncatedBody}
                 </p>
 
+                {children}
+
                 {
-                    labels?.length && (
+                    displayedLabels?.length && (
                         <div className="card-labels">
                             <hr className="text-brand-teal-20 border my-3" />
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-nowrap gap-2 overflow-hidden">
                                 {
-                                    labels.map((label) => (
-                                        <span key={label} className="text-sm px-2 py-1 text-brand-teal-80 bg-white" data-testid='service-label'>{label}</span>
+                                    displayedLabels.map((label) => (
+                                        <span key={label} className="text-sm text-nowrap px-2 py-1 text-brand-teal-80 bg-white" data-testid='service-label'>{label}</span>
                                     ))
+                                }
+                                {
+                                    hiddenLabels?.length ? 
+                                    (
+                                        <span className="text-sm text-nowrap px-1 py-1 text-brand-teal-80" data-testid='service-hidden-label'>+{hiddenLabels.length}</span>
+                                    )
+                                    : null
                                 }
                             </div>
                         </div>

@@ -1,29 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { BenchmarkSummary, BenchmarkStatusKey } from '@/types/models/benchmark';
 import { isFeatureEnabled } from '@/lib/featureflag';
+import { getBenchmarkSummary } from '@/lib/api';
 import { BenchmarkStatusBadge } from './BenchmarkStatusBadge';
+import { getBenchmarkStatus } from '@/lib/benchmark-status';
+import { Spinner } from './Spinner';
 
 interface BenchmarkStatusProps {
     scenarioId: string;
-    data?: BenchmarkSummary;
-}
-
-export const STATUS_THRESHOLD = {
-    stable: 0.75,
-    unstable: 0,
-    'no benchmark': null,
-}
-
-const getBenchmarkStatus = (data?: BenchmarkSummary): BenchmarkStatusKey => {
-    if (data) {
-        const successRate = data.success_count / data.runs;
-
-        if (successRate >= STATUS_THRESHOLD.stable) {
-            return 'stable';
-        }
-        return 'unstable';
-    }
-    return 'no benchmark';
+    data?: BenchmarkSummary[];
 }
 
 export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
@@ -33,9 +18,8 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch('/api/services/benchmarks.json');
-            if (response.ok) {
-                const result = await response.json() as BenchmarkSummary[];
+            const result = await getBenchmarkSummary();
+            if (result) {
                 const summaryData = result.find(item => item.scenario_id === scenarioId);
                 setStatus(getBenchmarkStatus(summaryData));
             } else {
@@ -51,12 +35,12 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
     useEffect(() => {
         if (isEnabled) {
             if (data) {
-                setStatus(getBenchmarkStatus(data))
+                setStatus(getBenchmarkStatus(data.find(item => item.scenario_id === scenarioId)))
             } else {
                 fetchData();
             }
         }
-    }, []);
+    }, [data, scenarioId]);
 
     return isEnabled && (
         <>
@@ -65,10 +49,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
                     (
                         <BenchmarkStatusBadge status={status} />
                     ) : (
-                        <div className="flex items-center gap-2">
-                            <img className="w-3 h-3 animate-spin" src="/icons/icon-spinner.svg" />
-                            <span>loading...</span>
-                        </div>
+                        <Spinner />
                     )
             }
         </>
