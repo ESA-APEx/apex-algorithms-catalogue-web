@@ -11,6 +11,9 @@ import {loadCatalogueDetailData} from '../../lib/load-catalogue';
 import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
+import {CollapsibleText} from '../../components/react/CollapsibleText';
+import { BenchmarkStatusSideNavItem } from '../../components/react/BenchmarkStatusSideNavItem';
+
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
 import type {ToCElement} from '../../types/models/catalogue';
@@ -87,11 +90,11 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
     <aside class="block px-4 my-8">
-        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto" />
+        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3" />
     </aside>
 
 	<article class="flex-1 px-4 my-14">
-       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
+       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3">
             <section class="flex-1">
                 <header class="mb-12">
                     <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
@@ -172,13 +175,16 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                 <ul class="flex flex-col gap-4 text-brand-gray-50">
                     <li>
                         <div class="text-white mb-1">About</div>
-                        <div class="break-words">{algorithm.properties.description}</div>
+                        <div>
+                            <CollapsibleText text={algorithm.properties.description} client:idle />
+                        </div>
                     </li>
                     <li>
                         <ul class="flex flex-wrap gap-2">
                             {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
                         </ul>
                     </li>
+                    <BenchmarkStatusSideNavItem scenarioId={algorithm.id} client:only="react" />
                     <li>
                         <div class="text-white mb-1">Cost estimation</div>
                         <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>

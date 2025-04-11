@@ -21,3 +21,5 @@ export interface BenchmarkSummary {
     success_count: number;
     failed_count: number;
 }
+
+export type BenchmarkStatusKey = 'stable' | 'unstable' | 'no benchmark';
