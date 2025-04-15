@@ -21,6 +21,7 @@ RUN npm run build
 FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY .env ./
 RUN mkdir -p ./tmp
 RUN chown -R node:node ./tmp
 USER node
