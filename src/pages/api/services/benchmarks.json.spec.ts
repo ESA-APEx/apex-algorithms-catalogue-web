@@ -10,6 +10,7 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('@/lib/parquet-datasource', () => ({
     getUrls: vi.fn(),
+    isCacheExpired: vi.fn().mockReturnValue(true),
 }));
 
 describe('API Route: GET', () => {

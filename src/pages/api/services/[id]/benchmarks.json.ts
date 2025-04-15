@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import type { BenchmarkData } from '@/types/models/benchmark';
 
 import { executeQuery } from '@/lib/db';
-import { getUrls } from '@/lib/parquet-datasource';
+import { getUrls, isCacheExpired } from '@/lib/parquet-datasource';
 
 /**
  * @openapi
@@ -67,6 +67,12 @@ import { getUrls } from '@/lib/parquet-datasource';
 export const GET: APIRoute = async ({ params }) => {
     const scenario = params.id
     try {
+        if (isCacheExpired()) {
+            await executeQuery(
+                `
+                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
+                `);
+        }
         const query = `
             SELECT round("usage:cpu:cpu-seconds", 2)::INTEGER                  as cpu, 
                 round("usage:memory:mb-seconds", 2)::INTEGER                   as memory, 
@@ -77,7 +83,7 @@ export const GET: APIRoute = async ({ params }) => {
                 round("usage:network_received:b", 2)                           as network_received,
                 strptime("test:start:datetime", '%Y-%m-%dT%H:%M:%SZ')          as start_time,
                 "test:outcome"                                                 as status
-            FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
+            FROM benchmarks
             WHERE "scenario_id" = '${scenario}'
             ORDER BY "test:start:datetime" DESC
         `

@@ -11,9 +11,9 @@ const urlExists = async (url: string) => {
     return result.ok;
 }
 
-const isCacheExpired = () => {
+export const isCacheExpired = () => {
     const now = new Date();
-    return !!global.cachedUrlsExpireTime && now >= global.cachedUrlsExpireTime;
+    return !!global.cachedUrlsExpireTime ? now >= global.cachedUrlsExpireTime : true;
 }
 
 const updateCacheExpiration = () => {

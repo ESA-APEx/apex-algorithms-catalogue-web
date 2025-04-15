@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import type { BenchmarkSummary } from '@/types/models/benchmark';
 import { executeQuery } from '@/lib/db';
-import { getUrls } from '@/lib/parquet-datasource';
+import { getUrls, isCacheExpired } from '@/lib/parquet-datasource';
 
 /**
  * @openapi
@@ -38,12 +38,18 @@ import { getUrls } from '@/lib/parquet-datasource';
  */
 export const GET: APIRoute = async () => {
     try {
+        if (isCacheExpired()) {
+            await executeQuery(
+                `
+                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
+                `);
+        }
         const query = `
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
                 SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
                 SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
-            FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}])
+            FROM benchmarks
             WHERE "scenario_id" IS NOT NULL
             GROUP BY "scenario_id"
             ORDER BY "scenario_id"; 

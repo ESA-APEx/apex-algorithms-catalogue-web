@@ -5,6 +5,7 @@ import { executeQuery } from '@/lib/db';
 
 vi.mock('@/lib/parquet-datasource', () => ({
     getUrls: vi.fn(),
+    isCacheExpired: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock('@/lib/db', () => ({
@@ -46,7 +47,7 @@ describe('API Route: GET /benchmarks/:id', () => {
         });
 
         expect(getUrls).toHaveBeenCalledOnce();
-        expect(executeQuery).toHaveBeenCalledOnce();
+        expect(executeQuery).toHaveBeenCalled();
     });
 
     it('should return a 500 error response when an exception occurs', async () => {
