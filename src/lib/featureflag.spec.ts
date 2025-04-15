@@ -11,21 +11,21 @@ vi.mock("@/featureflag.config", () => ({
 }));
 
 describe("isFeatureEnabled", () => {
-    const originalStagingBaseUrl = import.meta.env.STAGING_BASE_URL;
-    const originalProductionBaseUrl = import.meta.env.PRODUCTION_BASE_URL;
+    const originalStagingBaseUrl = import.meta.env.PUBLIC_STAGING_BASE_URL;
+    const originalProductionBaseUrl = import.meta.env.PUBLIC_PRODUCTION_BASE_URL;
 
 
     const STAGING_BASE_URL = "https://staging.example.com";
     const PRODUCTION_BASE_URL = "https://example.com";
 
     beforeAll(() => {
-        import.meta.env.STAGING_BASE_URL = STAGING_BASE_URL;
-        import.meta.env.PRODUCTION_BASE_URL = PRODUCTION_BASE_URL;
+        import.meta.env.PUBLIC_STAGING_BASE_URL = STAGING_BASE_URL;
+        import.meta.env.PUBLIC_PRODUCTION_BASE_URL = PRODUCTION_BASE_URL;
     });
 
     afterAll(() => {
-        import.meta.env.STAGING_BASE_URL = originalStagingBaseUrl;
-        import.meta.env.PRODUCTION_BASE_URL = originalProductionBaseUrl;
+        import.meta.env.PUBLIC_STAGING_BASE_URL = originalStagingBaseUrl;
+        import.meta.env.PUBLIC_PRODUCTION_BASE_URL = originalProductionBaseUrl;
     })
 
     it("should return feature value from staging if URL matches staging base URL", () => {
