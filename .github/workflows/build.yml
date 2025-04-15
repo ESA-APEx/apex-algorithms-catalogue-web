@@ -46,8 +46,6 @@ jobs:
   e2e_test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.47.1
     steps:
     - name: Install duckdb prequisites
       run: sudo apt-get install -y libc6
@@ -57,6 +55,15 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: Install dependencies
       run: npm ci
+    - name: Check Playwright browser cache
+      id: playwright-cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Install Playwright browser
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: npx playwright install
     - name: Setup tmp directory for DuckDB
       run: mkdir -p ./tmp
     - name: Run Playwright tests
