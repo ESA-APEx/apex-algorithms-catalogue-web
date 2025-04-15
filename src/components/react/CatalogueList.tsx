@@ -28,6 +28,7 @@ import { generateUniqueOptions } from '../../lib/utils'
 import type { BenchmarkStatusKey, BenchmarkSummary } from '@/types/models/benchmark'
 import { getBenchmarkSummary } from '@/lib/api'
 import { getBenchmarkStatus, STATUS_THRESHOLD } from '@/lib/benchmark-status'
+import { isFeatureEnabled } from '@/lib/featureflag';
 
 interface CatalogueListProps {
     catalogues: Algorithm[]
@@ -146,6 +147,7 @@ const getCataloguesFilterList = (catalogues: Algorithm[]) => {
 }
 
 export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
+    const isBenchmarkStatusEnabled = isFeatureEnabled(window.location.href, 'benchmarkStatus');
     const [query, setQuery] = useState<string>('')
     const [sortBy, setSortBy] = useState<SortOption>('name')
     const [filterByLabels, setFilterByLabels] = useState<string[]>([])
@@ -154,6 +156,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<string[]>([])
     const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>()
     const {labels, licenses, types, benchmarkStatus} = getCataloguesFilterList(catalogues)
+    const toggledSortOptions = isBenchmarkStatusEnabled ? sortOptions : sortOptions.filter(option => option.value != 'benchmark status')
 
     const data = searchAndSortFilterCatalogues({
         query, 
@@ -187,7 +190,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     };
 
     useEffect(() => {
-        fetchBenchmarkData();
+        if (isBenchmarkStatusEnabled) {
+            fetchBenchmarkData();
+        }
     }, [])
 
     return 	(
@@ -258,25 +263,33 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                                     ))
                                 }
                             </div>
-                            <p className="mb-1">Benchmark status</p>
-                            <div className="flex flex-col mb-4">
-                                {
-                                    benchmarkStatus.map(({label, value}) => (
-                                        <label key={value} className="flex items-center gap-1" data-testid='filter-benchmark-status'>
-                                            <Checkbox
-                                                key={value}
-                                                checked={filterByBenchmarkStatus.includes(value)}
-                                                onCheckedChange={(checked) => {
-                                                    return checked ?
-                                                        setFilterByBenchmarkStatus([...filterByBenchmarkStatus, value]) :
-                                                        setFilterByBenchmarkStatus(filterByBenchmarkStatus.filter(item => item != value))
-                                                }}
-                                            />
-                                            <span>{label}</span>
-                                        </label>
-                                    ))
-                                }
-                            </div>
+                            { 
+                                isBenchmarkStatusEnabled ? 
+                                    (
+                                        <>
+                                            <p className="mb-1">Benchmark status</p>
+                                            <div className="flex flex-col mb-4">
+                                                {
+                                                    benchmarkStatus.map(({label, value}) => (
+                                                        <label key={value} className="flex items-center gap-1" data-testid='filter-benchmark-status'>
+                                                            <Checkbox
+                                                                key={value}
+                                                                checked={filterByBenchmarkStatus.includes(value)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked ?
+                                                                        setFilterByBenchmarkStatus([...filterByBenchmarkStatus, value]) :
+                                                                        setFilterByBenchmarkStatus(filterByBenchmarkStatus.filter(item => item != value))
+                                                                }}
+                                                            />
+                                                            <span>{label}</span>
+                                                        </label>
+                                                    ))
+                                                }
+                                            </div>
+                                            
+                                        </>
+                                    ) : null
+                            }
                             <p>Labels</p>
                             <MultiSelector values={filterByLabels} onValuesChange={setFilterByLabels} loop={false}>
                                 <MultiSelectorTrigger>
@@ -303,7 +316,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                         </SelectTrigger>
                         <SelectContent>
                             { 
-                                sortOptions.map(
+                                toggledSortOptions.map(
                                     ({ value, label }) => 
                                         <SelectItem key={value} value={value}>{label}</SelectItem>
                                 ) 
@@ -325,13 +338,16 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                             labels={item.properties.keywords}
                             thumbnail={item.links.find(link => link.rel === 'thumbnail')?.href}
                         >
-                            <div className="text-brand-teal-80 text-sm mt-2">
-                                {
-                                    benchmarkData ? 
-                                    <BenchmarkStatus key={`status-${id}`} scenarioId={item.id} data={benchmarkData} /> :
-                                    <Spinner />
-                                }
-                            </div>
+                            { isBenchmarkStatusEnabled ? (
+                                <div className="text-brand-teal-80 text-sm mt-2">
+                                    {
+                                        benchmarkData ? 
+                                        <BenchmarkStatus key={`status-${id}`} scenarioId={item.id} data={benchmarkData} /> :
+                                        <Spinner />
+                                    }
+                                </div>
+                                ) : null
+                            }
                         </Card>
                     </li>
                 ))}
