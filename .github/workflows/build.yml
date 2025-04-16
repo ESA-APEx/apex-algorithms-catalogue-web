@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install duckdb prequisites
-      run: apt-get install -y libc6
+      run: sudo apt-get install -y libc6
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
