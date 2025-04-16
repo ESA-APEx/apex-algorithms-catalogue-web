@@ -22,6 +22,6 @@ export default defineConfig({
     command: 'node ./dist/server/entry.mjs',
     url: 'http://localhost:4321/',
     timeout: 120 * 1000,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
 });
