@@ -11,8 +11,9 @@ import {loadCatalogueDetailData} from '../../lib/load-catalogue';
 import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
+import {CatalogueCwlDetailParametersTable} from '../../components/react/CatalogueCwlDetailParametersTable';
 import {CollapsibleText} from '../../components/react/CollapsibleText';
-import { BenchmarkStatusSideNavItem } from '../../components/react/BenchmarkStatusSideNavItem';
+import {BenchmarkStatusSideNavItem} from '../../components/react/BenchmarkStatusSideNavItem';
 
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
@@ -85,6 +86,7 @@ const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
 const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
 const previews = algorithm.links.filter(link => link.rel === 'preview');
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
+const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
 
 ---
 
@@ -140,7 +142,8 @@ const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
                             </li>
                         ))}
                     </ul>
-                    {applicationDetails && <CatalogueDetailParametersTable details={applicationDetails}/> }
+                    {applicationDetails && algorithm.type === AlgorithmType.OPENEO && <CatalogueDetailParametersTable details={applicationDetails}/> }
+                    {cwlUrl && <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} client:only="react" />}
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
