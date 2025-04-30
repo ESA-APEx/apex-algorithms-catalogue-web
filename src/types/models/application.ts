@@ -7,7 +7,7 @@ export interface Parameter {
     default?: string | string[];
 }
 export interface ApplicationDetails {
-    id: string
+    id?: string
     summary: string
     description: string
     parameters: Parameter[];
