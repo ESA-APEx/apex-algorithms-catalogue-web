@@ -18,7 +18,7 @@ export const CollapsibleText = ({ text, maxLength = 250 }: CollapsibleTextProps)
                     (
                         <button 
                             className="align-baseline ml-2 text-sm text-gray-300"
-                            onClick={() => setShowDetail((value) => !value)}>
+                            onClick={() => setShowDetail(true)}>
                             Read more
                         </button>
                     )
