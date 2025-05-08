@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './process-definition.json';
 import YAML from 'yaml';
+import nodeFetch from 'node-fetch';
 
 // Mock YAML parse
 vi.mock('yaml', () => ({
@@ -9,10 +10,13 @@ vi.mock('yaml', () => ({
 	},
 }));
 
+vi.mock('node-fetch', () => ({
+	default: vi.fn(),
+}));
+
 describe('API Route: GET', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		global.fetch = vi.fn();
 	});
 
 	it('should return 400 if no URL is provided', async () => {
@@ -33,8 +37,8 @@ describe('API Route: GET', () => {
 		expect(json).toEqual({ message: 'Type unknown is not supported.' });
 	});
 
-	it('should return empty object on unauthorized fetch', async () => {
-		(global.fetch as jest.Mock).mockResolvedValue({
+	it('should return error message on unauthorized fetch', async () => {
+		(nodeFetch as jest.Mock).mockResolvedValue({
 			ok: false,
 			status: 401,
 			text: vi.fn(),
@@ -43,9 +47,11 @@ describe('API Route: GET', () => {
 		const request = new Request('http://localhost:4321/api/services/process-definition?url=http://example.com/file.cwl&type=cwl');
 		const response = await GET({ request } as any);
 
-		expect(response.status).toBe(200);
+		expect(response.status).toBe(401);
 		const json = await response.json();
-		expect(json).toEqual({});
+		expect(json).toEqual({
+			message: 'Process definition for url http://example.com/file.cwl is protected.',
+		});
 	});
 
 	it('should return parsed application details for valid CWL', async () => {
@@ -66,7 +72,7 @@ describe('API Route: GET', () => {
 			],
 		};
 
-		(global.fetch as jest.Mock).mockResolvedValue({
+		(nodeFetch as jest.Mock).mockResolvedValue({
 			ok: true,
 			status: 200,
 			text: vi.fn().mockResolvedValue('yaml content'),
@@ -100,7 +106,7 @@ describe('API Route: GET', () => {
 			],
 		};
 
-		(global.fetch as jest.Mock).mockResolvedValue({
+		(nodeFetch as jest.Mock).mockResolvedValue({
 			ok: true,
 			status: 200,
 			text: vi.fn().mockResolvedValue('yaml content'),
@@ -117,7 +123,7 @@ describe('API Route: GET', () => {
 	});
 
 	it('should return 500 if fetch throws error', async () => {
-		(global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+		(nodeFetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
 		const request = new Request('http://localhost:4321/api/services/process-definition.json?url=http://example.com/file.cwl&type=cwl');
 		const response = await GET({ request } as any);
