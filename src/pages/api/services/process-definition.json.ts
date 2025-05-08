@@ -1,3 +1,5 @@
+import nodeFetch from 'node-fetch';
+import https from 'https';
 import type { ApplicationDetails } from '@/types/models/application';
 import type { CwlWorkflow } from '@/types/models/cwl';
 import type { APIRoute } from 'astro';
@@ -6,9 +8,9 @@ import YAML from 'yaml';
 const supportedTypes = ['cwl'];
 
 export const GET: APIRoute = async ({ request }) => {
-  const url = new URL(request.url);
-  const targetUrl = url.searchParams.get('url');
-  const type = url.searchParams.get('type');
+    const url = new URL(request.url);
+    const targetUrl = url.searchParams.get('url');
+    const type = url.searchParams.get('type');
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -29,12 +31,16 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
   try {
-        const response = await fetch(targetUrl);
+        const agent = new https.Agent({
+            rejectUnauthorized: false,
+        });
+        const response = await nodeFetch(targetUrl, { agent });
 
         // Handle unauthorized or protected files
         if (!response.ok || response.status === 401 || response.status === 403) {
-            return new Response(JSON.stringify({}), {
-                status: 200,
+            const message = `Process definition for url ${targetUrl} is protected.`;
+            return new Response(JSON.stringify({ message }), {
+                status: 401,
                 headers,
             });
         }

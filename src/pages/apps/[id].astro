@@ -14,6 +14,7 @@ import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDe
 import {CatalogueCwlDetailParametersTable} from '../../components/react/CatalogueCwlDetailParametersTable';
 import {CollapsibleText} from '../../components/react/CollapsibleText';
 import {BenchmarkStatusSideNavItem} from '../../components/react/BenchmarkStatusSideNavItem';
+import {InfoPopover} from '../../components/react/InfoPopover';
 
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
@@ -88,6 +89,8 @@ const previews = algorithm.links.filter(link => link.rel === 'preview');
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
 
+const serviceRequestWarning = 'Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.';
+
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
@@ -134,7 +137,14 @@ const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.t
                     <ul class="flex flex-col gap-5 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
-                                    <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
+                                    <div class="flex gap-2">
+                                        <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
+                                        {
+                                            link.rel === 'application' && orderUrl ? 
+                                            <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
+                                            null
+                                        }
+                                    </div>
                                     <p>
                                         <a class="text-gray-400 break-words" href={link.href}>{link.href}</a>
                                         <ClipboardButton text={link.href} client:idle />
@@ -143,7 +153,7 @@ const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.t
                         ))}
                     </ul>
                     {applicationDetails && algorithm.type === AlgorithmType.OPENEO && <CatalogueDetailParametersTable details={applicationDetails}/> }
-                    {cwlUrl && <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} client:only="react" />}
+                    {!orderUrl && cwlUrl ? <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} client:only="react" /> : null}
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
@@ -206,6 +216,19 @@ const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.t
                     </li>
                     }
                     <li>
+                        <div class="text-white mb-1 flex items-center gap-2">
+                            <span>Service access</span>
+                            <InfoPopover message={serviceRequestWarning} client:idle />
+                        </div>
+                        <div>
+                            {
+                                orderUrl ? 
+                                    <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
+                                    <Badge className="font-normal text-sm rounded-sm" variant="secondary">public</Badge>
+                            }
+                        </div>
+                    </li>
+                    <li>
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
                     </li>
@@ -241,7 +264,7 @@ const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.t
                                 </a>
                                 { orderUrl && <div class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md" data-testid="service-access-warning">
                                     <p class="flex items-center font-bold mb-2"><TriangleAlert className="w-4 h-4 mr-1" />Warning</p>
-                                    <p>Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.</p>
+                                    <p>{serviceRequestWarning}</p>
                                 </div>
                                 }
                             </li>

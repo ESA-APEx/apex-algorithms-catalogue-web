@@ -17,6 +17,10 @@ export const getCwlProcessDefinition = async (cwlUrl: string) => {
         const response = await fetch(`/api/services/process-definition.json?url=${cwlUrl}&type=cwl`);
         if (response.ok) {
             return await response.json() as ApplicationDetails;
+        } else if (response.status === 401) {
+            throw { status: 'protected', httpStatus: response.status };
+        } else {
+            throw { status: 'error', httpStatus: response.status };
         }
     } catch (error) {
         throw error;
