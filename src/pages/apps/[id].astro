@@ -218,7 +218,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                     <li>
                         <div class="text-white mb-1 flex items-center gap-2">
                             <span>Service access</span>
-                            <InfoPopover message={serviceRequestWarning} client:idle />
+                            { orderUrl && <InfoPopover message={serviceRequestWarning} client:idle /> }
                         </div>
                         <div>
                             {
