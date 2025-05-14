@@ -71,4 +71,81 @@ test.describe('Service Details Test', () => {
         await expect(desc).not.toContainText('...');
         await expect(readMoreButton).not.toBeVisible();
     })
+
+    test("Should show parameters in the details page for OpenEO service", async ({page}) => {
+        await openService(page, 'Multi output gaussian process regression');
+
+        const parametersTable = page.getByTestId('parameters-table');
+        await expect(parametersTable).toBeVisible();
+
+        const rows = parametersTable.locator('tr');
+        await expect(rows).toHaveCount(5); 
+
+        // Check if the first row contains header information
+        const headerCells = rows.first().locator('th');
+        await expect(headerCells.nth(0)).toHaveText('Parameter');
+        await expect(headerCells.nth(1)).toHaveText('Type');
+        await expect(headerCells.nth(2)).toHaveText('Default');
+
+        // Check if the content rows contain parameter information
+        const contentCells = rows.nth(1).locator('td');
+        await expect(contentCells.nth(0)).toContainText('spatial_extent (required)');
+        await expect(contentCells.nth(1)).toHaveText('object/bounding-box, object/datacube');
+        await expect(contentCells.nth(2)).toHaveText('');
+    })
+
+    test("Should show parameters in the details page for public OGC API Process service", async ({page}) => {
+        // Note: This test is working because the application url is patched for the test. 
+        // Adjusting reference to the application with public application url is necessary in the future.
+        // (see scripts/setup-public-cwl.mjs)
+        await openService(page, 'SAR-COIN - Coherence and Intensity Composite');
+
+        const parametersTable = page.getByTestId('parameters-table');
+        await expect(parametersTable).toBeVisible();
+
+        const rows = parametersTable.locator('tr');
+        await expect(rows).toHaveCount(3); 
+
+        // Check if the first row contains header information
+        const headerCells = rows.first().locator('th');
+        await expect(headerCells.nth(0)).toHaveText('Parameter');
+        await expect(headerCells.nth(1)).toHaveText('Type');
+        await expect(headerCells.nth(2)).toHaveText('Default');
+
+        // Check if the content rows contain parameter information
+        const contentCells = rows.nth(1).locator('td');
+        await expect(contentCells.nth(0)).toContainText('STAC item reference (required)');
+        await expect(contentCells.nth(1)).toHaveText('string');
+        await expect(contentCells.nth(2)).toHaveText('');
+    })
+
+    test("Should not show parameters in the details page for protected OGC API Process service", async ({page}) => {
+        await openService(page, 'Burned Area Severity (BAS) analysis');
+        const parametersTable = page.getByTestId('parameters-table');
+        await expect(parametersTable).not.toBeVisible();
+    })
+
+    test("Should show the service access label as public for OpenEO service", async ({page}) => {
+        await openService(page, 'Multi output gaussian process regression');
+
+        const accessLabel = page.getByTestId('service-access-label');
+        await expect(accessLabel).toBeVisible();
+        await expect(accessLabel).toHaveText('public');
+
+        const executionLabel = page.getByTestId('execution-info-label');
+        await expect(executionLabel.first()).toHaveText('openEO Process');
+        await expect(executionLabel.last()).toHaveText('openEO Backend');
+    })
+
+    test("Should show the service access label as protected for OGC API Process service", async ({page}) => {
+        await openService(page, 'Burned Area Severity (BAS) analysis');
+
+        const accessLabel = page.getByTestId('service-access-label');
+        await expect(accessLabel).toBeVisible();
+        await expect(accessLabel).toHaveText('protected');
+
+        const executionLabel = page.getByTestId('execution-info-label');
+        await expect(executionLabel.first()).toHaveText('OGC API Process');
+        await expect(executionLabel.last()).toContainText('CWL Definition protected');
+    })
 })
