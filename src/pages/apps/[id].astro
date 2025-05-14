@@ -137,7 +137,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                     <ul class="flex flex-col gap-5 mb-6">
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
-                                    <div class="flex gap-2">
+                                    <div class="flex gap-2" data-testid="execution-info-label">
                                         <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
                                         {
                                             link.rel === 'application' && orderUrl ? 
@@ -220,7 +220,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                             <span>Service access</span>
                             { orderUrl && <InfoPopover message={serviceRequestWarning} client:idle /> }
                         </div>
-                        <div>
+                        <div data-testid="service-access-label">
                             {
                                 orderUrl ? 
                                     <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
