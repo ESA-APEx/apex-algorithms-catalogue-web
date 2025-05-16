@@ -18,7 +18,7 @@ export const isCacheExpired = () => {
 
 const updateCacheExpiration = () => {
     const now = new Date();
-    global.cachedUrlsExpireTime = addDate(now, { hours: PARQUET_FILE_EXPIRATION });
+    global.cachedUrlsExpireTime = addDate(now, { hours: Number(PARQUET_FILE_EXPIRATION) });
 }
 
 export const getUrls = async (): Promise<string[]> => {
