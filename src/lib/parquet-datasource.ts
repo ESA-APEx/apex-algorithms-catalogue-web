@@ -1,6 +1,6 @@
 import { formatDate, compareAsc, add as addDate } from 'date-fns';
 
-const start = '2024-08-01';
+const PARQUET_MONTH_COVERAGE = import.meta.env.PARQUET_MONTH_COVERAGE || '2';
 const PARQUET_FILE_TEMPLATE = import.meta.env.PARQUET_FILE_TEMPLATE || 'https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet';
 const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || '1'; // in hours
 
@@ -22,6 +22,9 @@ const updateCacheExpiration = () => {
 }
 
 export const getUrls = async (): Promise<string[]> => {
+    const now = new Date();
+    const start = addDate(now, { months: -Number(PARQUET_MONTH_COVERAGE) });
+
     if (global.cachedUrls.length > 0 && !isCacheExpired()) {
         return global.cachedUrls;
     }
@@ -30,9 +33,8 @@ export const getUrls = async (): Promise<string[]> => {
         let template = PARQUET_FILE_TEMPLATE;
         let cursor = new Date(start);
         const urls: string[] = [];
-        const now = new Date();
 
-        while (compareAsc(now, cursor) > 0) {
+        while (compareAsc(now, cursor) >= 0) {
             const url = template
                 .replace('[YEAR]', formatDate(cursor, 'yyyy'))
                 .replace('[MONTH]', formatDate(cursor, 'MM'));

@@ -9,6 +9,7 @@ global.fetch = vi.fn();
 describe('getUrls', () => {
     beforeEach(() => {
         vi.useFakeTimers();
+        vi.stubEnv('PARQUET_MONTH_COVERAGE', '2');
         vi.stubEnv('PARQUET_FILE_TEMPLATE', 'https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet');
         vi.stubEnv('PARQUET_FILE_EXPIRATION', '1');
     });
@@ -35,27 +36,35 @@ describe('getUrls', () => {
     });
 
     it('should fetch URLs and return them when they exist, given cached URLs are empty', async () => {
-        const existingUrl = `${baseUrl}/2024-08/part-0.parquet`;
+        const existingUrl = [
+            `${baseUrl}/2024-07/part-0.parquet`,
+            `${baseUrl}/2024-08/part-0.parquet`, 
+            `${baseUrl}/2024-09/part-0.parquet`,
+        ];
         
-        (fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+        (fetch as jest.Mock).mockResolvedValue({ ok: true });
 
         const currentDate = new Date('2024-09-01');
         vi.setSystemTime(currentDate);
 
         const result = await getUrls();
 
-        expect(result).toContain(existingUrl);
-        expect(result.length).toBe(1);
-        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(result).toEqual(existingUrl);
+        expect(result.length).toBe(3);
+        expect(fetch).toHaveBeenCalledTimes(3);
     });
 
     it('should fetch URLs and return them when they exist, given cached URLs are not empty but expired', async () => {
         const mockCachedUrls = [`${baseUrl}/some-cached.parquet`];
         global.cachedUrls = mockCachedUrls;
 
-        const existingUrl = `${baseUrl}/2024-08/part-0.parquet`;
+        const existingUrl = [
+            `${baseUrl}/2024-07/part-0.parquet`,
+            `${baseUrl}/2024-08/part-0.parquet`, 
+            `${baseUrl}/2024-09/part-0.parquet`,
+        ];
         
-        (fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+        (fetch as jest.Mock).mockResolvedValue({ ok: true });
 
         const currentDate = new Date('2024-09-01');
         vi.setSystemTime(currentDate);
@@ -63,14 +72,14 @@ describe('getUrls', () => {
 
         const result = await getUrls();
 
-        expect(result).toContain(existingUrl);
+        expect(result).toEqual(existingUrl);
         expect(result).not.toContain(mockCachedUrls[0]);
-        expect(result.length).toBe(1);
-        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(result.length).toBe(3);
+        expect(fetch).toHaveBeenCalledTimes(3);
     });
 
     it('should return an empty array if no URLs exist', async () => {
-        (fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
+        (fetch as jest.Mock).mockResolvedValue({ ok: false });
 
         const currentDate = new Date('2024-08-01');
         vi.setSystemTime(currentDate);
@@ -78,6 +87,6 @@ describe('getUrls', () => {
         const result = await getUrls();
 
         expect(result).toEqual([]);
-        expect(fetch).toHaveBeenCalledTimes(0);
+        expect(fetch).toHaveBeenCalledTimes(3);
     });
 });
