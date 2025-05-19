@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import type { BenchmarkSummary } from '@/types/models/benchmark';
 import { executeQuery } from '@/lib/db';
-import { getUrls, isCacheExpired } from '@/lib/parquet-datasource';
+import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-datasource';
 
 /**
  * @openapi
@@ -39,6 +39,7 @@ import { getUrls, isCacheExpired } from '@/lib/parquet-datasource';
 export const GET: APIRoute = async () => {
     try {
         if (isCacheExpired()) {
+            console.log('Cache expired, updating benchmarks table');
             await executeQuery(
                 `
                     CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
@@ -48,9 +49,10 @@ export const GET: APIRoute = async () => {
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
                 SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
-                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
+                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count"
             FROM benchmarks
             WHERE "scenario_id" IS NOT NULL
+              AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
             GROUP BY "scenario_id"
             ORDER BY "scenario_id"; 
         `; 
