@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import type { BenchmarkData } from '@/types/models/benchmark';
 
 import { executeQuery } from '@/lib/db';
-import { getUrls, isCacheExpired } from '@/lib/parquet-datasource';
+import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-datasource';
 
 /**
  * @openapi
@@ -68,6 +68,7 @@ export const GET: APIRoute = async ({ params }) => {
     const scenario = params.id
     try {
         if (isCacheExpired()) {
+            console.log('Cache expired, updating benchmarks table');
             await executeQuery(
                 `
                     CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
@@ -85,6 +86,7 @@ export const GET: APIRoute = async ({ params }) => {
                 "test:outcome"                                                 as status
             FROM benchmarks
             WHERE "scenario_id" = '${scenario}'
+                AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
             ORDER BY "test:start:datetime" DESC
         `
         const data = await executeQuery(query) as BenchmarkData[];

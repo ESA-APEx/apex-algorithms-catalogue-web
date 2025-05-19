@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './benchmarks.json';
 import { executeQuery } from '@/lib/db';
-import { getUrls } from '@/lib/parquet-datasource';
+import { getUrls, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-datasource';
 import type { BenchmarkSummary } from '@/types/models/benchmark';
 
 vi.mock('@/lib/db', () => ({
@@ -11,6 +11,7 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/parquet-datasource', () => ({
     getUrls: vi.fn(),
     isCacheExpired: vi.fn().mockReturnValue(true),
+    PARQUET_MONTH_COVERAGE: '2',
 }));
 
 describe('API Route: GET', () => {
