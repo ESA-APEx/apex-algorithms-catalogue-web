@@ -133,7 +133,8 @@ test.describe('Service Details Test', () => {
         await expect(accessLabel).toHaveText('public');
 
         const executionLabel = page.getByTestId('execution-info-label');
-        await expect(executionLabel.first()).toHaveText('openEO Process');
+        await expect(executionLabel.first()).toHaveText('Process ID');
+        await expect(executionLabel.nth(1)).toHaveText('openEO Process');
         await expect(executionLabel.last()).toHaveText('openEO Backend');
     })
 

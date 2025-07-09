@@ -135,6 +135,17 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                         </div> }
                     </h2>
                     <ul class="flex flex-col gap-5 mb-6">
+                        {applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
+                            <li>
+                                <div class="flex gap-2" data-testid="execution-info-label">
+                                    <p class="text-white">Process ID</p>
+                                </div>
+                                <p>
+                                    <span class="text-gray-400 break-words">{algorithm.id}</span>
+                                    <ClipboardButton text={algorithm.id} client:idle />
+                                </p>
+                            </li>
+                        )}
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
                                     <div class="flex gap-2" data-testid="execution-info-label">
