@@ -49,7 +49,7 @@ test.describe('Service Details Test', () => {
 
         await expect(page.getByText('Benchmark status')).toBeVisible();
 
-        const statusBadge = page.getByTestId('benchmark-status-sidenav');
+        const statusBadge = page.getByTestId('benchmark-status-badge');
 
         await expect(statusBadge).toBeVisible();
 
