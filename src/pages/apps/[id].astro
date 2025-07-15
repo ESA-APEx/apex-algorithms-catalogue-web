@@ -85,7 +85,7 @@ const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
 const documentationUrl = algorithm.links.find(link => link.rel === 'about')?.href
 const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
 const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
-const previews = algorithm.links.filter(link => link.rel === 'preview').filter(link => ['image/png', 'images/jpg'].includes(link.type || ''));
+const previews = algorithm.links.filter(link => link.rel === 'preview').filter(link => ['image/png', 'image/jpeg'].includes(link.type || ''));
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
 
