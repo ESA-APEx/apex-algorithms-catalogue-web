@@ -85,7 +85,7 @@ const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
 const documentationUrl = algorithm.links.find(link => link.rel === 'about')?.href
 const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
 const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
-const previews = algorithm.links.filter(link => link.rel === 'preview');
+const previews = algorithm.links.filter(link => link.rel === 'preview').filter(link => ['image/png', 'images/jpg'].includes(link.type || ''));
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
 const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
 
@@ -116,7 +116,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                        Preview
                     </h2>
                     <ul class="flex flex-col gap-2 mb-6">
-                        {previews.filter(link => ['image/png'].includes(link.type || '')).map(link => (
+                        {previews.map(link => (
                                 <div class="mb-5">
                                     <img src={link.href}  alt={link.title}/>
                                     <p class="text-sm text-gray-400 mt-2 text-center"> {link.title}</p>
