@@ -4,6 +4,7 @@ import {Info, Globe, SquareArrowOutUpRight, TriangleAlert} from 'lucide-react';
 import {Badge} from '../../components/react/Badge';
 import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
 import {ClipboardButton} from '../../components/react/ClipboardButton';
+import {BenchmarkStatus} from '../../components/react/BenchmarkStatus';
 import Layout from '../../layouts/Layout.astro';
 import Prose from '../../components/Prose.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -11,11 +12,8 @@ import {loadCatalogueDetailData} from '../../lib/load-catalogue';
 import {getDate}  from '../../lib/utils';
 import {generateToC} from '../../lib/toc-generator';
 import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
-import {CatalogueCwlDetailParametersTable} from '../../components/react/CatalogueCwlDetailParametersTable';
+import {BenchmarkInfoPopover} from '../../components/react/BenchmarkInfoPopover';
 import {CollapsibleText} from '../../components/react/CollapsibleText';
-import {BenchmarkStatusSideNavItem} from '../../components/react/BenchmarkStatusSideNavItem';
-import {InfoPopover} from '../../components/react/InfoPopover';
-
 
 import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
 import type {ToCElement} from '../../types/models/catalogue';
@@ -85,11 +83,8 @@ const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
 const documentationUrl = algorithm.links.find(link => link.rel === 'about')?.href
 const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
 const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
-const previews = algorithm.links.filter(link => link.rel === 'preview');
+const previews = algorithm.links.filter(link => link.rel === 'preview').filter(link => ['image/png', 'image/jpeg'].includes(link.type || ''));
 const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
-const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
-
-const serviceRequestWarning = 'Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.';
 
 ---
 
@@ -116,7 +111,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                        Preview
                     </h2>
                     <ul class="flex flex-col gap-2 mb-6">
-                        {previews.filter(link => ['image/png'].includes(link.type || '')).map(link => (
+                        {previews.map(link => (
                                 <div class="mb-5">
                                     <img src={link.href}  alt={link.title}/>
                                     <p class="text-sm text-gray-400 mt-2 text-center"> {link.title}</p>
@@ -135,27 +130,9 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                         </div> }
                     </h2>
                     <ul class="flex flex-col gap-5 mb-6">
-                        {applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
-                            <li>
-                                <div class="flex gap-2" data-testid="execution-info-label">
-                                    <p class="text-white">Process ID</p>
-                                </div>
-                                <p>
-                                    <span class="text-gray-400 break-words">{algorithm.id}</span>
-                                    <ClipboardButton text={algorithm.id} client:idle />
-                                </p>
-                            </li>
-                        )}
                         {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
                             <li>
-                                    <div class="flex gap-2" data-testid="execution-info-label">
-                                        <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
-                                        {
-                                            link.rel === 'application' && orderUrl ? 
-                                            <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
-                                            null
-                                        }
-                                    </div>
+                                    <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
                                     <p>
                                         <a class="text-gray-400 break-words" href={link.href}>{link.href}</a>
                                         <ClipboardButton text={link.href} client:idle />
@@ -163,8 +140,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                             </li>
                         ))}
                     </ul>
-                    {applicationDetails && algorithm.type === AlgorithmType.OPENEO && <CatalogueDetailParametersTable details={applicationDetails}/> }
-                    {!orderUrl && cwlUrl ? <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} client:only="react" /> : null}
+                    {applicationDetails && <CatalogueDetailParametersTable details={applicationDetails}/> }
                 </section>
                 <section>
                     <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
@@ -200,7 +176,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                     <li>
                         <div class="text-white mb-1">About</div>
                         <div>
-                            <CollapsibleText text={algorithm.properties.description} client:only="react" />
+                            <CollapsibleText text={algorithm.properties.description} client:idle />
                         </div>
                     </li>
                     <li>
@@ -208,7 +184,13 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                             {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
                         </ul>
                     </li>
-                    <BenchmarkStatusSideNavItem scenarioId={algorithm.id} client:only="react" />
+                    <li>
+                        <div class="text-white mb-1 flex items-center gap-2">
+                            <span>Benchmark status</span>
+                            <BenchmarkInfoPopover client:idle />
+                        </div>
+                        <BenchmarkStatus scenarioId={algorithm.id} client:only="react" />
+                    </li>
                     <li>
                         <div class="text-white mb-1">Cost estimation</div>
                         <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>
@@ -226,19 +208,6 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                         <div><a class="underline" href={eulaUrl} target="__blank">License Agreement</a></div>
                     </li>
                     }
-                    <li>
-                        <div class="text-white mb-1 flex items-center gap-2">
-                            <span>Service access</span>
-                            { orderUrl && <InfoPopover message={serviceRequestWarning} client:idle /> }
-                        </div>
-                        <div data-testid="service-access-label">
-                            {
-                                orderUrl ? 
-                                    <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
-                                    <Badge className="font-normal text-sm rounded-sm" variant="secondary">public</Badge>
-                            }
-                        </div>
-                    </li>
                     <li>
                         <div class="text-white mb-1">Last updated</div>
                         <div>{getDate(algorithm.properties.updated)}</div>
@@ -275,7 +244,7 @@ const serviceRequestWarning = 'Access to this service requires a valid account a
                                 </a>
                                 { orderUrl && <div class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md" data-testid="service-access-warning">
                                     <p class="flex items-center font-bold mb-2"><TriangleAlert className="w-4 h-4 mr-1" />Warning</p>
-                                    <p>{serviceRequestWarning}</p>
+                                    <p>Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.</p>
                                 </div>
                                 }
                             </li>
