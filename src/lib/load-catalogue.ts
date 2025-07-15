@@ -124,14 +124,12 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
             algorithm.type = getAlgorithmType(algorithm);
 
             if (applicationUrl) {
-                console.log("APPLICATION URL", applicationUrl);
                 const applicationDetails = await fetchApplicationDetails(algorithm.type, applicationUrl);
                 data.push({
                     algorithm,
                     applicationDetails,
                 })
             } else {
-                console.warn(`No application URL found for algorithm: ${algorithm.id}`);
                 data.push({
                     algorithm
                 })
