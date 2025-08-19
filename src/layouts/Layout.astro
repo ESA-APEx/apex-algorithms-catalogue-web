@@ -1,12 +1,12 @@
 ---
-import '@/styles/globals.css'
+import "@/styles/globals.css";
 
-import NavBar from '../components/NavBar.astro';
-import Footer from '../components/Footer.astro';
-import HamburgerMenu from '../components/HamburgerMenu.astro';
+import NavBar from "../components/NavBar.astro";
+import Footer from "../components/Footer.astro";
+import HamburgerMenu from "../components/HamburgerMenu.astro";
 
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
@@ -14,90 +14,104 @@ const { title } = Astro.props;
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<div class="bg-container">
-			<NavBar />
-			<slot />
-			<Footer />
-		</div>
-		<HamburgerMenu />
-		<script is:inline>
-			document.addEventListener('DOMContentLoaded', () => {
-				'use strict';
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="bg-container">
+      <NavBar />
+      <slot />
+      <Footer />
+    </div>
+    <HamburgerMenu />
+    <script is:inline>
+      document.addEventListener("DOMContentLoaded", () => {
+        "use strict";
 
-				// MegaMenu Class
-				class MegaMenu {
-					constructor() {
-						const megaMenu = document.querySelector('.js-mega-menu');
-						if (!megaMenu) return;
+        // MegaMenu Class
+        class MegaMenu {
+          constructor() {
+            const megaMenu = document.querySelector(".js-mega-menu");
+            if (!megaMenu) return;
 
-						const megaMenuTopics = document.querySelectorAll('.js-mega-menu-topic');
-						const megaMenuContents = document.querySelectorAll('.js-mega-menu-content');
+            const megaMenuTopics = document.querySelectorAll(
+              ".js-mega-menu-topic",
+            );
+            const megaMenuContents = document.querySelectorAll(
+              ".js-mega-menu-content",
+            );
 
-						megaMenuTopics.forEach(topic => {
-							topic.addEventListener('click', this.handleClickTopic.bind(this));
-							topic.addEventListener('mouseover', this.handleHoverTopic.bind(this));
-							topic.addEventListener('mouseout', this.handleMouseOutTopic.bind(this));
-						});
+            megaMenuTopics.forEach((topic) => {
+              topic.addEventListener("click", this.handleClickTopic.bind(this));
+              topic.addEventListener(
+                "mouseover",
+                this.handleHoverTopic.bind(this),
+              );
+              topic.addEventListener(
+                "mouseout",
+                this.handleMouseOutTopic.bind(this),
+              );
+            });
 
-						this.megaMenuContents = megaMenuContents;
-					}
+            this.megaMenuContents = megaMenuContents;
+          }
 
-					handleClickTopic(e) {
-						e.preventDefault();
-						this.switchContent(e.currentTarget);
-					}
+          handleClickTopic(e) {
+            e.preventDefault();
+            this.switchContent(e.currentTarget);
+          }
 
-					handleHoverTopic(e) {
-						this.switchContent(e.currentTarget);
-					}
+          handleHoverTopic(e) {
+            this.switchContent(e.currentTarget);
+          }
 
-					handleMouseOutTopic(e) {
-						// Optional: Add logic for mouse out events if needed
-					}
+          handleMouseOutTopic(e) {
+            // Optional: Add logic for mouse out events if needed
+          }
 
-					switchContent(topic) {
-						const topicIndex = topic.getAttribute('data-index');
-						this.megaMenuContents.forEach(content => {
-							content.setAttribute('aria-hidden', content.getAttribute('data-index') !== topicIndex);
-						});
-					}
-				}
+          switchContent(topic) {
+            const topicIndex = topic.getAttribute("data-index");
+            this.megaMenuContents.forEach((content) => {
+              content.setAttribute(
+                "aria-hidden",
+                content.getAttribute("data-index") !== topicIndex,
+              );
+            });
+          }
+        }
 
-				// Hamburger Menu Class
-				class HamburgerMenu {
-					constructor() {
-						const hamburgers = document.querySelectorAll('.js-hamburger');
-						const menu = document.querySelector('.js-hamburger-menu');
-						const body = document.body;
+        // Hamburger Menu Class
+        class HamburgerMenu {
+          constructor() {
+            const hamburgers = document.querySelectorAll(".js-hamburger");
+            const menu = document.querySelector(".js-hamburger-menu");
+            const body = document.body;
 
-						if (menu) {
-							hamburgers.forEach(hamburger => {
-								hamburger.addEventListener('click', (e) => this.handleClickHamburger(e, menu, body));
-							});
-						} else {
+            if (menu) {
+              hamburgers.forEach((hamburger) => {
+                hamburger.addEventListener("click", (e) =>
+                  this.handleClickHamburger(e, menu, body),
+                );
+              });
+            } else {
+            }
+          }
 
-						}
-					}
+          handleClickHamburger(e, menu, body) {
+            e.preventDefault();
+            menu.classList.toggle("open");
+            body.classList.toggle("has-hamburger-open");
+          }
+        }
 
-					handleClickHamburger(e, menu, body) {
-						e.preventDefault();
-						menu.classList.toggle('open');
-						body.classList.toggle('has-hamburger-open');
-					}
-				}
-
-				new MegaMenu();
-				new HamburgerMenu();
-			});
-		</script>
-	</body>
+        new MegaMenu();
+        new HamburgerMenu();
+      });
+    </script>
+  </body>
 </html>

@@ -1,287 +1,450 @@
 ---
-import {Markdown} from '@astropub/md';
-import {Info, Globe, SquareArrowOutUpRight, TriangleAlert} from 'lucide-react';
-import {Badge} from '../../components/react/Badge';
-import {CatalogueDetailActions} from '../../components/react/CatalogueDetailActions';
-import {ClipboardButton} from '../../components/react/ClipboardButton';
-import Layout from '../../layouts/Layout.astro';
-import Prose from '../../components/Prose.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
-import {loadCatalogueDetailData} from '../../lib/load-catalogue';
-import {getDate}  from '../../lib/utils';
-import {generateToC} from '../../lib/toc-generator';
-import {CatalogueDetailParametersTable} from '../../components/react/CatalogueDetailParametersTable';
-import {CatalogueCwlDetailParametersTable} from '../../components/react/CatalogueCwlDetailParametersTable';
-import {CollapsibleText} from '../../components/react/CollapsibleText';
-import {BenchmarkStatusSideNavItem} from '../../components/react/BenchmarkStatusSideNavItem';
-import {InfoPopover} from '../../components/react/InfoPopover';
+import { Markdown } from "@astropub/md";
+import {
+  Info,
+  Globe,
+  SquareArrowOutUpRight,
+  TriangleAlert,
+} from "lucide-react";
+import { Badge } from "../../components/react/Badge";
+import { CatalogueDetailActions } from "../../components/react/CatalogueDetailActions";
+import { ClipboardButton } from "../../components/react/ClipboardButton";
+import Layout from "../../layouts/Layout.astro";
+import Prose from "../../components/Prose.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import { loadCatalogueDetailData } from "../../lib/load-catalogue";
+import { getDate } from "../../lib/utils";
+import { generateToC } from "../../lib/toc-generator";
+import { CatalogueDetailParametersTable } from "../../components/react/CatalogueDetailParametersTable";
+import { CatalogueCwlDetailParametersTable } from "../../components/react/CatalogueCwlDetailParametersTable";
+import { CollapsibleText } from "../../components/react/CollapsibleText";
+import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStatusSideNavItem";
+import { InfoPopover } from "../../components/react/InfoPopover";
 
-
-import type {InferGetStaticPropsType, GetStaticPaths} from 'astro';
-import type {ToCElement} from '../../types/models/catalogue';
-import {AlgorithmType} from "../../types/models/algorithm";
+import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
+import type { ToCElement } from "../../types/models/catalogue";
+import { AlgorithmType } from "../../types/models/algorithm";
 
 export const prerender = true;
 
 export const getExecutionInfo = (type: AlgorithmType) => {
-    switch (type) {
-
-        case AlgorithmType.OPENEO:
-            return {
-                service: 'openEO Backend',
-                application: 'openEO Process'
-            }
-        case AlgorithmType.OGC_API_PROCESS:
-            return {
-                service: 'OGC API Process',
-                application: 'CWL Definition'
-            }
-        default:
-            return {
-                service: 'Unknown',
-                application: 'Unknown'
-
-            }
-    }
-}
+  switch (type) {
+    case AlgorithmType.OPENEO:
+      return {
+        service: "openEO Backend",
+        application: "openEO Process",
+      };
+    case AlgorithmType.OGC_API_PROCESS:
+      return {
+        service: "OGC API Process",
+        application: "CWL Definition",
+      };
+    default:
+      return {
+        service: "Unknown",
+        application: "Unknown",
+      };
+  }
+};
 
 export const getStaticPaths = (async () => {
-    const data = await loadCatalogueDetailData()
-    const result = []
+  const data = await loadCatalogueDetailData();
+  const result = [];
 
-    for (const item of data) {
-        const {algorithm, applicationDetails} = item
+  for (const item of data) {
+    const { algorithm, applicationDetails } = item;
 
-        const description = applicationDetails?.description || algorithm.properties.description;
+    const description =
+      applicationDetails?.description || algorithm.properties.description;
 
-        const toc = (await generateToC(description, algorithm.links)) as ToCElement[]
-        result.push({
-            params: {id: item.algorithm.id},
-            props: {
-                data: {
-                    algorithm,
-                    applicationDetails
-                },
-                description,
-                toc,
-            }
-        })
-    }
+    const toc = (await generateToC(
+      description,
+      algorithm.links,
+    )) as ToCElement[];
+    result.push({
+      params: { id: item.algorithm.id },
+      props: {
+        data: {
+          algorithm,
+          applicationDetails,
+        },
+        description,
+        toc,
+      },
+    });
+  }
 
-    return result;
+  return result;
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const {data, toc, description} = Astro.props;
-const {applicationDetails, algorithm} = data;
+const { data, toc, description } = Astro.props;
+const { applicationDetails, algorithm } = data;
 
-const UDP_DOCS_URL = 'https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube';
+const UDP_DOCS_URL =
+  "https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube";
 
-const executionInfoLinksRel = ['service', 'application'];
-const executionInfoLabels: Record<string, string> = getExecutionInfo(algorithm.type);
+const executionInfoLinksRel = ["service", "application"];
+const executionInfoLabels: Record<string, string> = getExecutionInfo(
+  algorithm.type,
+);
 
-const orderUrl = algorithm.links.find(link => link.rel === 'order')?.href
-const documentationUrl = algorithm.links.find(link => link.rel === 'about')?.href
-const codeUrl = algorithm.links.find(link => link.rel === 'code')?.href
-const eulaUrl = algorithm.links.find(link => link.rel === 'license')?.href
-const previews = algorithm.links.filter(link => link.rel === 'preview').filter(link => ['image/png', 'image/jpeg'].includes(link.type || ''));
-const webAppUrl = algorithm.links.find(link => link.rel === 'webapp')?.href;
-const cwlUrl = algorithm.links.find(link => link.rel === 'application' && link.type === 'application/cwl+yaml')?.href;
+const orderUrl = algorithm.links.find((link) => link.rel === "order")?.href;
+const documentationUrl = algorithm.links.find(
+  (link) => link.rel === "about",
+)?.href;
+const codeUrl = algorithm.links.find((link) => link.rel === "code")?.href;
+const eulaUrl = algorithm.links.find((link) => link.rel === "license")?.href;
+const previews = algorithm.links
+  .filter((link) => link.rel === "preview")
+  .filter((link) => ["image/png", "image/jpeg"].includes(link.type || ""));
+const webAppUrl = algorithm.links.find((link) => link.rel === "webapp")?.href;
+const cwlUrl = algorithm.links.find(
+  (link) => link.rel === "application" && link.type === "application/cwl+yaml",
+)?.href;
 
-const serviceRequestWarning = 'Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.';
-
+const serviceRequestWarning =
+  "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
-    <aside class="block px-4 my-8">
-        <Breadcrumb path={`/${data.algorithm.id}`} class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3" />
-    </aside>
+  <aside class="block px-4 my-8">
+    <Breadcrumb
+      path={`/${data.algorithm.id}`}
+      class="w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3"
+    />
+  </aside>
 
-	<article class="flex-1 px-4 my-14">
-       <div class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3">
-            <section class="flex-1">
-                <header class="mb-12">
-                    <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
-                    <h1 class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50 break-words text-balance">
-                        {algorithm.properties.title}
-                    </h1>
-                    <CatalogueDetailActions data={algorithm} toc={toc} client:idle />
-                </header>
-                <Prose>
-                    <Markdown of={description}/>
-                </Prose>
-                { previews.length > 0 && <section class="text-white mb-8">
-                    <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="preview-information">
-                       Preview
-                    </h2>
-                    <ul class="flex flex-col gap-2 mb-6">
-                        {previews.map(link => (
-                                <div class="mb-5">
-                                    <img src={link.href}  alt={link.title}/>
-                                    <p class="text-sm text-gray-400 mt-2 text-center"> {link.title}</p>
-                                </div>
-                        ))}
-                    </ul>
-                </section>
-                }
-                <section class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8">
-                    <h2 class="text-xl md:text-2xl mb-6 relative inline-flex" id="execution-information">
-                        Execution information
-                        { applicationDetails && algorithm.type === AlgorithmType.OPENEO && <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
-                            <a href={UDP_DOCS_URL} target="__blank" class="text-white inline-block rounded-full hover:bg-brand-teal-50/20" >
-                                <Info className="w-4 h-4" />
-                            </a>
-                        </div> }
-                    </h2>
-                    <ul class="flex flex-col gap-5 mb-6">
-                        {applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
-                            <li>
-                                <div class="flex gap-2" data-testid="execution-info-label">
-                                    <p class="text-white">Process ID</p>
-                                </div>
-                                <p>
-                                    <span class="text-gray-400 break-words">{algorithm.id}</span>
-                                    <ClipboardButton text={algorithm.id} client:idle />
-                                </p>
-                            </li>
-                        )}
-                        {algorithm.links.filter(link => executionInfoLinksRel.includes(link.rel)).map(link => (
-                            <li>
-                                    <div class="flex gap-2" data-testid="execution-info-label">
-                                        <p class="text-white">{executionInfoLabels[link.rel] || link.title}</p>
-                                        {
-                                            link.rel === 'application' && orderUrl ? 
-                                            <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
-                                            null
-                                        }
-                                    </div>
-                                    <p>
-                                        <a class="text-gray-400 break-words" href={link.href}>{link.href}</a>
-                                        <ClipboardButton text={link.href} client:idle />
-                                    </p>
-                            </li>
-                        ))}
-                    </ul>
-                    {applicationDetails && algorithm.type === AlgorithmType.OPENEO && <CatalogueDetailParametersTable details={applicationDetails}/> }
-                    {!orderUrl && cwlUrl ? <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} client:only="react" /> : null}
-                </section>
-                <section>
-                    <h2 class="text-white text-xl md:text-2xl mb-4 relative inline-flex" id="contact">
-                        Contact
-                    </h2>
-                    <ul class="flex flex-wrap gap-4 text-brand-gray-50">
-                        {algorithm.properties.contacts.map(contact => (
-                            <li class="w-full md:w-1/4">
-                                <div>
-                                    <p class="text-white text-lg">{contact.name}</p>
-                                    {contact.organization && (<p class="text-white">{contact.organization}</p>)}
-                                    {contact.position && (<p>{contact.position}</p>)}
-                                    <p class="mt-1 text-sm mb-2">{contact.roles.join(', ')}</p>
-                                    <div class="flex gap-2">
-                                        {contact.links.map(link => (
-                                            <a href={link.href} target="__blank" class="hover:text-white">
-                                                {link.href.includes('github') ? (
-                                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path fill-rule="evenodd" d="M12.006 2a9.847 9.847 0 0 0-6.484 2.44 10.32 10.32 0 0 0-3.393 6.17 10.48 10.48 0 0 0 1.317 6.955 10.045 10.045 0 0 0 5.4 4.418c.504.095.683-.223.683-.494 0-.245-.01-1.052-.014-1.908-2.78.62-3.366-1.21-3.366-1.21a2.711 2.711 0 0 0-1.11-1.5c-.907-.637.07-.621.07-.621.317.044.62.163.885.346.266.183.487.426.647.71.135.253.318.476.538.655a2.079 2.079 0 0 0 2.37.196c.045-.52.27-1.006.635-1.37-2.219-.259-4.554-1.138-4.554-5.07a4.022 4.022 0 0 1 1.031-2.75 3.77 3.77 0 0 1 .096-2.713s.839-.275 2.749 1.05a9.26 9.26 0 0 1 5.004 0c1.906-1.325 2.74-1.05 2.74-1.05.37.858.406 1.828.101 2.713a4.017 4.017 0 0 1 1.029 2.75c0 3.939-2.339 4.805-4.564 5.058a2.471 2.471 0 0 1 .679 1.897c0 1.372-.012 2.477-.012 2.814 0 .272.18.592.687.492a10.05 10.05 0 0 0 5.388-4.421 10.473 10.473 0 0 0 1.313-6.948 10.32 10.32 0 0 0-3.39-6.165A9.847 9.847 0 0 0 12.007 2Z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                ) : <Globe className="w-4 h-4" />}
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
+  <article class="flex-1 px-4 my-14">
+    <div
+      class="flex flex-col-reverse gap-12 lg:flex-row w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-3"
+    >
+      <section class="flex-1">
+        <header class="mb-12">
+          <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
+          <h1
+            class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50 break-words text-balance"
+          >
+            {algorithm.properties.title}
+          </h1>
+          <CatalogueDetailActions data={algorithm} toc={toc} client:idle />
+        </header>
+        <Prose>
+          <Markdown of={description} />
+        </Prose>
+        {
+          previews.length > 0 && (
+            <section class="text-white mb-8">
+              <h2
+                class="text-xl md:text-2xl mb-6 relative inline-flex"
+                id="preview-information"
+              >
+                Preview
+              </h2>
+              <ul class="flex flex-col gap-2 mb-6">
+                {previews.map((link) => (
+                  <div class="mb-5">
+                    <img src={link.href} alt={link.title} />
+                    <p class="text-sm text-gray-400 mt-2 text-center">
+                      {" "}
+                      {link.title}
+                    </p>
+                  </div>
+                ))}
+              </ul>
             </section>
-            <aside class="w-full lg:w-64">
-                <ul class="flex flex-col gap-4 text-brand-gray-50">
-                    <li>
-                        <div class="text-white mb-1">About</div>
-                        <div>
-                            <CollapsibleText text={algorithm.properties.description} client:only="react" />
-                        </div>
-                    </li>
-                    <li>
-                        <ul class="flex flex-wrap gap-2">
-                            {algorithm.properties.keywords.map((item) => <Badge className="font-normal text-sm rounded-sm" variant="secondary">{item}</Badge>)}
-                        </ul>
-                    </li>
-                    <BenchmarkStatusSideNavItem scenarioId={algorithm.id} client:only="react" />
-                    <li>
-                        <div class="text-white mb-1">Cost estimation</div>
-                        <div>{algorithm.properties.cost_estimate} {algorithm.properties.cost_unit}</div>
-                    </li>
-                    <li>
-                        <div class="text-white mb-1">Format</div>
-                        <div>{algorithm.properties.formats.map(f => f.name).join(', ')}</div>
-                    </li>
-                    <li>
-                        <div class="text-white mb-1">License</div>
-                        <div>{algorithm.properties.license}</div>
-                    </li>
-                    { eulaUrl && <li>
-                        <div class="text-white mb-1">Legal</div>
-                        <div><a class="underline" href={eulaUrl} target="__blank">License Agreement</a></div>
-                    </li>
-                    }
-                    <li>
-                        <div class="text-white mb-1 flex items-center gap-2">
-                            <span>Service access</span>
-                            { orderUrl && <InfoPopover message={serviceRequestWarning} client:idle /> }
-                        </div>
-                        <div data-testid="service-access-label">
-                            {
-                                orderUrl ? 
-                                    <Badge className="font-normal text-sm rounded-sm">protected</Badge> : 
-                                    <Badge className="font-normal text-sm rounded-sm" variant="secondary">public</Badge>
-                            }
-                        </div>
-                    </li>
-                    <li>
-                        <div class="text-white mb-1">Last updated</div>
-                        <div>{getDate(algorithm.properties.updated)}</div>
-                    </li>
-                    { documentationUrl && (
-                            <li class="mt-2">
-                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={documentationUrl} target="__blank">
-                                    Open documentation
-                                    <SquareArrowOutUpRight className="w-4 h-4" />
-                                </a>
-                            </li>
+          )
+        }
+        <section
+          class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8"
+        >
+          <h2
+            class="text-xl md:text-2xl mb-6 relative inline-flex"
+            id="execution-information"
+          >
+            Execution information
+            {
+              applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
+                <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
+                  <a
+                    href={UDP_DOCS_URL}
+                    target="__blank"
+                    class="text-white inline-block rounded-full hover:bg-brand-teal-50/20"
+                  >
+                    <Info className="w-4 h-4" />
+                  </a>
+                </div>
+              )
+            }
+          </h2>
+          <ul class="flex flex-col gap-5 mb-6">
+            {
+              applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
+                <li>
+                  <div class="flex gap-2" data-testid="execution-info-label">
+                    <p class="text-white">Process ID</p>
+                  </div>
+                  <p>
+                    <span class="text-gray-400 break-words">
+                      {algorithm.id}
+                    </span>
+                    <ClipboardButton text={algorithm.id} client:idle />
+                  </p>
+                </li>
+              )
+            }
+            {
+              algorithm.links
+                .filter((link) => executionInfoLinksRel.includes(link.rel))
+                .map((link) => (
+                  <li>
+                    <div class="flex gap-2" data-testid="execution-info-label">
+                      <p class="text-white">
+                        {executionInfoLabels[link.rel] || link.title}
+                      </p>
+                      {link.rel === "application" && orderUrl ? (
+                        <Badge className="font-normal text-sm rounded-sm">
+                          protected
+                        </Badge>
+                      ) : null}
+                    </div>
+                    <p>
+                      <a class="text-gray-400 break-words" href={link.href}>
+                        {link.href}
+                      </a>
+                      <ClipboardButton text={link.href} client:idle />
+                    </p>
+                  </li>
+                ))
+            }
+          </ul>
+          {
+            applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
+              <CatalogueDetailParametersTable details={applicationDetails} />
+            )
+          }
+          {
+            !orderUrl && cwlUrl ? (
+              <CatalogueCwlDetailParametersTable
+                cwlUrl={cwlUrl}
+                client:only="react"
+              />
+            ) : null
+          }
+        </section>
+        <section>
+          <h2
+            class="text-white text-xl md:text-2xl mb-4 relative inline-flex"
+            id="contact"
+          >
+            Contact
+          </h2>
+          <ul class="flex flex-wrap gap-4 text-brand-gray-50">
+            {
+              algorithm.properties.contacts.map((contact) => (
+                <li class="w-full md:w-1/4">
+                  <div>
+                    <p class="text-white text-lg">{contact.name}</p>
+                    {contact.organization && (
+                      <p class="text-white">{contact.organization}</p>
                     )}
-                    { codeUrl && (
-                            <li class="mt-2">
-                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={codeUrl} target="__blank">
-                                    Show code repository
-                                    <SquareArrowOutUpRight className="w-4 h-4" />
-                                </a>
-                            </li>
-                    )}
-                    { orderUrl && (
-                            <li class="mt-2">
-                                <a class="btn btn-secondary !flex items-center justify-center gap-2" href={orderUrl} target="__blank">
-                                    Request access
-                                    <SquareArrowOutUpRight className="w-4 h-4" />
-                                </a>
-                            </li>
-                    )}
-                    { webAppUrl && (
-                            <li class="mt-2">
-                                <a class="btn btn-primary !flex items-center justify-center gap-2" href={webAppUrl} target="__blank">
-                                    Execute service
-                                    <SquareArrowOutUpRight className="w-4 h-4" />
-                                </a>
-                                { orderUrl && <div class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md" data-testid="service-access-warning">
-                                    <p class="flex items-center font-bold mb-2"><TriangleAlert className="w-4 h-4 mr-1" />Warning</p>
-                                    <p>{serviceRequestWarning}</p>
-                                </div>
-                                }
-                            </li>
-                    )}
-                </ul>
-            </aside>
-        </div>
-    </article>
+                    {contact.position && <p>{contact.position}</p>}
+                    <p class="mt-1 text-sm mb-2">{contact.roles.join(", ")}</p>
+                    <div class="flex gap-2">
+                      {contact.links.map((link) => (
+                        <a
+                          href={link.href}
+                          target="__blank"
+                          class="hover:text-white"
+                        >
+                          {link.href.includes("github") ? (
+                            <svg
+                              class="w-4 h-4"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M12.006 2a9.847 9.847 0 0 0-6.484 2.44 10.32 10.32 0 0 0-3.393 6.17 10.48 10.48 0 0 0 1.317 6.955 10.045 10.045 0 0 0 5.4 4.418c.504.095.683-.223.683-.494 0-.245-.01-1.052-.014-1.908-2.78.62-3.366-1.21-3.366-1.21a2.711 2.711 0 0 0-1.11-1.5c-.907-.637.07-.621.07-.621.317.044.62.163.885.346.266.183.487.426.647.71.135.253.318.476.538.655a2.079 2.079 0 0 0 2.37.196c.045-.52.27-1.006.635-1.37-2.219-.259-4.554-1.138-4.554-5.07a4.022 4.022 0 0 1 1.031-2.75 3.77 3.77 0 0 1 .096-2.713s.839-.275 2.749 1.05a9.26 9.26 0 0 1 5.004 0c1.906-1.325 2.74-1.05 2.74-1.05.37.858.406 1.828.101 2.713a4.017 4.017 0 0 1 1.029 2.75c0 3.939-2.339 4.805-4.564 5.058a2.471 2.471 0 0 1 .679 1.897c0 1.372-.012 2.477-.012 2.814 0 .272.18.592.687.492a10.05 10.05 0 0 0 5.388-4.421 10.473 10.473 0 0 0 1.313-6.948 10.32 10.32 0 0 0-3.39-6.165A9.847 9.847 0 0 0 12.007 2Z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                          ) : (
+                            <Globe className="w-4 h-4" />
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </section>
+      <aside class="w-full lg:w-64">
+        <ul class="flex flex-col gap-4 text-brand-gray-50">
+          <li>
+            <div class="text-white mb-1">About</div>
+            <div>
+              <CollapsibleText
+                text={algorithm.properties.description}
+                client:only="react"
+              />
+            </div>
+          </li>
+          <li>
+            <ul class="flex flex-wrap gap-2">
+              {
+                algorithm.properties.keywords.map((item) => (
+                  <Badge
+                    className="font-normal text-sm rounded-sm"
+                    variant="secondary"
+                  >
+                    {item}
+                  </Badge>
+                ))
+              }
+            </ul>
+          </li>
+          <BenchmarkStatusSideNavItem
+            scenarioId={algorithm.id}
+            client:only="react"
+          />
+          <li>
+            <div class="text-white mb-1">Cost estimation</div>
+            <div>
+              {algorithm.properties.cost_estimate}
+              {algorithm.properties.cost_unit}
+            </div>
+          </li>
+          <li>
+            <div class="text-white mb-1">Format</div>
+            <div>
+              {algorithm.properties.formats.map((f) => f.name).join(", ")}
+            </div>
+          </li>
+          <li>
+            <div class="text-white mb-1">License</div>
+            <div>{algorithm.properties.license}</div>
+          </li>
+          {
+            eulaUrl && (
+              <li>
+                <div class="text-white mb-1">Legal</div>
+                <div>
+                  <a class="underline" href={eulaUrl} target="__blank">
+                    License Agreement
+                  </a>
+                </div>
+              </li>
+            )
+          }
+          <li>
+            <div class="text-white mb-1 flex items-center gap-2">
+              <span>Service access</span>
+              {
+                orderUrl && (
+                  <InfoPopover message={serviceRequestWarning} client:idle />
+                )
+              }
+            </div>
+            <div data-testid="service-access-label">
+              {
+                orderUrl ? (
+                  <Badge className="font-normal text-sm rounded-sm">
+                    protected
+                  </Badge>
+                ) : (
+                  <Badge
+                    className="font-normal text-sm rounded-sm"
+                    variant="secondary"
+                  >
+                    public
+                  </Badge>
+                )
+              }
+            </div>
+          </li>
+          <li>
+            <div class="text-white mb-1">Last updated</div>
+            <div>{getDate(algorithm.properties.updated)}</div>
+          </li>
+          {
+            documentationUrl && (
+              <li class="mt-2">
+                <a
+                  class="btn btn-secondary !flex items-center justify-center gap-2"
+                  href={documentationUrl}
+                  target="__blank"
+                >
+                  Open documentation
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                </a>
+              </li>
+            )
+          }
+          {
+            codeUrl && (
+              <li class="mt-2">
+                <a
+                  class="btn btn-secondary !flex items-center justify-center gap-2"
+                  href={codeUrl}
+                  target="__blank"
+                >
+                  Show code repository
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                </a>
+              </li>
+            )
+          }
+          {
+            orderUrl && (
+              <li class="mt-2">
+                <a
+                  class="btn btn-secondary !flex items-center justify-center gap-2"
+                  href={orderUrl}
+                  target="__blank"
+                >
+                  Request access
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                </a>
+              </li>
+            )
+          }
+          {
+            webAppUrl && (
+              <li class="mt-2">
+                <a
+                  class="btn btn-primary !flex items-center justify-center gap-2"
+                  href={webAppUrl}
+                  target="__blank"
+                >
+                  Execute service
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                </a>
+                {orderUrl && (
+                  <div
+                    class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md"
+                    data-testid="service-access-warning"
+                  >
+                    <p class="flex items-center font-bold mb-2">
+                      <TriangleAlert className="w-4 h-4 mr-1" />
+                      Warning
+                    </p>
+                    <p>{serviceRequestWarning}</p>
+                  </div>
+                )}
+              </li>
+            )
+          }
+        </ul>
+      </aside>
+    </div>
+  </article>
 </Layout>

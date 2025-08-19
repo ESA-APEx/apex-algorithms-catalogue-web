@@ -1,26 +1,35 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { CatalogueList } from '../components/react/CatalogueList.tsx';
-import { loadCatalogueData } from '../lib/load-catalogue.ts';
+import Layout from "../layouts/Layout.astro";
+import { CatalogueList } from "../components/react/CatalogueList.tsx";
+import { loadCatalogueData } from "../lib/load-catalogue.ts";
 
 const data = loadCatalogueData();
-const title = 'Algorithm Services Catalogue'
+const title = "Algorithm Services Catalogue";
 
 export const prerender = true;
 ---
 
 <Layout title={`${title} | APEx`}>
-	<div class="my-14">
-		<main class="w-full block min-h-screen sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto px-4">	
-			<div class="max-w-screen-xl text-center mx-auto mb-10">
-				<h1 class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:bg-brand-teal-50">
-					{title}
-				</h1>
-				<p class="text-balance text-brand-gray-50">
-					The APEx Algorithm Catalogue is a valuable and innovative resource that provides access to a wide range of high-quality EO services. For users, it offers a central place to discover EO services that meet their specific needs. For EO projects, it serves as an easy and reliable platform to showcase and offer their services to a broader community, fostering collaboration and wider usage of their results.
-				</p>
-			</div>
-			<CatalogueList catalogues={data} client:only="react" />
-		</main>
-	</div>
+  <div class="my-14">
+    <main
+      class="w-full block min-h-screen sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto px-4"
+    >
+      <div class="max-w-screen-xl text-center mx-auto mb-10">
+        <h1
+          class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:bg-brand-teal-50"
+        >
+          {title}
+        </h1>
+        <p class="text-balance text-brand-gray-50">
+          The APEx Algorithm Catalogue is a valuable and innovative resource
+          that provides access to a wide range of high-quality EO services. For
+          users, it offers a central place to discover EO services that meet
+          their specific needs. For EO projects, it serves as an easy and
+          reliable platform to showcase and offer their services to a broader
+          community, fostering collaboration and wider usage of their results.
+        </p>
+      </div>
+      <CatalogueList catalogues={data} client:only="react" />
+    </main>
+  </div>
 </Layout>

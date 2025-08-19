@@ -55,7 +55,7 @@ const getServiceRecords = (): string[] =>
     .filter(
       (file: string) =>
         file.endsWith(".json") &&
-        (file.includes("/records/") || file.includes("\\records\\")) // support linux and windows based path
+        (file.includes("/records/") || file.includes("\\records\\")), // support linux and windows based path
     );
 
 export const loadCatalogueData = () => {
@@ -80,7 +80,7 @@ export const loadCatalogueData = () => {
 };
 
 export const fetchOpenEOApplicationDetails = async (
-  url: string
+  url: string,
 ): Promise<undefined | ApplicationDetails> => {
   if (!url) {
     return undefined;
@@ -110,7 +110,7 @@ export const fetchOpenEOApplicationDetails = async (
 
 export const fetchApplicationDetails = async (
   type: AlgorithmType,
-  url: string
+  url: string,
 ): Promise<undefined | ApplicationDetails> => {
   if (!url) {
     return undefined;
@@ -125,7 +125,7 @@ export const fetchApplicationDetails = async (
   } catch (e) {
     console.error(
       `Could not retrieve application details for ${url} (${type})`,
-      e
+      e,
     );
     return undefined;
   }
@@ -139,10 +139,10 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
   for (const file of jsonsInDir) {
     try {
       const algorithm = JSON.parse(
-        fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString()
+        fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString(),
       ) as Algorithm;
       const applicationUrl = algorithm.links.find(
-        (link) => link.rel === "application"
+        (link) => link.rel === "application",
       )?.href;
 
       algorithm.type = getAlgorithmType(algorithm);
@@ -150,7 +150,7 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       if (applicationUrl) {
         const applicationDetails = await fetchApplicationDetails(
           algorithm.type,
-          applicationUrl
+          applicationUrl,
         );
         data.push({
           algorithm,

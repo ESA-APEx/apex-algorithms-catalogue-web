@@ -20,16 +20,16 @@ test.describe("Service Details Test", () => {
     await openService(page, "Multi output gaussian process regression");
 
     await expect(
-      page.getByRole("link").getByText("Open documentation")
+      page.getByRole("link").getByText("Open documentation"),
     ).toHaveAttribute("href", "https://open-eo.github.io/FuseTS/");
     await expect(
-      page.getByRole("link").getByText("Show code repository")
+      page.getByRole("link").getByText("Show code repository"),
     ).toHaveAttribute("href", "https://github.com/Open-EO/FuseTS");
     await expect(
-      page.getByRole("link").getByText("Execute service")
+      page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
       "href",
-      "https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu"
+      "https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu",
     );
   });
 
@@ -39,19 +39,19 @@ test.describe("Service Details Test", () => {
     await openService(page, "Burned Area Severity (BAS) analysis");
 
     await expect(
-      page.getByRole("link").getByText("Open documentation")
+      page.getByRole("link").getByText("Open documentation"),
     ).toHaveAttribute(
       "href",
-      "https://geohazards-tep.gitlab.io/gep-docs/services/burned-area-severity/service-specs/"
+      "https://geohazards-tep.gitlab.io/gep-docs/services/burned-area-severity/service-specs/",
     );
     await expect(
-      page.getByRole("link").getByText("Request access")
+      page.getByRole("link").getByText("Request access"),
     ).toHaveAttribute("href", "https://geohazards-tep.eu/#!web_store");
     await expect(
-      page.getByRole("link").getByText("Execute service")
+      page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
       "href",
-      "https://geohazards-tep.eu/geobrowser/?id=opt-bas-app"
+      "https://geohazards-tep.eu/geobrowser/?id=opt-bas-app",
     );
   });
 
@@ -119,10 +119,10 @@ test.describe("Service Details Test", () => {
     // Check if the content rows contain parameter information
     const contentCells = rows.nth(1).locator("td");
     await expect(contentCells.nth(0)).toContainText(
-      "spatial_extent (required)"
+      "spatial_extent (required)",
     );
     await expect(contentCells.nth(1)).toHaveText(
-      "object/bounding-box, object/datacube"
+      "object/bounding-box, object/datacube",
     );
     await expect(contentCells.nth(2)).toHaveText("");
   });
@@ -150,7 +150,7 @@ test.describe("Service Details Test", () => {
     // Check if the content rows contain parameter information
     const contentCells = rows.nth(1).locator("td");
     await expect(contentCells.nth(0)).toContainText(
-      "STAC item reference (required)"
+      "STAC item reference (required)",
     );
     await expect(contentCells.nth(1)).toHaveText("string");
     await expect(contentCells.nth(2)).toHaveText("");
@@ -191,7 +191,7 @@ test.describe("Service Details Test", () => {
     const executionLabel = page.getByTestId("execution-info-label");
     await expect(executionLabel.first()).toHaveText("OGC API Process");
     await expect(executionLabel.last()).toContainText(
-      "CWL Definition protected"
+      "CWL Definition protected",
     );
   });
 });

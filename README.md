@@ -37,7 +37,7 @@ $ npm run dev
 
 ## UI Testing
 
-This project uses [Playwright](https://playwright.dev/) for UI testing. The test scripts are stored in `tests` folder. 
+This project uses [Playwright](https://playwright.dev/) for UI testing. The test scripts are stored in `tests` folder.
 
 Before running the tests, install the Playwright first:
 
@@ -62,7 +62,7 @@ To deploy the website, follow these steps:
 - Push the changes to the main branch. The deployment workflow will be running automatically.
 
 > - Prod url: https://algorithm-catalogue.apex.esa.int/
-> - Dev url: https://algorithm-catalogue.dev.apex.esa.int/ 
+> - Dev url: https://algorithm-catalogue.dev.apex.esa.int/
 
 ## Commands
 
@@ -146,7 +146,7 @@ Retrieves aggregated benchmark statistics from a specified service.
       "max_executor_memory": 1.54,
       "network_received": 7047668,
       "start_time": "2024-11-24T16:47:28.000Z",
-      "status": "success",
+      "status": "success"
     },
     {
       "cpu": 174,

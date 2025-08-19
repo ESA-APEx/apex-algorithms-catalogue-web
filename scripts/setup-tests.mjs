@@ -8,13 +8,13 @@ createPrivateAlgorithm();
 function modifySarCoinJson() {
   console.log("Modifying sar_coin.json...");
   const filePath = path.resolve(
-    "./contents/apex_algorithms-main/algorithm_catalog/terradue/sar_coin/records/sar_coin.json"
+    "./contents/apex_algorithms-main/algorithm_catalog/terradue/sar_coin/records/sar_coin.json",
   );
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const jsonData = JSON.parse(fileContent);
 
   jsonData.links = jsonData.links.filter(
-    (link) => !["order", "application"].includes(link.rel)
+    (link) => !["order", "application"].includes(link.rel),
   );
   jsonData.links.push({
     rel: "application",
@@ -29,7 +29,7 @@ function modifySarCoinJson() {
 function createPrivateAlgorithm() {
   console.log("Creating private algorithm...");
   const filePath = path.resolve(
-    "./contents/apex_algorithms-main/algorithm_catalog/vito/biopar/records/biopar.json"
+    "./contents/apex_algorithms-main/algorithm_catalog/vito/biopar/records/biopar.json",
   );
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const jsonData = JSON.parse(fileContent);

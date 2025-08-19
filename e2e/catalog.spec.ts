@@ -8,7 +8,7 @@ test.describe("Catalog Tests", () => {
   test("Should render the homepage correctly", async ({ page }) => {
     await expect(page).toHaveTitle("Algorithm Services Catalogue | APEx");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Algorithm Services Catalogue"
+      "Algorithm Services Catalogue",
     );
 
     await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
@@ -21,10 +21,10 @@ test.describe("Catalog Tests", () => {
 
     await expect(card.getByTestId("service-type")).toHaveText("openEO");
     await expect(card.getByTestId("service-label").nth(0)).toContainText(
-      "agriculture"
+      "agriculture",
     );
     await expect(card.getByTestId("service-label").nth(1)).toContainText(
-      "crops"
+      "crops",
     );
   });
 
@@ -68,7 +68,7 @@ test.describe("Catalog Tests", () => {
       page
         .getByTestId("service-card")
         .getByText("Private Algorithm Test")
-        .locator("..")
+        .locator(".."),
     ).toHaveCount(0);
   });
 });

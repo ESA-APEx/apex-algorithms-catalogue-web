@@ -1,8 +1,12 @@
-import type { APIRoute } from 'astro';
-import type { BenchmarkData } from '@/types/models/benchmark';
+import type { APIRoute } from "astro";
+import type { BenchmarkData } from "@/types/models/benchmark";
 
-import { executeQuery } from '@/lib/db';
-import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-datasource';
+import { executeQuery } from "@/lib/db";
+import {
+  getUrls,
+  isCacheExpired,
+  PARQUET_MONTH_COVERAGE,
+} from "@/lib/parquet-datasource";
 
 /**
  * @openapi
@@ -65,16 +69,17 @@ import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-d
  *         description: An error occurred while fetching the scenario data.
  */
 export const GET: APIRoute = async ({ params }) => {
-    const scenario = params.id
-    try {
-        if (isCacheExpired()) {
-            console.log('Cache expired, updating benchmarks table');
-            await executeQuery(
-                `
-                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
-                `);
-        }
-        const query = `
+  const scenario = params.id;
+  try {
+    if (isCacheExpired()) {
+      console.log("Cache expired, updating benchmarks table");
+      await executeQuery(
+        `
+                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);
+                `,
+      );
+    }
+    const query = `
             SELECT round("usage:cpu:cpu-seconds", 2)::INTEGER                  as cpu, 
                 round("usage:memory:mb-seconds", 2)::INTEGER                   as memory, 
                 costs::INTEGER                                                 as costs, 
@@ -88,18 +93,18 @@ export const GET: APIRoute = async ({ params }) => {
             WHERE "scenario_id" = '${scenario}'
                 AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
             ORDER BY "test:start:datetime" DESC
-        `
-        const data = await executeQuery(query) as BenchmarkData[];
-        return Response.json({
-            scenario_id: scenario,
-            data
-        });
-    } catch (error) {
-        const message = `Fetching benchmark data for service ${scenario} failed.`;
-        console.error(message, error);
+        `;
+    const data = (await executeQuery(query)) as BenchmarkData[];
+    return Response.json({
+      scenario_id: scenario,
+      data,
+    });
+  } catch (error) {
+    const message = `Fetching benchmark data for service ${scenario} failed.`;
+    console.error(message, error);
 
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        return new Response(JSON.stringify({ message }), { status: 500, headers });
-    }
-}
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    return new Response(JSON.stringify({ message }), { status: 500, headers });
+  }
+};
