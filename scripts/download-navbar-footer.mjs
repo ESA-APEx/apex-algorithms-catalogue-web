@@ -72,7 +72,7 @@ function resolveExternalUrls(html, baseUrl) {
   });
 
   // Prepend base URL to image sources that do not start with http or https
-  $("img").each((index, element) => {
+  $("img").each((_, element) => {
     const src = $(element).attr("src");
     if (src && !/^https?:\/\//i.test(src)) {
       // Prepend base URL if the source is relative

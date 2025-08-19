@@ -6,8 +6,8 @@ import node from "@astrojs/node";
 import markdownIntegration from "@astropub/md";
 import { RemarkNormalizeHeadings } from "./src/remark-plugins/normalize-headings";
 
-// @ts-expect-error
 const { PRODUCTION_BASE_URL } = loadEnv(
+  // @ts-expect-error
   process.env.NODE_ENV,
   process.cwd(),
   "",

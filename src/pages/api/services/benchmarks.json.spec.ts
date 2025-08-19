@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GET } from "./benchmarks.json";
 import { executeQuery } from "@/lib/db";
-import { getUrls, PARQUET_MONTH_COVERAGE } from "@/lib/parquet-datasource";
+import { getUrls } from "@/lib/parquet-datasource";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GET } from "./benchmarks.json";
 
 vi.mock("@/lib/db", () => ({
   executeQuery: vi.fn(),

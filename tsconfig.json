@@ -7,5 +7,6 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "exclude": ["playwright-report", "dist", "node_modules"]
 }

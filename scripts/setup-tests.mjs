@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { json } from "stream/consumers";
 
 modifySarCoinJson();
 createPrivateAlgorithm();

@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { isFeatureEnabled } from "./featureflag";
-import { featureflag } from "@/featureflag.config";
 
 vi.mock("@/featureflag.config", () => ({
   featureflag: {
