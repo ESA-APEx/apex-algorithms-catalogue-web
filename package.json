@@ -6,7 +6,7 @@
     "setup": "make-dir ./tmp && astro check && npm run download-source",
     "dev": "npm run setup && astro dev --force",
     "build": "npm run setup && astro build",
-    "build-test": "npm run setup && node ./scripts/setup-public-cwl.mjs && astro build",
+    "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "test": "npm run test-unit && npm run test-e2e",
