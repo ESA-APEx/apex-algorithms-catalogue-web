@@ -1,12 +1,7 @@
 "use client";
 
 import { Badge } from "./Badge";
-import {
-  Command,
-  CommandItem,
-  CommandEmpty,
-  CommandList,
-} from "./Command";
+import { Command, CommandItem, CommandEmpty, CommandList } from "./Command";
 import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { X as RemoveIcon, Check } from "lucide-react";
@@ -17,7 +12,7 @@ import React, {
   useContext,
   useState,
 } from "react";
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent } from "react";
 
 interface MultiSelectorProps
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive> {
@@ -270,7 +265,7 @@ MultiSelectorTrigger.displayName = "MultiSelectorTrigger";
 const MultiSelectorInput = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => {
+>(({ className, ...props }, _) => {
   const {
     setOpen,
     inputValue,

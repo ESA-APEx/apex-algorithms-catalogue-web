@@ -1,152 +1,197 @@
-import {expect, type Page, test} from '@playwright/test';
+import { expect, type Page, test } from "@playwright/test";
 
 const openService = async (page: Page, name: string) => {
-    await page.getByTestId('service-card').getByText(name).first().click();
-}
+  await page.getByTestId("service-card").getByText(name).first().click();
+};
 
-test.describe('Service Details Test', () => {
+test.describe("Service Details Test", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
 
-    test.beforeEach(async ({page}) => {
-        await page.goto('/');
-    });
+  test("Should open the details page", async ({ page }) => {
+    await openService(page, "ESA worldcereal global crop type detector");
+    await page.waitForURL("**/apps/worldcereal_crop_type");
+  });
 
-    test("Should open the details page", async ({page}) => {
+  test("Should show the correct links for an openEO service", async ({
+    page,
+  }) => {
+    await openService(page, "Multi output gaussian process regression");
 
-        await openService(page, 'ESA worldcereal global crop type detector');
-        await page.waitForURL('**/apps/worldcereal_crop_type');
-    });
+    await expect(
+      page.getByRole("link").getByText("Open documentation"),
+    ).toHaveAttribute("href", "https://open-eo.github.io/FuseTS/");
+    await expect(
+      page.getByRole("link").getByText("Show code repository"),
+    ).toHaveAttribute("href", "https://github.com/Open-EO/FuseTS");
+    await expect(
+      page.getByRole("link").getByText("Execute service"),
+    ).toHaveAttribute(
+      "href",
+      "https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu",
+    );
+  });
 
-    test("Should show the correct links for an openEO service", async ({page}) => {
-        await openService(page, 'Multi output gaussian process regression');
+  test("Should show the correct links for an OGC API Process service", async ({
+    page,
+  }) => {
+    await openService(page, "Burned Area Severity (BAS) analysis");
 
-        await expect(page.getByRole('link').getByText('Open documentation')).toHaveAttribute('href', 'https://open-eo.github.io/FuseTS/');
-        await expect(page.getByRole('link').getByText('Show code repository')).toHaveAttribute('href', 'https://github.com/Open-EO/FuseTS');
-        await expect(page.getByRole('link').getByText('Execute service')).toHaveAttribute('href', 'https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu');
-    });
+    await expect(
+      page.getByRole("link").getByText("Open documentation"),
+    ).toHaveAttribute(
+      "href",
+      "https://geohazards-tep.gitlab.io/gep-docs/services/burned-area-severity/service-specs/",
+    );
+    await expect(
+      page.getByRole("link").getByText("Request access"),
+    ).toHaveAttribute("href", "https://geohazards-tep.eu/#!web_store");
+    await expect(
+      page.getByRole("link").getByText("Execute service"),
+    ).toHaveAttribute(
+      "href",
+      "https://geohazards-tep.eu/geobrowser/?id=opt-bas-app",
+    );
+  });
 
-    test("Should show the correct links for an OGC API Process service", async ({page}) => {
-        await openService(page, 'Burned Area Severity (BAS) analysis');
+  test("Should show warning for restricted OGC API Process services", async ({
+    page,
+  }) => {
+    await openService(page, "Burned Area Severity (BAS) analysis");
 
-        await expect(page.getByRole('link').getByText('Open documentation')).toHaveAttribute('href', 'https://geohazards-tep.gitlab.io/gep-docs/services/burned-area-severity/service-specs/');
-        await expect(page.getByRole('link').getByText('Request access')).toHaveAttribute('href', 'https://geohazards-tep.eu/#!web_store');
-        await expect(page.getByRole('link').getByText('Execute service')).toHaveAttribute('href', 'https://geohazards-tep.eu/geobrowser/?id=opt-bas-app');
-    });
+    await expect(page.getByTestId("service-access-warning")).toBeVisible();
+  });
 
-    test("Should show warning for restricted OGC API Process services", async ({page}) => {
-        await openService(page, 'Burned Area Severity (BAS) analysis');
+  test("Should not show warning for openEO services", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
 
-        await expect(page.getByTestId('service-access-warning')).toBeVisible();
-    });
+    await expect(page.getByTestId("service-access-warning")).not.toBeVisible();
+  });
 
-    test("Should not show warning for openEO services", async ({page}) => {
-        await openService(page, 'Multi output gaussian process regression');
+  test("Should show benchmark status", async ({ page }) => {
+    await openService(page, "Sentinel-1 statistics");
 
-        await expect(page.getByTestId('service-access-warning')).not.toBeVisible();
-    });
+    await expect(page.getByText("Benchmark status")).toBeVisible();
 
-    test("Should show benchmark status", async ({page}) => {
-        await openService(page, 'Sentinel-1 statistics');
+    const statusBadge = page.getByTestId("benchmark-status-sidenav");
 
-        await expect(page.getByText('Benchmark status')).toBeVisible();
+    await expect(statusBadge).toBeVisible();
 
-        const statusBadge = page.getByTestId('benchmark-status-sidenav');
+    const statusBadgeLabel = statusBadge.getByText("Stable");
 
-        await expect(statusBadge).toBeVisible();
+    await statusBadgeLabel.waitFor({ state: "visible", timeout: 50000 });
+    await expect(statusBadgeLabel).toBeVisible({ timeout: 50000 });
+  });
 
-        const statusBadgeLabel = statusBadge.getByText('Stable')
+  test("Should truncate the lengthy description and display 'read more' to show complete text", async ({
+    page,
+  }) => {
+    await openService(page, "Multi output gaussian process regression");
 
-        await statusBadgeLabel.waitFor({ state: 'visible', timeout: 50000 });
-        await expect(statusBadgeLabel).toBeVisible({ timeout: 50000 });
-    });
+    const desc = page.getByTestId("collapsible-text");
+    await expect(desc).toContainText("...");
 
-    test("Should truncate the lengthy description and display 'read more' to show complete text", async ({page}) => {
-        await openService(page, 'Multi output gaussian process regression');
+    const readMoreButton = desc.getByRole("button");
+    await readMoreButton.click();
 
-        const desc = page.getByTestId('collapsible-text');
-        await expect(desc).toContainText('...');
+    await expect(desc).not.toContainText("...");
+    await expect(readMoreButton).not.toBeVisible();
+  });
 
-        const readMoreButton = desc.getByRole('button');
-        await readMoreButton.click();
+  test("Should show parameters in the details page for OpenEO service", async ({
+    page,
+  }) => {
+    await openService(page, "Multi output gaussian process regression");
 
-        await expect(desc).not.toContainText('...');
-        await expect(readMoreButton).not.toBeVisible();
-    })
+    const parametersTable = page.getByTestId("parameters-table");
+    await expect(parametersTable).toBeVisible();
 
-    test("Should show parameters in the details page for OpenEO service", async ({page}) => {
-        await openService(page, 'Multi output gaussian process regression');
+    const rows = parametersTable.locator("tr");
+    await expect(rows).toHaveCount(5);
 
-        const parametersTable = page.getByTestId('parameters-table');
-        await expect(parametersTable).toBeVisible();
+    // Check if the first row contains header information
+    const headerCells = rows.first().locator("th");
+    await expect(headerCells.nth(0)).toHaveText("Parameter");
+    await expect(headerCells.nth(1)).toHaveText("Type");
+    await expect(headerCells.nth(2)).toHaveText("Default");
 
-        const rows = parametersTable.locator('tr');
-        await expect(rows).toHaveCount(5); 
+    // Check if the content rows contain parameter information
+    const contentCells = rows.nth(1).locator("td");
+    await expect(contentCells.nth(0)).toContainText(
+      "spatial_extent (required)",
+    );
+    await expect(contentCells.nth(1)).toHaveText(
+      "object/bounding-box, object/datacube",
+    );
+    await expect(contentCells.nth(2)).toHaveText("");
+  });
 
-        // Check if the first row contains header information
-        const headerCells = rows.first().locator('th');
-        await expect(headerCells.nth(0)).toHaveText('Parameter');
-        await expect(headerCells.nth(1)).toHaveText('Type');
-        await expect(headerCells.nth(2)).toHaveText('Default');
+  test("Should show parameters in the details page for public OGC API Process service", async ({
+    page,
+  }) => {
+    // Note: This test is working because the application url is patched for the test.
+    // Adjusting reference to the application with public application url is necessary in the future.
+    // (see scripts/setup-tests.mjs)
+    await openService(page, "SAR-COIN - Coherence and Intensity Composite");
 
-        // Check if the content rows contain parameter information
-        const contentCells = rows.nth(1).locator('td');
-        await expect(contentCells.nth(0)).toContainText('spatial_extent (required)');
-        await expect(contentCells.nth(1)).toHaveText('object/bounding-box, object/datacube');
-        await expect(contentCells.nth(2)).toHaveText('');
-    })
+    const parametersTable = page.getByTestId("parameters-table");
+    await expect(parametersTable).toBeVisible();
 
-    test("Should show parameters in the details page for public OGC API Process service", async ({page}) => {
-        // Note: This test is working because the application url is patched for the test. 
-        // Adjusting reference to the application with public application url is necessary in the future.
-        // (see scripts/setup-public-cwl.mjs)
-        await openService(page, 'SAR-COIN - Coherence and Intensity Composite');
+    const rows = parametersTable.locator("tr");
+    await expect(rows).toHaveCount(3);
 
-        const parametersTable = page.getByTestId('parameters-table');
-        await expect(parametersTable).toBeVisible();
+    // Check if the first row contains header information
+    const headerCells = rows.first().locator("th");
+    await expect(headerCells.nth(0)).toHaveText("Parameter");
+    await expect(headerCells.nth(1)).toHaveText("Type");
+    await expect(headerCells.nth(2)).toHaveText("Default");
 
-        const rows = parametersTable.locator('tr');
-        await expect(rows).toHaveCount(3); 
+    // Check if the content rows contain parameter information
+    const contentCells = rows.nth(1).locator("td");
+    await expect(contentCells.nth(0)).toContainText(
+      "STAC item reference (required)",
+    );
+    await expect(contentCells.nth(1)).toHaveText("string");
+    await expect(contentCells.nth(2)).toHaveText("");
+  });
 
-        // Check if the first row contains header information
-        const headerCells = rows.first().locator('th');
-        await expect(headerCells.nth(0)).toHaveText('Parameter');
-        await expect(headerCells.nth(1)).toHaveText('Type');
-        await expect(headerCells.nth(2)).toHaveText('Default');
+  test("Should not show parameters in the details page for protected OGC API Process service", async ({
+    page,
+  }) => {
+    await openService(page, "Burned Area Severity (BAS) analysis");
+    const parametersTable = page.getByTestId("parameters-table");
+    await expect(parametersTable).not.toBeVisible();
+  });
 
-        // Check if the content rows contain parameter information
-        const contentCells = rows.nth(1).locator('td');
-        await expect(contentCells.nth(0)).toContainText('STAC item reference (required)');
-        await expect(contentCells.nth(1)).toHaveText('string');
-        await expect(contentCells.nth(2)).toHaveText('');
-    })
+  test("Should show the service access label as public for OpenEO service", async ({
+    page,
+  }) => {
+    await openService(page, "Multi output gaussian process regression");
 
-    test("Should not show parameters in the details page for protected OGC API Process service", async ({page}) => {
-        await openService(page, 'Burned Area Severity (BAS) analysis');
-        const parametersTable = page.getByTestId('parameters-table');
-        await expect(parametersTable).not.toBeVisible();
-    })
+    const accessLabel = page.getByTestId("service-access-label");
+    await expect(accessLabel).toBeVisible();
+    await expect(accessLabel).toHaveText("public");
 
-    test("Should show the service access label as public for OpenEO service", async ({page}) => {
-        await openService(page, 'Multi output gaussian process regression');
+    const executionLabel = page.getByTestId("execution-info-label");
+    await expect(executionLabel.first()).toHaveText("Process ID");
+    await expect(executionLabel.nth(1)).toHaveText("openEO Process");
+    await expect(executionLabel.last()).toHaveText("openEO Backend");
+  });
 
-        const accessLabel = page.getByTestId('service-access-label');
-        await expect(accessLabel).toBeVisible();
-        await expect(accessLabel).toHaveText('public');
+  test("Should show the service access label as protected for OGC API Process service", async ({
+    page,
+  }) => {
+    await openService(page, "Burned Area Severity (BAS) analysis");
 
-        const executionLabel = page.getByTestId('execution-info-label');
-        await expect(executionLabel.first()).toHaveText('Process ID');
-        await expect(executionLabel.nth(1)).toHaveText('openEO Process');
-        await expect(executionLabel.last()).toHaveText('openEO Backend');
-    })
+    const accessLabel = page.getByTestId("service-access-label");
+    await expect(accessLabel).toBeVisible();
+    await expect(accessLabel).toHaveText("protected");
 
-    test("Should show the service access label as protected for OGC API Process service", async ({page}) => {
-        await openService(page, 'Burned Area Severity (BAS) analysis');
-
-        const accessLabel = page.getByTestId('service-access-label');
-        await expect(accessLabel).toBeVisible();
-        await expect(accessLabel).toHaveText('protected');
-
-        const executionLabel = page.getByTestId('execution-info-label');
-        await expect(executionLabel.first()).toHaveText('OGC API Process');
-        await expect(executionLabel.last()).toContainText('CWL Definition protected');
-    })
-})
+    const executionLabel = page.getByTestId("execution-info-label");
+    await expect(executionLabel.first()).toHaveText("OGC API Process");
+    await expect(executionLabel.last()).toContainText(
+      "CWL Definition protected",
+    );
+  });
+});

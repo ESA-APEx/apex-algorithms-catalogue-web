@@ -1,7 +1,11 @@
-import type { APIRoute } from 'astro';
-import type { BenchmarkSummary } from '@/types/models/benchmark';
-import { executeQuery } from '@/lib/db';
-import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-datasource';
+import type { APIRoute } from "astro";
+import type { BenchmarkSummary } from "@/types/models/benchmark";
+import { executeQuery } from "@/lib/db";
+import {
+  getUrls,
+  isCacheExpired,
+  PARQUET_MONTH_COVERAGE,
+} from "@/lib/parquet-datasource";
 
 /**
  * @openapi
@@ -37,15 +41,16 @@ import { getUrls, isCacheExpired, PARQUET_MONTH_COVERAGE } from '@/lib/parquet-d
  *       - Benchmark
  */
 export const GET: APIRoute = async () => {
-    try {
-        if (isCacheExpired()) {
-            console.log('Cache expired, updating benchmarks table');
-            await executeQuery(
-                `
-                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map(url => `"${url}"`)}]);
-                `);
-        }
-        const query = `
+  try {
+    if (isCacheExpired()) {
+      console.log("Cache expired, updating benchmarks table");
+      await executeQuery(
+        `
+                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);
+                `,
+      );
+    }
+    const query = `
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
                 SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
@@ -55,16 +60,16 @@ export const GET: APIRoute = async () => {
               AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
             GROUP BY "scenario_id"
             ORDER BY "scenario_id"; 
-        `; 
+        `;
 
-        const data = (await executeQuery(query) as BenchmarkSummary[]);
-        return Response.json(data);
-    } catch (error) {
-        const message = 'Fetching benchmark statistics from all services failed.';
-        console.error(message, error);
+    const data = (await executeQuery(query)) as BenchmarkSummary[];
+    return Response.json(data);
+  } catch (error) {
+    const message = "Fetching benchmark statistics from all services failed.";
+    console.error(message, error);
 
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        return new Response(JSON.stringify({ message }), { status: 500, headers });
-    }
-}
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    return new Response(JSON.stringify({ message }), { status: 500, headers });
+  }
+};
