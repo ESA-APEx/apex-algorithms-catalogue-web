@@ -46,6 +46,7 @@ export interface Contact {
   position?: string;
   organization?: string;
   links: Link[];
+  email?: string;
   contactInstructions: string;
   roles: string[];
 }
