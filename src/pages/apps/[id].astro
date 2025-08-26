@@ -3,6 +3,7 @@ import { Markdown } from "@astropub/md";
 import {
   Info,
   Globe,
+  Mail,
   SquareArrowOutUpRight,
   TriangleAlert,
 } from "lucide-react";
@@ -279,6 +280,15 @@ const serviceRequestWarning =
                           )}
                         </a>
                       ))}
+                      {
+                        contact.email && (
+                          <a
+                            href={`mailto:${contact.email}`}
+                          >
+                            <Mail className="w-4 h-4" />
+                          </a>
+                        )
+                      }
                     </div>
                   </div>
                 </li>
