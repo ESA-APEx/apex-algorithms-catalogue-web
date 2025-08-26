@@ -252,6 +252,7 @@ const serviceRequestWarning =
                     )}
                     {contact.position && <p>{contact.position}</p>}
                     <p class="mt-1 text-sm mb-2">{contact.roles.join(", ")}</p>
+                    {contact.contactInstructions && <p class="mt-1 text-sm mb-2">{contact.contactInstructions}</p> }
                     <div class="flex gap-2">
                       {contact.links.map((link) => (
                         <a
