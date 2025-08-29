@@ -1,13 +1,12 @@
 import fs from "fs";
 import path from "path";
 import https from "https";
-import { SOURCE_BRANCH } from "../config";
 import { type Algorithm, AlgorithmType } from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
 import type { UDP } from "../types/models/udp";
 import type { ApplicationDetails } from "@/types/models/application.ts";
 
-const CATALOGUE_JSON_DIR = `contents/apex_algorithms-${SOURCE_BRANCH}/algorithm_catalog`;
+const CATALOGUE_JSON_DIR = `contents/apex_algorithms/algorithm_catalog`;
 
 const fetchJson = (url: string) => {
   return new Promise<any>((resolve, reject) => {

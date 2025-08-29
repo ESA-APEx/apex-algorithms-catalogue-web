@@ -5,19 +5,29 @@ import { Readable } from "stream";
 import { finished } from "stream/promises";
 import unzipper from "unzipper";
 
-const SOURCE_BRANCH = "main";
-const REPO_URL = `https://github.com/ESA-APEx/apex_algorithms/archive/refs/heads/${SOURCE_BRANCH}.zip`;
+const SOURCE_REF = process.env.ALGO_REF || "main";
+const REPO_URL = `https://github.com/ESA-APEx/apex_algorithms/archive/refs/heads/${SOURCE_REF}.zip`;
 const DOWNLOAD_DIR = "contents";
-const REPO_FILENAME = "apex_algorithms-main.zip";
+const REPO_FILENAME = `apex_algorithms`;
 
 await main();
 
 async function main() {
-  await downloadFile(REPO_URL, REPO_FILENAME);
+  console.log(`Downloading algorithms from ${REPO_URL}`);
+  await downloadFile(REPO_URL, `${REPO_FILENAME}.zip`);
   const downloadedFile = await unzipper.Open.file(
-    `${DOWNLOAD_DIR}/${REPO_FILENAME}`,
+    `${DOWNLOAD_DIR}/${REPO_FILENAME}.zip`,
   );
   await downloadedFile.extract({ path: `${DOWNLOAD_DIR}/` });
+  console.log(
+    "Renaming",
+    `${DOWNLOAD_DIR}/${REPO_FILENAME}-${SOURCE_REF}`,
+    `${DOWNLOAD_DIR}/${REPO_FILENAME}`,
+  );
+  fs.renameSync(
+    `${DOWNLOAD_DIR}/${REPO_FILENAME}-${SOURCE_REF}`,
+    `${DOWNLOAD_DIR}/${REPO_FILENAME}`,
+  );
 }
 
 async function downloadFile(url, fileName) {
