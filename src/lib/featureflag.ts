@@ -7,6 +7,9 @@ export function isFeatureEnabled(url: string, feature: string): boolean {
   if (url.includes(import.meta.env.PUBLIC_PRODUCTION_BASE_URL)) {
     return featureflag.production[feature] ?? featureflag.default[feature];
   }
+  if (url.includes(import.meta.env.PUBLIC_PREVIEW_BASE_URL)) {
+    return featureflag.preview?.[feature] ?? featureflag.default[feature];
+  }
 
   return featureflag.default[feature] ?? false;
 }
