@@ -1,4 +1,4 @@
-# APEx Algorithm Catalogue Web
+# APEx Algorithm Services Catalogue Web
 
 A portal website for discovering algorithms onboarded onto APEx.
 
