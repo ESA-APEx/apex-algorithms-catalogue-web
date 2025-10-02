@@ -59,11 +59,11 @@ jobs:
           rm artifact.tar
       - name: Merge new preview site with current preview site
         run: |
-          cp -r preview/new/* preview/
-          ls -R preview
           rm preview/index.html
-          mv "preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
+          cp -r preview/new/* preview/pr-preview
+          mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
           rm -rf preview/new
+          rm -rf preview/pr-${PR_NUMBER}
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
