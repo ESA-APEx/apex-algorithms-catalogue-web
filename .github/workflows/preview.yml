@@ -33,7 +33,7 @@ jobs:
         run: |
           npx make-dir preview/pr-preview
           mv dist/client preview/pr-preview
-          mv preview/pr-preview/client "preview/pr-preview/pr-${env.PR_NUMBER}"
+          mv preview/pr-preview/client "preview/pr-preview/pr-${PR_NUMBER}"
           mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
