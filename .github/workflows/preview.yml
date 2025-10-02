@@ -7,6 +7,10 @@ on:
 
 env:
   NODE_VERSION: 20.17.0
+  ALGO_REF: Issue81_bapCompositeUpdate
+  PR_NUMBER: 252
+  # PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+  # ALGO_REF:  ${{ github.event.client_payload.head_ref }}
 
 permissions:
   contents: read
@@ -23,12 +27,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run build-preview
-      - name: Upload Pages artifact
+      - name: Build new preview site
+        run: BUILD_TARGET=preview npm run build
+      - name: Setup preview homepage
+        run: |
+          npx make-dir "preview/pr-preview/pr-$PR_NUMBER"
+          mv dist/client "preview/pr-preview/pr-$PR_NUMBER"
+          mv "preview/pr-preview/pr-$PR_NUMBER/pr-preview.html" preview/index.html
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: dist/client
+          name: github-pages
+          path: preview
+          retention-days: 90
 
   deploy:
     needs: build

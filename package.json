@@ -6,7 +6,6 @@
     "setup": "make-dir ./tmp && astro check && npm run download-source",
     "dev": "npm run setup && astro dev --force",
     "build": "npm run setup && astro build",
-    "build-preview": "BUILD_TARGET=preview npm run build",
     "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
