@@ -29,12 +29,27 @@ jobs:
         run: npm ci
       - name: Build new preview site
         run: BUILD_TARGET=preview npm run build
-      - name: Setup preview homepage
+      - name: Setup new preview site
+        run: |
+          npx make-dir preview/new
+          mv dist/client preview/new
+          mv preview/new/client "preview/new/pr-${PR_NUMBER}"
+      - name: Download current preview site
+        uses: actions/download-artifact@v5
+        with:
+          name: github-pages
+      - name: Extract current preview site
         run: |
           npx make-dir preview/pr-preview
-          mv dist/client preview/pr-preview
-          mv preview/pr-preview/client "preview/pr-preview/pr-${PR_NUMBER}"
-          mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
+          unzip github-pages.zip -d preview/pr-preview
+          cd preview/pr-preview && tar xf artifact.tar
+          rm artifact.tar
+      - name: Merge new preview site with current preview site
+        run: |
+          cp -r preview/new/* preview/
+          rm preview/index.html
+          mv "preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
+          rm -rf preview/new
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
