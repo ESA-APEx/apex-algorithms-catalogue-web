@@ -60,6 +60,7 @@ jobs:
           rm artifact.tar
       - name: Merge new preview site with current preview site
         run: |
+          ls preview
           cp -r preview/new/* preview/
           rm preview/index.html
           mv "preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
