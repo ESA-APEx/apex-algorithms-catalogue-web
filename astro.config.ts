@@ -20,7 +20,7 @@ const {
 const config = {
   preview: {
     SITE_URL: PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: "",
+    BASE_PATH: "/apex-algorithms-catalogue-web",
   },
   staging: {
     SITE_URL: PUBLIC_STAGING_BASE_URL,
