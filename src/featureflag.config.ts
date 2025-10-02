@@ -7,6 +7,10 @@ export const featureflag: Record<any, any> = {
     benchmarkStatus: false,
     cwlParameterDetail: false,
   },
+  preview: {
+    benchmarkStatus: false,
+    cwlParameterDetail: false,
+  },
   default: {
     benchmarkStatus: true,
     cwlParameterDetail: true,

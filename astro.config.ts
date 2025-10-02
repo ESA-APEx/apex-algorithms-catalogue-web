@@ -39,7 +39,7 @@ const { SITE_URL, BASE_PATH } = config[buildTarget];
 
 // https://astro.build/config
 export default defineConfig({
-  output: buildTarget === "preview" ? "static" : "server",
+  output: "server",
   site: SITE_URL,
   base: BASE_PATH,
   image: {
