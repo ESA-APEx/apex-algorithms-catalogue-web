@@ -16,6 +16,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 jobs:
   build:
@@ -34,10 +35,22 @@ jobs:
           npx make-dir preview/new
           mv dist/client preview/new
           mv preview/new/client "preview/new/pr-${PR_NUMBER}"
+      - name: Get latest successful workflow run ID
+        id: get-latest-run
+        run: |
+          WORKFLOW_ID=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            repos/${{ github.repository }}/actions/workflows/preview.yml/runs \
+            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' \
+            | head -n 1)
+          echo "run_id=$WORKFLOW_ID" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download current preview site
         uses: actions/download-artifact@v5
         with:
           name: github-pages
+          run-id: ${{ steps.get-latest-run.outputs.run_id }}
       - name: Extract current preview site
         run: |
           npx make-dir preview/pr-preview
