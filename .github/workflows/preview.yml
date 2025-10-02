@@ -65,8 +65,7 @@ jobs:
           rm preview/index.html
           cp -r preview/new/* preview/pr-preview
           mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
-          rm -rf preview/new
-          rm -rf preview/pr-${PR_NUMBER}
+      # check whether the new preview site is uploaded
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
