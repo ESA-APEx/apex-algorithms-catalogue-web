@@ -30,6 +30,9 @@ jobs:
         run: npm ci
       - name: Build new preview site
         run: BUILD_TARGET=preview npm run build
+        env:
+          ALGO_REF: ${{ env.ALGO_REF }}
+          PR_NUMBER: ${{ env.PR_NUMBER }}
       - name: Setup new preview site
         run: |
           npx make-dir preview/new
