@@ -54,14 +54,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract current preview site
         run: |
-          npx make-dir preview/pr-preview
-          cp artifact.tar preview/pr-preview
-          cd preview/pr-preview && tar xf artifact.tar
+          cp artifact.tar preview
+          cd preview && tar xf artifact.tar
           rm artifact.tar
       - name: Merge new preview site with current preview site
         run: |
-          ls -R preview
           cp -r preview/new/* preview/
+          ls -R preview
           rm preview/index.html
           mv "preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
           rm -rf preview/new
