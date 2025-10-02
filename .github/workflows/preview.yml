@@ -31,9 +31,9 @@ jobs:
         run: BUILD_TARGET=preview npm run build
       - name: Setup preview homepage
         run: |
-          npx make-dir "preview/pr-preview/pr-$PR_NUMBER"
-          mv dist/client "preview/pr-preview/pr-$PR_NUMBER"
-          mv "preview/pr-preview/pr-$PR_NUMBER/pr-preview.html" preview/index.html
+          npx make-dir "preview/pr-preview/pr-${{ PR_NUMBER }}"
+          mv dist/client "preview/pr-preview/pr-${{ PR_NUMBER }}"
+          mv "preview/pr-preview/pr-${{ PR_NUMBER }}/pr-preview.html" preview/index.html
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
