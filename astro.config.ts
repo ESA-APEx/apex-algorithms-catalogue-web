@@ -6,7 +6,11 @@ import node from "@astrojs/node";
 import markdownIntegration from "@astropub/md";
 import { RemarkNormalizeHeadings } from "./src/remark-plugins/normalize-headings";
 
-const { PRODUCTION_BASE_URL } = loadEnv(
+const {
+  PUBLIC_PRODUCTION_BASE_URL,
+  PUBLIC_STAGING_BASE_URL,
+  PUBLIC_PREVIEW_BASE_URL,
+} = loadEnv(
   // @ts-expect-error
   process.env.NODE_ENV,
   process.cwd(),
@@ -14,12 +18,16 @@ const { PRODUCTION_BASE_URL } = loadEnv(
 );
 
 const config = {
+  preview: {
+    SITE_URL: PUBLIC_PREVIEW_BASE_URL,
+    BASE_PATH: "",
+  },
   staging: {
-    SITE_URL: PRODUCTION_BASE_URL,
+    SITE_URL: PUBLIC_STAGING_BASE_URL,
     BASE_PATH: "",
   },
   production: {
-    SITE_URL: PRODUCTION_BASE_URL,
+    SITE_URL: PUBLIC_PRODUCTION_BASE_URL,
     BASE_PATH: "",
   },
 };

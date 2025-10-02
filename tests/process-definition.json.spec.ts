@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GET } from "./process-definition.json";
+import { GET } from "@/pages/api/services/process-definition.json";
 import YAML from "yaml";
 import nodeFetch from "node-fetch";
 

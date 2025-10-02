@@ -2,7 +2,7 @@ import { executeQuery } from "@/lib/db";
 import { getUrls } from "@/lib/parquet-datasource";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { GET } from "./benchmarks.json";
+import { GET } from "@/pages/api/services/benchmarks.json";
 
 vi.mock("@/lib/db", () => ({
   executeQuery: vi.fn(),
