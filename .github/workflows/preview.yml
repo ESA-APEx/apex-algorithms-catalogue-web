@@ -7,8 +7,8 @@ on:
 
 env:
   NODE_VERSION: 20.17.0
-  ALGO_REF: Issue81_bapCompositeUpdate
-  PR_NUMBER: 252
+  ALGO_REF: issue244_updateWAC
+  PR_NUMBER: 251
   # PR_NUMBER: ${{ github.event.client_payload.pr_number }}
   # ALGO_REF:  ${{ github.event.client_payload.head_ref }}
 
@@ -35,6 +35,7 @@ jobs:
           PR_NUMBER: ${{ env.PR_NUMBER }}
       - name: Setup new preview site
         run: |
+          rm -rf preview/new
           npx make-dir preview/new
           mv dist/client preview/new
           mv preview/new/client "preview/new/pr-${PR_NUMBER}"
@@ -65,7 +66,7 @@ jobs:
           rm preview/index.html
           cp -r preview/new/* preview/pr-preview
           mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
-      # check whether the new preview site is uploaded
+          rm -rf preview/new
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
