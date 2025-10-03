@@ -33,7 +33,8 @@ export const Card = ({
   const truncatedBody = truncateBody(body);
   const displayedLabels = labels?.slice(0, maxDisplayedLabels);
   const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
-  const imageUrl = thumbnail || "/images/default-thumbnail.png";
+  const imageUrl =
+    thumbnail || `${import.meta.env.BASE_URL}images/default-thumbnail.png`;
 
   return (
     <a href={href} data-testid="service-card">
