@@ -1,22 +1,26 @@
 name: Deploy PR preview
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  repository_dispatch:
+    types: [catalogue-pr-updated]
+    # TODO: handle cleanup on PR close event (catalogue-pr-closed)
 
 env:
   NODE_VERSION: 20.17.0
-  ALGO_REF: issue244_updateWAC
-  PR_NUMBER: 251
-  # PR_NUMBER: ${{ github.event.client_payload.pr_number }}
-  # ALGO_REF:  ${{ github.event.client_payload.head_ref }}
+  PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+  ALGO_REF: ${{ github.event.client_payload.head_ref }}
+  DATA_REPO: ${{ github.event.client_payload.head_repo }}
 
 permissions:
   contents: read
   pages: write
   id-token: write
   actions: read
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.client_payload.pr_number }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -72,7 +76,7 @@ jobs:
         with:
           name: github-pages
           path: preview
-          retention-days: 90
+          retention-days: 180
 
   deploy:
     needs: build
@@ -84,3 +88,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      # TODO: use https://github.com/marocchino/sticky-pull-request-comment to post the preview link as a comment on the PR
