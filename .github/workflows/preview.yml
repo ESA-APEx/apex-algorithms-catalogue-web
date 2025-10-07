@@ -25,6 +25,8 @@ jobs:
   build:
     if: ${{ github.event.action == 'catalogue-pr-updated' }}
     runs-on: ubuntu-latest
+    outputs:
+      pr-message: ${{ steps.pr-message.outputs.message }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -71,6 +73,22 @@ jobs:
           cp -r preview/new/* preview/pr-preview
           mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
           rm -rf preview/new
+      - name: Set PR message
+        id: pr-message
+        run: |
+          MESSAGE=$(cat <<EOF
+          ## 🔍 Catalogue's Preview Site Deployed
+
+          Your changes have been deployed to the preview site:
+
+          **🔗 Preview URL:** \${{ steps.deployment.outputs.page_url }}pr-preview/pr-${{ env.PR_NUMBER }}/
+
+          This preview will be updated automatically when you push new changes to your PR.
+          EOF
+          )
+          echo "message<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$MESSAGE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -81,6 +99,8 @@ jobs:
   cleanup:
     if: ${{ github.event.action == 'catalogue-pr-closed' }}
     runs-on: ubuntu-latest
+    outputs:
+      pr-message: ${{ steps.pr-message.outputs.message }}
     steps:
       - name: Get latest successful workflow run ID
         id: get-latest-run
@@ -101,6 +121,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract current preview site
         run: |
+          mkdir preview
           cp artifact.tar preview
           cd preview && tar xf artifact.tar
           rm artifact.tar
@@ -113,22 +134,29 @@ jobs:
           name: github-pages
           path: preview
           retention-days: 90
-      - name: Comment PR with cleanup message
-        uses: marocchino/sticky-pull-request-comment@v2
+      - name: Set PR message
+        id: pr-message
+        run: |
+          MESSAGE=$(cat <<EOF
+          ## 🧹 Catalogue's Preview Site Cleanup
+
+          The preview site for this pull request has been cleaned up.
+
+          If you need a new preview, please reopen the PR or create a new one.
+          EOF
+          )
+          echo "message<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$MESSAGE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
-          repo: apex_algorithms
-          number: ${{ env.PR_NUMBER }}
-          header: preview-link
-          message: |
-            ## 🧹 Catalogue's Preview Site Cleanup
-
-            The preview site for this pull request has been cleaned up.
-
-            If you need a new preview, please reopen the PR or create a new one.
+          name: github-pages
+          path: preview
+          retention-days: 90
 
   deploy:
-    needs: build
+    needs: [build, cleanup]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -138,18 +166,11 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Comment PR with preview link
+      - name: Send comment to PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
           repo: apex_algorithms
           number: ${{ env.PR_NUMBER }}
           header: preview-link
-          message: |
-            ## 🔍 Catalogue's Preview Site Deployed
-
-            Your changes have been deployed to the preview site:
-
-            **🔗 Preview URL:** ${{ steps.deployment.outputs.page_url }}pr-preview/pr-${{ env.PR_NUMBER }}/
-
-            This preview will be updated automatically when you push new changes to your PR.
+          message: ${{ needs.build.outputs.pr-message }}
