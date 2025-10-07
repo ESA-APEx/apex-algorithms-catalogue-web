@@ -156,6 +156,7 @@ jobs:
           retention-days: 90
 
   deploy:
+    if: always() && (needs.build.result == 'success' || needs.cleanup.result == 'success')
     needs: [build, cleanup]
     runs-on: ubuntu-latest
     environment:
@@ -173,4 +174,4 @@ jobs:
           repo: apex_algorithms
           number: ${{ env.PR_NUMBER }}
           header: preview-link
-          message: ${{ needs.build.outputs.pr-message }}
+          message: ${{ needs.build.outputs.pr-message || needs.cleanup.outputs.pr-message }}
