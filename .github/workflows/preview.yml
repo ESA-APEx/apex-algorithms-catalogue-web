@@ -92,7 +92,7 @@ jobs:
       - name: Comment PR with preview link
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          repo_token: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
           repo: ${{ env.DATA_REPO }}
           number: ${{ env.PR_NUMBER }}
           header: preview-link
