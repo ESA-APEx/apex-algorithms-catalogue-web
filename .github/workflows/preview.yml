@@ -19,8 +19,8 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: preview-${{ github.event.client_payload.pr_number }}
-  cancel-in-progress: true
+  group: preview-deployment
+  cancel-in-progress: false
 
 jobs:
   build:
