@@ -72,8 +72,11 @@ jobs:
         run: |
           rm preview/index.html
           cp -r preview/new/* preview/pr-preview
-          mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
+          mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html
           rm -rf preview/new
+      - name: Update index.html static assets paths
+        run: |
+          sed -i.bak "s|/_astro/|/pr-preview/pr-${PR_NUMBER}/_astro/|g" preview/index.html
       - name: Update versions.csv
         run: |
           rm preview/versions.csv || true

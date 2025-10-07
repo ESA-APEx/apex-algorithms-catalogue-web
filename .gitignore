@@ -35,3 +35,4 @@ terraform.tfstate.backup
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/public/versions.csv

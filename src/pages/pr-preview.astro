@@ -1,0 +1,300 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "Algorithm Services Catalogue Preview";
+
+export const prerender = true;
+---
+
+<Layout title={`${title} | APEx`}>
+  <div class="my-14">
+    <main
+      class="w-full block min-h-screen sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto px-4"
+    >
+      <div class="max-w-screen-xl text-center mx-auto mb-10">
+        <h1
+          class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:bg-brand-teal-50"
+        >
+          {title}
+        </h1>
+        <p class="text-balance text-brand-gray-50 mb-8">
+          Browse available PR preview versions
+        </p>
+      </div>
+
+      <div class="max-w-4xl mx-auto">
+        <!-- Search Section -->
+        <div id="search-section" class="hidden mb-8">
+          <div
+            class="flex flex-col sm:flex-row gap-4 items-center justify-between"
+          >
+            <div class="relative flex-1 max-w-md">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search by PR number..."
+                class="w-full px-4 py-2 pl-10 bg-brand-dark-blue border border-brand-gray-70 rounded-lg placeholder-brand-gray-50 focus:outline-none focus:border-brand-teal-50"
+              />
+              <svg
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-brand-gray-50"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <div class="flex items-center gap-4">
+              <span id="results-count" class="text-sm text-brand-gray-50"
+              ></span>
+              <button
+                id="clear-search"
+                class="hidden px-3 py-1 text-sm border border-brand-gray-50 text-brand-gray-50 rounded hover:border-white hover:text-white transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="loading" class="text-center text-brand-gray-50 mb-8">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-teal-50 mx-auto mb-4"
+          >
+          </div>
+          Loading preview versions...
+        </div>
+
+        <div id="error" class="hidden text-center text-red-400 mb-8">
+          <p>Failed to load preview versions. Please try again later.</p>
+        </div>
+
+        <div id="preview-list" class="hidden">
+          <div class="grid gap-4 md:gap-6">
+            <!-- Preview versions will be populated here -->
+          </div>
+        </div>
+
+        <div id="no-previews" class="hidden text-center text-brand-gray-50">
+          <p>No preview versions available at the moment.</p>
+        </div>
+
+        <div
+          id="no-search-results"
+          class="hidden text-center text-brand-gray-50"
+        >
+          <p>No preview versions match your keyword.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    import { parse } from "csv-parse/browser/esm/sync";
+
+    interface PreviewVersion {
+      pr_number: string;
+      last_updated: string;
+    }
+
+    let allVersions: PreviewVersion[] = [];
+    let filteredVersions: PreviewVersion[] = [];
+
+    async function loadPreviewVersions() {
+      const loadingEl = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      const previewListEl = document.getElementById("preview-list");
+      const noPreviewsEl = document.getElementById("no-previews");
+      const searchSectionEl = document.getElementById("search-section");
+
+      try {
+        const response = await fetch("/versions.csv");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        const records = parse(csvText, {
+          columns: true,
+          skip_empty_lines: true,
+          trim: true,
+        }) as PreviewVersion[];
+
+        loadingEl?.classList.add("hidden");
+
+        if (records.length === 0) {
+          noPreviewsEl?.classList.remove("hidden");
+          return;
+        }
+
+        // Sort by PR number (descending to show latest first)
+        allVersions = records.sort(
+          (a, b) => parseInt(b.pr_number) - parseInt(a.pr_number),
+        );
+        filteredVersions = [...allVersions];
+
+        // Show search section
+        searchSectionEl?.classList.remove("hidden");
+
+        // Render initial list
+        renderVersions();
+        updateResultsCount();
+
+        // Setup search functionality
+        setupSearch();
+
+        previewListEl?.classList.remove("hidden");
+      } catch (error) {
+        console.error("Error loading preview versions:", error);
+        loadingEl?.classList.add("hidden");
+        errorEl?.classList.remove("hidden");
+      }
+    }
+
+    function renderVersions() {
+      const previewListEl = document.getElementById("preview-list");
+      const noSearchResultsEl = document.getElementById("no-search-results");
+      const previewListContainer = previewListEl?.querySelector(".grid");
+
+      if (!previewListContainer) return;
+
+      if (filteredVersions.length === 0) {
+        previewListContainer.innerHTML = "";
+        previewListEl?.classList.add("hidden");
+        noSearchResultsEl?.classList.remove("hidden");
+        return;
+      }
+
+      noSearchResultsEl?.classList.add("hidden");
+      previewListEl?.classList.remove("hidden");
+
+      previewListContainer.innerHTML = filteredVersions
+        .map(
+          (version) => `
+        <div class="border border-brand-gray-70 rounded-lg p-6 hover:border-brand-teal-50 transition-colors" data-pr="${version.pr_number}">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-white">#${version.pr_number}</h3>
+            <span class="text-sm text-brand-gray-50">${formatDate(version.last_updated)}</span>
+          </div>
+          <div class="flex gap-4">
+            <a 
+              href="pr-preview/pr-${version.pr_number}/" 
+              class="inline-flex items-center px-4 py-2 bg-brand-teal-50 text-brand-dark-blue rounded-md hover:bg-brand-teal-40 transition-colors font-medium"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Preview
+              <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+            <a 
+              href="https://github.com/ESA-APEx/apex_algorithms/pull/${version.pr_number}" 
+              class="inline-flex items-center px-4 py-2 border border-brand-gray-50 text-brand-gray-50 rounded-md hover:border-white hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PR
+              <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      `,
+        )
+        .join("");
+    }
+
+    function setupSearch() {
+      const searchInput = document.getElementById(
+        "search-input",
+      ) as HTMLInputElement;
+      const clearButton = document.getElementById("clear-search");
+
+      if (!searchInput || !clearButton) return;
+
+      // Real-time search
+      searchInput.addEventListener("input", (e) => {
+        const searchTerm = (e.target as HTMLInputElement).value
+          .trim()
+          .toLowerCase();
+        filterVersions(searchTerm);
+
+        // Show/hide clear button
+        if (searchTerm) {
+          clearButton.classList.remove("hidden");
+        } else {
+          clearButton.classList.add("hidden");
+        }
+      });
+
+      // Clear search
+      clearButton.addEventListener("click", () => {
+        searchInput.value = "";
+        filterVersions("");
+        clearButton.classList.add("hidden");
+        searchInput.focus();
+      });
+
+      // Handle Enter key
+      searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+        }
+      });
+    }
+
+    function filterVersions(searchTerm: string) {
+      if (!searchTerm) {
+        filteredVersions = [...allVersions];
+      } else {
+        filteredVersions = allVersions.filter((version) =>
+          version.pr_number.toLowerCase().includes(searchTerm),
+        );
+      }
+
+      renderVersions();
+      updateResultsCount();
+    }
+
+    function updateResultsCount() {
+      const resultsCountEl = document.getElementById("results-count");
+      if (!resultsCountEl) return;
+
+      const searchInput = document.getElementById(
+        "search-input",
+      ) as HTMLInputElement;
+      const searchTerm = searchInput?.value.trim();
+
+      if (searchTerm) {
+        resultsCountEl.textContent = `${filteredVersions.length} result${filteredVersions.length !== 1 ? "s" : ""} found`;
+      } else {
+        resultsCountEl.textContent = `${allVersions.length} preview${allVersions.length !== 1 ? "s" : ""} available`;
+      }
+    }
+
+    function formatDate(dateString: string): string {
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } catch {
+        return dateString;
+      }
+    }
+
+    // Load versions when the page loads
+    document.addEventListener("DOMContentLoaded", loadPreviewVersions);
+  </script>
+</Layout>
