@@ -7,7 +7,7 @@ on:
 
 env:
   NODE_VERSION: 20.17.0
-  PR_NUMBER: 254 # ${{ github.event.client_payload.pr_number }}
+  PR_NUMBER: ${{ github.event.client_payload.pr_number }}
   ALGO_REF: ${{ github.event.client_payload.head_ref }}
   DATA_REPO: ${{ github.event.client_payload.head_repo }}
 
