@@ -2,8 +2,7 @@ name: Deploy PR preview
 
 on:
   repository_dispatch:
-    types: [catalogue-pr-updated]
-    # TODO: handle cleanup on PR close event (catalogue-pr-closed)
+    types: [catalogue-pr-updated, catalogue-pr-closed]
 
 env:
   NODE_VERSION: 20.17.0
@@ -24,6 +23,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event.action == 'catalogue-pr-updated' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +76,56 @@ jobs:
         with:
           name: github-pages
           path: preview
-          retention-days: 180
+          retention-days: 90
+
+  cleanup:
+    if: ${{ github.event.action == 'catalogue-pr-closed' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest successful workflow run ID
+        id: get-latest-run
+        run: |
+          WORKFLOW_ID=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            repos/${{ github.repository }}/actions/workflows/preview.yml/runs \
+            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' \
+            | head -n 1)
+          echo "run_id=$WORKFLOW_ID" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download current preview site
+        uses: actions/download-artifact@v5
+        with:
+          name: github-pages
+          run-id: ${{ steps.get-latest-run.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract current preview site
+        run: |
+          cp artifact.tar preview
+          cd preview && tar xf artifact.tar
+          rm artifact.tar
+      - name: Remove preview for closed PR
+        run: |
+          rm -rf "preview/pr-preview/pr-${PR_NUMBER}"
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          name: github-pages
+          path: preview
+          retention-days: 90
+      - name: Comment PR with cleanup message
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
+          repo: apex_algorithms
+          number: ${{ env.PR_NUMBER }}
+          header: preview-link
+          message: |
+            ## 🧹 Catalogue's Preview Site Cleanup
+
+            The preview site for this pull request has been cleaned up.
+
+            If you need a new preview, please reopen the PR or create a new one.
 
   deploy:
     needs: build
