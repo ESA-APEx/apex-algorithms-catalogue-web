@@ -74,6 +74,11 @@ jobs:
           cp -r preview/new/* preview/pr-preview
           mv "preview/pr-preview/pr-${PR_NUMBER}/pr-preview.html" preview/index.html
           rm -rf preview/new
+      - name: Update versions.csv
+        run: |
+          rm preview/versions.csv || true
+          chmod +x scripts/generate-preview-versions.sh
+          ./scripts/generate-preview-versions.sh
       - name: Set PR message
         id: pr-message
         run: |
@@ -103,6 +108,7 @@ jobs:
     outputs:
       pr-message: ${{ steps.pr-message.outputs.message }}
     steps:
+      - uses: actions/checkout@v4
       - name: Get latest successful workflow run ID
         id: get-latest-run
         run: |
@@ -129,6 +135,11 @@ jobs:
       - name: Remove preview for closed PR
         run: |
           rm -rf "preview/pr-preview/pr-${PR_NUMBER}"
+      - name: Update versions.csv
+        run: |
+          rm preview/versions.csv || true
+          chmod +x scripts/generate-preview-versions.sh
+          ./scripts/generate-preview-versions.sh
       - name: Set PR message
         id: pr-message
         run: |
