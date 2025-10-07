@@ -129,12 +129,6 @@ jobs:
       - name: Remove preview for closed PR
         run: |
           rm -rf "preview/pr-preview/pr-${PR_NUMBER}"
-      - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          name: github-pages
-          path: preview
-          retention-days: 90
       - name: Set PR message
         id: pr-message
         run: |
