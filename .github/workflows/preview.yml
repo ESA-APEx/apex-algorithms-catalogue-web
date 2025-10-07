@@ -7,7 +7,7 @@ on:
 
 env:
   NODE_VERSION: 20.17.0
-  PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+  PR_NUMBER: 254 # ${{ github.event.client_payload.pr_number }}
   ALGO_REF: ${{ github.event.client_payload.head_ref }}
   DATA_REPO: ${{ github.event.client_payload.head_repo }}
 
@@ -88,4 +88,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      # TODO: use https://github.com/marocchino/sticky-pull-request-comment to post the preview link as a comment on the PR
+
+      - name: Comment PR with preview link
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          repo_token: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
+          repo_name_with_owner: ${{ env.DATA_REPO }}
+          number: ${{ env.PR_NUMBER }}
+          header: preview-link
+          message: |
+            ## 🔍 Catalogue's Preview Site Deployed
+
+            Your changes have been deployed to the preview site:
+
+            **🔗 Preview URL:** ${{ steps.deployment.outputs.page_url }}pr-preview/pr-${{ env.PR_NUMBER }}/
+
+            This preview will be updated automatically when you push new changes to your PR.
