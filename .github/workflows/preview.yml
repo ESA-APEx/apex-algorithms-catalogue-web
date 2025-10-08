@@ -76,7 +76,7 @@ jobs:
           rm -rf preview/new
       - name: Update index.html static assets paths
         run: |
-          sed -i.bak "s|/_astro/|/pr-preview/pr-${PR_NUMBER}/_astro/|g" preview/index.html
+          sed -i -e "s|/_astro/|/pr-preview/pr-${PR_NUMBER}/_astro/|g" preview/index.html
       - name: Update versions.csv
         run: |
           rm preview/versions.csv || true
