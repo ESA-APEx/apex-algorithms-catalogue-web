@@ -72,7 +72,7 @@ jobs:
         run: |
           rm preview/index.html
           cp -r preview/new/* preview/pr-preview
-          cp preview/new/pr-preview/index.html preview/index.html
+          cp "preview/new/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html
           rm -rf preview/new
       - name: Update versions.csv
         run: |
