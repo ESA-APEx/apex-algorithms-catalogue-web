@@ -112,7 +112,9 @@ export const prerender = true;
       const searchSectionEl = document.getElementById("search-section");
 
       try {
-        const response = await fetch(`${import.meta.env.SITE}/versions.csv`);
+        const response = await fetch(
+          `${import.meta.env.PUBLIC_PREVIEW_BASE_PATH}/versions.csv`,
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

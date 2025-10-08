@@ -10,6 +10,7 @@ const {
   PUBLIC_PRODUCTION_BASE_URL,
   PUBLIC_STAGING_BASE_URL,
   PUBLIC_PREVIEW_BASE_URL,
+  PUBLIC_PREVIEW_BASE_PATH,
 } = loadEnv(
   // @ts-expect-error
   process.env.NODE_ENV,
@@ -17,7 +18,6 @@ const {
   "",
 );
 
-const PREVIEW_BASE_PATH = "/apex-algorithms-catalogue-web";
 const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
   ? `/pr-preview/pr-${process.env.PR_NUMBER}`
   : "";
@@ -25,7 +25,7 @@ const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
 const config = {
   preview: {
     SITE_URL: PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: `${PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
+    BASE_PATH: `${PUBLIC_PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
   },
   staging: {
     SITE_URL: PUBLIC_STAGING_BASE_URL,
