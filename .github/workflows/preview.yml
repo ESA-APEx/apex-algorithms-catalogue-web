@@ -172,11 +172,16 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
+      - name: Generate a token for gh cli
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       - name: Send comment to PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.CATALOGUE_REPOSITORY_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           repo: apex_algorithms
           number: ${{ env.PR_NUMBER }}
           header: preview-link
