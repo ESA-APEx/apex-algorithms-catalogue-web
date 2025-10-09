@@ -178,6 +178,7 @@ jobs:
         with:
           app-id: ${{ vars.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          repositories: apex_algorithms
       - name: Send comment to PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
