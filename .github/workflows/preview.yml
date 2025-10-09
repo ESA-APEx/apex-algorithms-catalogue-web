@@ -9,7 +9,7 @@ env:
   PREVIEW_BASE_URL: https://esa-apex.github.io/apex-algorithms-catalogue-web
   PR_NUMBER: ${{ github.event.client_payload.pr_number }}
   ALGO_REF: ${{ github.event.client_payload.head_ref }}
-  DATA_REPO: ${{ github.event.client_payload.head_repo }}
+  ALGO_REPO: apex_algorithms
 
 permissions:
   contents: read
@@ -178,12 +178,13 @@ jobs:
         with:
           app-id: ${{ vars.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-          repositories: apex_algorithms
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ env.ALGO_REPO }}
       - name: Send comment to PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          repo: apex_algorithms
+          repo: ${{ env.ALGO_REPO }}
           number: ${{ env.PR_NUMBER }}
           header: preview-link
           message: ${{ needs.build.outputs.pr-message || needs.cleanup.outputs.pr-message }}
