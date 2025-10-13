@@ -86,8 +86,8 @@ jobs:
           cp "preview/new/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html.tmp
 
           # Update asset references in index.html to point to shared assets
-          sed -i 's|href="/[^"]*/_astro/|href="/_assets/|g' preview/index.html.tmp
-          sed -i 's|src="/[^"]*/_astro/|src="/_assets/|g' preview/index.html.tmp
+          sed -i 's|href="/[^"]*/_astro/|href="${PREVIEW_BASE_URL}/_assets/|g' preview/index.html.tmp
+          sed -i 's|src="/[^"]*/_astro/|src="${PREVIEW_BASE_URL}/_assets/|g' preview/index.html.tmp
 
           mv preview/index.html.tmp preview/index.html
           rm -rf preview/new
