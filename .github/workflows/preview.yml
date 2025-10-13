@@ -70,9 +70,26 @@ jobs:
           rm artifact.tar
       - name: Merge new preview site with current preview site
         run: |
+          # Create shared assets directory if it doesn't exist
+          mkdir -p preview/_assets
+
+          # Copy assets from the new build to shared location
+          if [ -d "preview/new/pr-${PR_NUMBER}/_astro" ]; then
+            cp -r preview/new/pr-${PR_NUMBER}/_astro/* preview/_assets/ 2>/dev/null || true
+          fi
+
+          # Copy the PR-specific content
           rm preview/index.html
           cp -r preview/new/* preview/pr-preview
-          cp "preview/new/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html
+
+          # Copy and modify the index.html to use shared assets
+          cp "preview/new/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html.tmp
+
+          # Update asset references in index.html to point to shared assets
+          sed -i 's|href="/[^"]*/_astro/|href="/_assets/|g' preview/index.html.tmp
+          sed -i 's|src="/[^"]*/_astro/|src="/_assets/|g' preview/index.html.tmp
+
+          mv preview/index.html.tmp preview/index.html
           rm -rf preview/new
       - name: Update versions.csv
         run: |
