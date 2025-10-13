@@ -23,8 +23,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build-homepage:
+    if: ${{ github.event.action == 'catalogue-pr-updated' }}
+    runs-on: ubuntu-latest
+    outputs:
+      homepage-artifact: homepage-build-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Build preview homepage only
+        run: |
+          BUILD_TARGET=preview-homepage npm run build
+          mkdir -p homepage-build
+          cp -r dist/client/* homepage-build/
+          # Keep only the homepage and its assets
+          find homepage-build -name "*.html" ! -name "pr-preview*" -delete
+          find homepage-build -type d -name "pr-preview" -prune -o -name "apps" -type d -exec rm -rf {} + 2>/dev/null || true
+      - name: Upload homepage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-build-${{ github.run_id }}
+          path: homepage-build
+          retention-days: 1
+
   build:
     if: ${{ github.event.action == 'catalogue-pr-updated' }}
+    needs: build-homepage
     runs-on: ubuntu-latest
     outputs:
       pr-message: ${{ steps.pr-message.outputs.message }}
@@ -46,6 +74,11 @@ jobs:
           npx make-dir preview/new
           mv dist/client preview/new
           mv preview/new/client "preview/new/pr-${PR_NUMBER}"
+      - name: Download homepage build
+        uses: actions/download-artifact@v4
+        with:
+          name: homepage-build-${{ github.run_id }}
+          path: homepage-build
       - name: Get latest successful workflow run ID
         id: get-latest-run
         run: |
@@ -70,30 +103,19 @@ jobs:
           rm artifact.tar
       - name: Merge new preview site with current preview site
         run: |
-          # Create shared assets directory if it doesn't exist
-          mkdir -p preview/_assets
-
-          # Copy assets from the new build to shared location
-          cp -r preview/new/pr-${PR_NUMBER}/_astro/* preview/_assets/ 2>/dev/null || true
-          cp -r preview/new/pr-${PR_NUMBER}/fonts/* preview/_assets/ 2>/dev/null || true
-          cp -r preview/new/pr-${PR_NUMBER}/icons/* preview/_assets/ 2>/dev/null || true
-          cp -r preview/new/pr-${PR_NUMBER}/images/* preview/_assets/ 2>/dev/null || true
-
           # Copy the PR-specific content
-          rm preview/index.html
           cp -r preview/new/* preview/pr-preview
 
-          # Copy and modify the index.html to use shared assets
-          cp "preview/new/pr-${PR_NUMBER}/pr-preview/index.html" preview/index.html.tmp
+          # Copy the homepage build to replace the main index.html
+          cp homepage-build/pr-preview/index.html preview/index.html
 
-          # Update asset references in index.html to point to shared assets
-          sed -i "s|href=\"/[^\"]*/_astro/|href=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
-          sed -i "s|src=\"/[^\"]*/_astro/|src=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
-          # Update other asset references
-          sed -i "s|href=\"/apex-algorithms-catalogue-web/pr-preview/pr-[^\"]*|href=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
-          sed -i "s|src=\"/apex-algorithms-catalogue-web/pr-preview/pr-[^\"]*|src=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
+          # Copy homepage assets to the root for the main homepage
+          cp -r homepage-build/_astro preview/ 2>/dev/null || true
+          cp -r homepage-build/fonts preview/ 2>/dev/null || true
+          cp -r homepage-build/icons preview/ 2>/dev/null || true
+          cp -r homepage-build/images preview/ 2>/dev/null || true
 
-          mv preview/index.html.tmp preview/index.html
+          # Clean up
           rm -rf preview/new
       - name: Update versions.csv
         run: |
