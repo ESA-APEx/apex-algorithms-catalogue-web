@@ -74,9 +74,10 @@ jobs:
           mkdir -p preview/_assets
 
           # Copy assets from the new build to shared location
-          if [ -d "preview/new/pr-${PR_NUMBER}/_astro" ]; then
-            cp -r preview/new/pr-${PR_NUMBER}/_astro/* preview/_assets/ 2>/dev/null || true
-          fi
+          cp -r preview/new/pr-${PR_NUMBER}/_astro/* preview/_assets/ 2>/dev/null || true
+          cp -r preview/new/pr-${PR_NUMBER}/fonts/* preview/_assets/ 2>/dev/null || true
+          cp -r preview/new/pr-${PR_NUMBER}/icons/* preview/_assets/ 2>/dev/null || true
+          cp -r preview/new/pr-${PR_NUMBER}/images/* preview/_assets/ 2>/dev/null || true
 
           # Copy the PR-specific content
           rm preview/index.html
@@ -88,6 +89,9 @@ jobs:
           # Update asset references in index.html to point to shared assets
           sed -i "s|href=\"/[^\"]*/_astro/|href=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
           sed -i "s|src=\"/[^\"]*/_astro/|src=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
+          # Update other asset references
+          sed -i "s|href=\"/apex-algorithms-catalogue-web/pr-preview/pr-[^\"]*|href=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
+          sed -i "s|src=\"/apex-algorithms-catalogue-web/pr-preview/pr-[^\"]*|src=\"${PREVIEW_BASE_URL}/_assets/|g" preview/index.html.tmp
 
           mv preview/index.html.tmp preview/index.html
           rm -rf preview/new
