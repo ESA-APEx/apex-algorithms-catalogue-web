@@ -41,7 +41,6 @@ jobs:
           mkdir -p homepage-build
           cp -r dist/client/* homepage-build/
           # Keep only the homepage and its assets
-          find homepage-build -name "*.html" ! -name "pr-preview*" -delete
           find homepage-build -type d -name "pr-preview" -prune -o -name "apps" -type d -exec rm -rf {} + 2>/dev/null || true
       - name: Upload homepage artifact
         uses: actions/upload-artifact@v4
