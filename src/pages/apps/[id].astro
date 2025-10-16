@@ -211,7 +211,7 @@ const serviceRequestWarning =
                       ) : null}
                     </div>
                     <p>
-                      <a class="text-gray-400 break-words" href={link.href}>
+                      <a class="text-gray-400 break-all" href={link.href}>
                         {link.href}
                       </a>
                       <ClipboardButton text={link.href} client:idle />
@@ -252,7 +252,11 @@ const serviceRequestWarning =
                     )}
                     {contact.position && <p>{contact.position}</p>}
                     <p class="mt-1 text-sm mb-2">{contact.roles.join(", ")}</p>
-                    {contact.contactInstructions && <p class="mt-1 text-sm mb-2">{contact.contactInstructions}</p> }
+                    {contact.contactInstructions && (
+                      <p class="mt-1 text-sm mb-2">
+                        {contact.contactInstructions}
+                      </p>
+                    )}
                     <div class="flex gap-2">
                       {contact.links.map((link) => (
                         <a
@@ -281,15 +285,11 @@ const serviceRequestWarning =
                           )}
                         </a>
                       ))}
-                      {
-                        contact.email && (
-                          <a
-                            href={`mailto:${contact.email}`}
-                          >
-                            <Mail className="w-4 h-4" />
-                          </a>
-                        )
-                      }
+                      {contact.email && (
+                        <a href={`mailto:${contact.email}`}>
+                          <Mail className="w-4 h-4" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </li>
