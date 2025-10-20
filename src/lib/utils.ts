@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BASE_PATH } from "@/config";
+import { a } from "vitest/dist/chunks/suite.qtkXWc6R.js";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,7 +28,7 @@ export function linkTo(slug: string) {
 export function generateUniqueOptions(arr: string[]) {
   return arr
     .filter((value, index, arr) => arr.indexOf(value) === index)
-    .sort()
+    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
     .map((label) => ({
       label: label,
       value: label,
