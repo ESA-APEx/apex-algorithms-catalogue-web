@@ -246,11 +246,11 @@ const serviceRequestWarning =
               algorithm.properties.contacts.map((contact) => (
                 <li class="w-full md:w-1/4">
                   <div>
-                    <p class="text-white text-lg">{contact.name}</p>
                     {contact.organization && (
-                      <p class="text-white">{contact.organization}</p>
+                      <p class="text-sm">{contact.organization}</p>
                     )}
-                    {contact.position && <p>{contact.position}</p>}
+                    <p class="text-white text-lg">{contact.name}</p>
+                    {contact.position && <p class="text-white text-sm">{contact.position}</p>}
                     <p class="mt-1 text-sm mb-2">{contact.roles.join(", ")}</p>
                     {contact.contactInstructions && (
                       <p class="mt-1 text-sm mb-2">
