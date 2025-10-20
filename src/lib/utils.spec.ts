@@ -91,9 +91,9 @@ describe("Utility Functions", () => {
     it("should handle an array with all unique values", () => {
       const input = ["car", "bike", "bus"];
       const expected = [
-        { label: "car", value: "car" },
         { label: "bike", value: "bike" },
         { label: "bus", value: "bus" },
+        { label: "car", value: "car" },
       ];
       expect(generateUniqueOptions(input)).toEqual(expected);
     });
