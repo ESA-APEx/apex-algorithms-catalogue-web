@@ -27,6 +27,7 @@ export function linkTo(slug: string) {
 export function generateUniqueOptions(arr: string[]) {
   return arr
     .filter((value, index, arr) => arr.indexOf(value) === index)
+    .sort()
     .map((label) => ({
       label: label,
       value: label,
