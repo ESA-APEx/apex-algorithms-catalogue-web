@@ -13,7 +13,7 @@ import { validateDateParameters } from "@/lib/api-validation";
  * /api/admin/services/{id}/benchmarks.json:
  *   get:
  *     summary: Admin API to query detailed benchmark data for a specific scenario
- *     description: Comprehensive benchmark data API for admin dashboard with date filtering, pagination, sorting, and detailed metrics for a specific scenario.
+ *     description: Comprehensive benchmark data API for admin dashboard with date filtering.
  *     parameters:
  *       - name: id
  *         in: path
@@ -26,49 +26,13 @@ import { validateDateParameters } from "@/lib/api-validation";
  *         schema:
  *           type: string
  *           format: date
- *         description: Start date for filtering benchmarks (YYYY-MM-DD format). Required if end date is provided.
+ *         description: Start date for filtering benchmarks (YYYY-MM-DD format).
  *       - in: query
  *         name: end
  *         schema:
  *           type: string
  *           format: date
- *         description: End date for filtering benchmarks (YYYY-MM-DD format). Must be later than start date and not in the future.
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [passed, failed, all]
- *         description: Filter by test outcome status. Default is "all".
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 1000
- *         description: Maximum number of results to return. Default is 100.
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *           minimum: 0
- *         description: Number of results to skip for pagination. Default is 0.
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *           enum: [start_time, duration, cpu, memory, costs, status]
- *         description: Field to sort by. Default is "start_time".
- *       - in: query
- *         name: order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *         description: Sort order. Default is "desc" (most recent first).
- *       - in: query
- *         name: include_aggregates
- *         schema:
- *           type: boolean
- *         description: Include aggregate statistics in the response. Default is false.
+ *         description: End date for filtering benchmarks (YYYY-MM-DD format).
  *     responses:
  *       200:
  *         description: Detailed benchmark data for the specified scenario with metadata.
@@ -113,53 +77,6 @@ import { validateDateParameters } from "@/lib/api-validation";
  *                       status:
  *                         type: string
  *                         description: Status of the benchmark ('passed' or 'failed').
- *                 metadata:
- *                   type: object
- *                   properties:
- *                     total_count:
- *                       type: integer
- *                       description: Total number of benchmark runs matching the filters.
- *                     page_info:
- *                       type: object
- *                       properties:
- *                         limit:
- *                           type: integer
- *                         offset:
- *                           type: integer
- *                         has_next_page:
- *                           type: boolean
- *                     date_range:
- *                       type: object
- *                       properties:
- *                         start:
- *                           type: string
- *                           format: date
- *                         end:
- *                           type: string
- *                           format: date
- *                     filters_applied:
- *                       type: object
- *                       description: Summary of filters that were applied to the query.
- *                     aggregates:
- *                       type: object
- *                       description: Aggregate statistics (only included if include_aggregates=true).
- *                       properties:
- *                         total_runs:
- *                           type: integer
- *                         success_count:
- *                           type: integer
- *                         failed_count:
- *                           type: integer
- *                         success_rate:
- *                           type: number
- *                         avg_duration:
- *                           type: number
- *                         avg_cpu:
- *                           type: number
- *                         avg_memory:
- *                           type: number
- *                         avg_costs:
- *                           type: number
  *       400:
  *         description: Bad request
  *         content:
@@ -170,16 +87,6 @@ import { validateDateParameters } from "@/lib/api-validation";
  *                 message:
  *                   type: string
  *                   description: Error message describing the validation failure.
- *       404:
- *         description: Scenario not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message indicating the scenario was not found.
  *       500:
  *         description: Server error fetching benchmark data.
  *     tags:

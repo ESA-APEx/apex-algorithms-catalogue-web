@@ -12,113 +12,47 @@ import { validateDateParameters } from "@/lib/api-validation";
  * @openapi
  * /api/admin/services/benchmarks.json:
  *   get:
- *     summary: Admin API to query benchmark statistics with advanced filtering
- *     description: Comprehensive benchmark data API for admin dashboard with date filtering, scenario filtering, and flexible querying capabilities.
+ *     summary: Admin API to query benchmark statistics
+ *     description: Comprehensive benchmark data API for admin dashboard with date filtering.
  *     parameters:
  *       - in: query
  *         name: start
  *         schema:
  *           type: string
  *           format: date
- *         description: Start date for filtering benchmarks (YYYY-MM-DD format). Required if end date is provided.
+ *         description: Start date for filtering benchmarks (YYYY-MM-DD format).
  *       - in: query
  *         name: end
  *         schema:
  *           type: string
  *           format: date
- *         description: End date for filtering benchmarks (YYYY-MM-DD format). Must be later than start date and not in the future.
- *       - in: query
- *         name: scenarios
- *         schema:
- *           type: string
- *         description: Comma-separated list of scenario IDs to filter by (e.g., "scenario1,scenario2").
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [passed, failed, all]
- *         description: Filter by test outcome status. Default is "all".
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 1000
- *         description: Maximum number of results to return. Default is 100.
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *           minimum: 0
- *         description: Number of results to skip for pagination. Default is 0.
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *           enum: [scenario_id, runs, success_count, failed_count, success_rate]
- *         description: Field to sort by. Default is "scenario_id".
- *       - in: query
- *         name: order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *         description: Sort order. Default is "asc".
+ *         description: End date for filtering benchmarks (YYYY-MM-DD format).
  *     responses:
  *       200:
  *         description: Benchmark statistics with metadata.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       runs:
- *                         type: integer
- *                         description: Total number of test runs.
- *                       scenario_id:
- *                         type: string
- *                         description: Unique identifier for the scenario.
- *                       success_count:
- *                         type: integer
- *                         description: Total number of successful runs.
- *                       failed_count:
- *                         type: integer
- *                         description: Total number of failed runs.
- *                       success_rate:
- *                         type: number
- *                         format: float
- *                         description: Success rate as a percentage (0-100).
- *                 metadata:
- *                   type: object
- *                   properties:
- *                     total_count:
- *                       type: integer
- *                       description: Total number of scenarios matching the filters.
- *                     page_info:
- *                       type: object
- *                       properties:
- *                         limit:
- *                           type: integer
- *                         offset:
- *                           type: integer
- *                         has_next_page:
- *                           type: boolean
- *                     date_range:
- *                       type: object
- *                       properties:
- *                         start:
- *                           type: string
- *                           format: date
- *                         end:
- *                           type: string
- *                           format: date
- *                     filters_applied:
- *                       type: object
- *                       description: Summary of filters that were applied to the query.
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   runs:
+ *                     type: integer
+ *                     description: Total number of test runs.
+ *                   scenario_id:
+ *                     type: string
+ *                     description: Unique identifier for the scenario.
+ *                   success_count:
+ *                     type: integer
+ *                     description: Total number of successful runs.
+ *                   failed_count:
+ *                     type: integer
+ *                     description: Total number of failed runs.
+ *                   success_rate:
+ *                     type: number
+ *                     format: float
+ *                     description: Success rate as a percentage (0-100).
  *       400:
  *         description: Bad request
  *         content:
