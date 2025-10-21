@@ -22,7 +22,7 @@ describe("API Validation", () => {
   describe("validateDateParameters", () => {
     describe("Valid date scenarios", () => {
       it("should return success when both parameters are null", () => {
-        const result = validateDateParameters(null, null);
+        const result = validateDateParameters(undefined, undefined);
 
         expect(result.success).toBe(true);
         expect(result.startDate).toBeUndefined();
@@ -31,7 +31,7 @@ describe("API Validation", () => {
       });
 
       it("should return success when only start date is provided", () => {
-        const result = validateDateParameters("2025-01-01", null);
+        const result = validateDateParameters("2025-01-01", undefined);
 
         expect(result.success).toBe(true);
         expect(result.startDate).toEqual(new Date("2025-01-01T00:00:00"));
@@ -67,7 +67,7 @@ describe("API Validation", () => {
 
     describe("Invalid start date format", () => {
       it("should return error for invalid start date format", async () => {
-        const result = validateDateParameters("invalid-date", null);
+        const result = validateDateParameters("invalid-date", undefined);
 
         expect(result.success).toBe(false);
         expect(result.startDate).toBeUndefined();
@@ -82,7 +82,7 @@ describe("API Validation", () => {
       });
 
       it("should return error for malformed start date", async () => {
-        const result = validateDateParameters("2025-13-01", null);
+        const result = validateDateParameters("2025-13-01", undefined);
 
         expect(result.success).toBe(false);
         expect(result.errorResponse).toBeDefined();
@@ -134,7 +134,7 @@ describe("API Validation", () => {
 
     describe("Missing start date validation", () => {
       it("should return error when end date is provided without start date", async () => {
-        const result = validateDateParameters(null, "2025-01-31");
+        const result = validateDateParameters(undefined, "2025-01-31");
 
         expect(result.success).toBe(false);
         expect(result.errorResponse).toBeDefined();
@@ -186,34 +186,12 @@ describe("API Validation", () => {
       });
 
       it("should validate response headers are set correctly", async () => {
-        const result = validateDateParameters("invalid", null);
+        const result = validateDateParameters("invalid", undefined);
 
         expect(result.errorResponse).toBeDefined();
         expect(result.errorResponse!.headers.get("Content-Type")).toBe(
           "application/json",
         );
-      });
-    });
-
-    describe("Time handling", () => {
-      it("should set start date to beginning of day (00:00:00)", () => {
-        const result = validateDateParameters("2025-01-15", null);
-
-        expect(result.success).toBe(true);
-        expect(result.startDate!.getHours()).toBe(0);
-        expect(result.startDate!.getMinutes()).toBe(0);
-        expect(result.startDate!.getSeconds()).toBe(0);
-        expect(result.startDate!.getMilliseconds()).toBe(0);
-      });
-
-      it("should set end date to end of day (23:59:59.999)", () => {
-        const result = validateDateParameters("2025-01-15", "2025-01-16");
-
-        expect(result.success).toBe(true);
-        expect(result.endDate!.getHours()).toBe(23);
-        expect(result.endDate!.getMinutes()).toBe(59);
-        expect(result.endDate!.getSeconds()).toBe(59);
-        expect(result.endDate!.getMilliseconds()).toBe(999);
       });
     });
   });

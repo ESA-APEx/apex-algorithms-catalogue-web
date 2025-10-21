@@ -40,7 +40,7 @@ import {
  *     tags:
  *       - Benchmark
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async () => {
   try {
     if (isCacheExpired()) {
       console.log("Cache expired, updating benchmarks table");

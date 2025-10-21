@@ -68,7 +68,7 @@ import {
  *       500:
  *         description: An error occurred while fetching the scenario data.
  */
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params }) => {
   const scenario = params.id;
   try {
     if (isCacheExpired()) {
