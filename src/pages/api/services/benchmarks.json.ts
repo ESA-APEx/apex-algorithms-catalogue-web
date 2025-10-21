@@ -6,6 +6,7 @@ import {
   isCacheExpired,
   PARQUET_MONTH_COVERAGE,
 } from "@/lib/parquet-datasource";
+import { validateDateParameters } from "@/lib/api-validation";
 
 /**
  * @openapi
@@ -13,6 +14,19 @@ import {
  *   get:
  *     summary: Retrieve benchmark statistics from all services
  *     description: Fetches aggregated benchmark statistics including CPU usage, duration, costs, network received, input pixels, and success/failure counts.
+ *     parameters:
+ *       - in: query
+ *         name: start
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for filtering benchmarks (YYYY-MM-DD format).
+ *       - in: query
+ *         name: end
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for filtering benchmarks (YYYY-MM-DD format).
  *     responses:
  *       200:
  *         description: A list of benchmark summary results grouped by scenario ID.
@@ -35,21 +49,50 @@ import {
  *                   failed_count:
  *                     type: integer
  *                     description: Total number of failed runs.
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message describing the validation failure.
  *       500:
  *         description: Server error fetching benchmark statistics.
  *     tags:
  *       - Benchmark
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
   try {
+    const url = new URL(request.url);
+    const startDateParam = url.searchParams.get("start");
+    const endDateParam = url.searchParams.get("end");
+
+    const dateValidation = validateDateParameters(startDateParam, endDateParam);
+    if (!dateValidation.success) {
+      return dateValidation.errorResponse!;
+    }
+
+    const { startDate, endDate } = dateValidation;
+
     if (isCacheExpired()) {
       console.log("Cache expired, updating benchmarks table");
       await executeQuery(
-        `
-                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);
-                `,
+        `CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);`,
       );
     }
+
+    // Build date filter condition
+    let dateFilter = "";
+    if (startDate && endDate) {
+      dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= '${startDate.toISOString()}'
+                    AND CAST("test:start:datetime" AS TIMESTAMP) <= '${endDate.toISOString()}'`;
+    } else {
+      dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
+    }
+
     const query = `
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
@@ -57,7 +100,7 @@ export const GET: APIRoute = async () => {
                 SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count"
             FROM benchmarks
             WHERE "scenario_id" IS NOT NULL
-              AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
+              ${dateFilter}
             GROUP BY "scenario_id"
             ORDER BY "scenario_id"; 
         `;
@@ -68,8 +111,9 @@ export const GET: APIRoute = async () => {
     const message = "Fetching benchmark statistics from all services failed.";
     console.error(message, error);
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    return new Response(JSON.stringify({ message }), { status: 500, headers });
+    return new Response(JSON.stringify({ message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
