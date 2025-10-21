@@ -6,8 +6,8 @@ interface DateValidationResult {
 }
 
 export function validateDateParameters(
-  startDateParam: string | null,
-  endDateParam: string | null,
+  startDateParam: string | undefined,
+  endDateParam: string | undefined,
 ): DateValidationResult {
   const errorResponseHeader = {
     status: 400,

@@ -6,27 +6,13 @@ import {
   isCacheExpired,
   PARQUET_MONTH_COVERAGE,
 } from "@/lib/parquet-datasource";
-import { validateDateParameters } from "@/lib/api-validation";
 
 /**
  * @openapi
  * /api/services/benchmarks.json:
  *   get:
  *     summary: Retrieve benchmark statistics from all services
- *     description: Fetches aggregated benchmark statistics including CPU usage, duration, costs, network received, input pixels, and success/failure counts.
- *     parameters:
- *       - in: query
- *         name: start
- *         schema:
- *           type: string
- *           format: date
- *         description: Start date for filtering benchmarks (YYYY-MM-DD format).
- *       - in: query
- *         name: end
- *         schema:
- *           type: string
- *           format: date
- *         description: End date for filtering benchmarks (YYYY-MM-DD format).
+ *     description: Fetches aggregated benchmark statistics including CPU usage, duration, costs, network received, input pixels, and success/failure counts for the default time period.
  *     responses:
  *       200:
  *         description: A list of benchmark summary results grouped by scenario ID.
@@ -49,16 +35,6 @@ import { validateDateParameters } from "@/lib/api-validation";
  *                   failed_count:
  *                     type: integer
  *                     description: Total number of failed runs.
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message describing the validation failure.
  *       500:
  *         description: Server error fetching benchmark statistics.
  *     tags:
@@ -66,17 +42,6 @@ import { validateDateParameters } from "@/lib/api-validation";
  */
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const url = new URL(request.url);
-    const startDateParam = url.searchParams.get("start");
-    const endDateParam = url.searchParams.get("end");
-
-    const dateValidation = validateDateParameters(startDateParam, endDateParam);
-    if (!dateValidation.success) {
-      return dateValidation.errorResponse!;
-    }
-
-    const { startDate, endDate } = dateValidation;
-
     if (isCacheExpired()) {
       console.log("Cache expired, updating benchmarks table");
       await executeQuery(
@@ -84,14 +49,8 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
-    // Build date filter condition
-    let dateFilter = "";
-    if (startDate && endDate) {
-      dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= '${startDate.toISOString()}'
-                    AND CAST("test:start:datetime" AS TIMESTAMP) <= '${endDate.toISOString()}'`;
-    } else {
-      dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
-    }
+    // Use default date filter for the last N months
+    const dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
 
     const query = `
             SELECT count()::INTEGER                                                   as "runs",
