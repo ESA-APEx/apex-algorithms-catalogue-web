@@ -7,5 +7,6 @@ export default getViteConfig({
   test: {
     exclude: [...defaultExclude, "**\/e2e\/**"],
     env: loadEnv("", process.cwd(), ""),
+    globalSetup: "./vitest.global.ts",
   },
 });

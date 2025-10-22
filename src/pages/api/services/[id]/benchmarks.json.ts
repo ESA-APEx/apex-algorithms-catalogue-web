@@ -5,6 +5,7 @@ import { executeQuery } from "@/lib/db";
 import {
   getUrls,
   isCacheExpired,
+  updateCacheExpiration,
   PARQUET_MONTH_COVERAGE,
 } from "@/lib/parquet-datasource";
 
@@ -13,7 +14,7 @@ import {
  * /api/services/{id}/benchmarks.json:
  *   get:
  *     summary: Retrieve benchmark data for a specific service or scenario
- *     description: Fetches benchmark details for a given service ID or scenario ID.
+ *     description: Fetches benchmark details for a given service ID or scenario ID using default time period.
  *     parameters:
  *       - name: id
  *         in: path
@@ -74,11 +75,14 @@ export const GET: APIRoute = async ({ params }) => {
     if (isCacheExpired()) {
       console.log("Cache expired, updating benchmarks table");
       await executeQuery(
-        `
-                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);
-                `,
+        `CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);`,
       );
+      updateCacheExpiration();
     }
+
+    // Use default date filter for the last N months
+    const dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
+
     const query = `
             SELECT round("usage:cpu:cpu-seconds", 2)::INTEGER                  as cpu, 
                 round("usage:memory:mb-seconds", 2)::INTEGER                   as memory, 
@@ -91,7 +95,7 @@ export const GET: APIRoute = async ({ params }) => {
                 "test:outcome"                                                 as status
             FROM benchmarks
             WHERE "scenario_id" = '${scenario}'
-                AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
+                ${dateFilter}
             ORDER BY "test:start:datetime" DESC
         `;
     const data = (await executeQuery(query)) as BenchmarkData[];

@@ -176,3 +176,99 @@ Retrieves aggregated benchmark statistics from a specified service.
   - `max_executor_memory` (number): Maximum executor memory used in GB.
   - `network_received` (number): Amount of data received over the network in bytes.
   - `status` (string): Status of the benchmark ('success' or 'failed').
+
+### Admin API Endpoints
+
+The admin API endpoints provide advanced querying capabilities with additional features like date filtering.
+
+#### `GET /api/admin/services/benchmarks.json`
+
+##### Description
+
+Retrieves comprehensive benchmark statistics from all services with date filtering.
+
+##### Query Parameters
+
+- `start` (string, optional): Start date for filtering in YYYY-MM-DD format.
+- `end` (string, optional): End date for filtering in YYYY-MM-DD format.
+
+##### Response
+
+- **200 OK**: Returns a JSON object with benchmark data.
+- **400 Bad Request**: Invalid query parameters.
+- **500 Internal Server Error**: Error fetching benchmark data.
+
+##### Example Response
+
+```json
+{
+  "data": [
+    {
+      "scenario_id": "service_1",
+      "runs": 100,
+      "success_count": 90,
+      "failed_count": 10,
+      "success_rate": 90.0
+    }
+  ]
+}
+```
+
+#### `GET /api/admin/scenarios/{id}/benchmarks.json`
+
+##### Description
+
+Retrieves detailed benchmark data for a specific scenario with date filtering.
+
+##### Path Parameters
+
+- `id` (string): The unique identifier of the scenario.
+
+##### Query Parameters
+
+- `start` (string, optional): Start date for filtering in YYYY-MM-DD format.
+- `end` (string, optional): End date for filtering in YYYY-MM-DD format. Required if `start` is provided.
+- `status` (string, optional): Filter by benchmark status. Valid values: `passed`, `failed`, `all`. Default: `all`.
+- `limit` (number, optional): Number of results per page. Range: 1-1000. Default: 100.
+- `offset` (number, optional): Number of results to skip for pagination. Default: 0.
+- `sort` (string, optional): Field to sort by. Valid values: `start_time`, `duration`, `cpu`, `memory`, `costs`, `status`. Default: `start_time`.
+- `order` (string, optional): Sort order. Valid values: `asc`, `desc`. Default: `desc`.
+- `include_aggregates` (boolean, optional): Include aggregate statistics in response. Default: false.
+
+##### Response
+
+- **200 OK**: Returns a JSON object with detailed benchmark data and metadata.
+- **400 Bad Request**: Invalid query parameters or scenario ID.
+- **500 Internal Server Error**: Error fetching benchmark data.
+
+##### Example Response
+
+```json
+[
+  {
+    "cpu": 107,
+    "memory": 390564,
+    "costs": 4,
+    "duration": 195.48,
+    "input_pixel": 2.95,
+    "max_executor_memory": 1.54,
+    "network_received": 7047668,
+    "start_time": "2024-11-24T16:47:28.000Z",
+    "status": "passed"
+  }
+]
+```
+
+##### Admin Response Fields
+
+**Data Fields**:
+
+- `cpu` (number): CPU usage in seconds.
+- `memory` (number): Memory usage in MB-seconds.
+- `costs` (number): Costs associated with the benchmark.
+- `duration` (number): Duration of the test in seconds.
+- `input_pixel` (number): Input pixel usage in mega-pixels.
+- `max_executor_memory` (number): Maximum executor memory used in GB.
+- `network_received` (number): Amount of data received over the network in bytes.
+- `start_time` (string): The start time of the test in ISO 8601 format.
+- `status` (string): Status of the benchmark ('passed' or 'failed').
