@@ -1,4 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  createColumnHelper,
+  type SortingState,
+  type ColumnFiltersState,
+} from "@tanstack/react-table";
 import { getAdminBenchmarks } from "@/lib/api";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { getBenchmarkStatus } from "@/lib/benchmark-status";
@@ -20,6 +30,8 @@ interface AdminBenchmarksTableProps {
   className?: string;
 }
 
+const columnHelper = createColumnHelper<BenchmarkSummary>();
+
 export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
   className,
 }) => {
@@ -28,6 +40,84 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const calculateSuccessRate = (
+    successCount: number,
+    totalRuns: number,
+  ): number => {
+    if (totalRuns === 0) return 0;
+    return Number(((successCount / totalRuns) * 100).toFixed(1));
+  };
+
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString();
+  };
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("scenario_id", {
+        header: "Scenario ID",
+        cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+        enableSorting: true,
+        enableColumnFilter: true,
+      }),
+      columnHelper.accessor("runs", {
+        header: "Total Runs",
+        cell: (info) => formatNumber(info.getValue()),
+        enableSorting: true,
+      }),
+      columnHelper.accessor("success_count", {
+        header: "Success",
+        cell: (info) => formatNumber(info.getValue()),
+        enableSorting: true,
+      }),
+      columnHelper.accessor("failed_count", {
+        header: "Failed",
+        cell: (info) => formatNumber(info.getValue()),
+        enableSorting: true,
+      }),
+      columnHelper.display({
+        id: "status",
+        header: "Status",
+        cell: (info) => {
+          const benchmark = info.row.original;
+          const successRate = calculateSuccessRate(
+            benchmark.success_count,
+            benchmark.runs,
+          );
+          const status = getBenchmarkStatus(benchmark);
+
+          return (
+            <div className="flex gap-2 items-center">
+              <BenchmarkStatusBadge status={status} />
+              <span className="font-medium text-gray-300">
+                ({successRate}%)
+              </span>
+            </div>
+          );
+        },
+        enableSorting: false,
+      }),
+    ],
+    [],
+  );
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+    manualPagination: true,
+  });
 
   useEffect(() => {
     const defaultEndDate = new Date().toISOString().split("T")[0];
@@ -81,25 +171,26 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
     fetchData(startDate || undefined, endDate || undefined);
   };
 
-  const calculateSuccessRate = (
-    successCount: number,
-    totalRuns: number,
-  ): number => {
-    if (totalRuns === 0) return 0;
-    return Number(((successCount / totalRuns) * 100).toFixed(1));
-  };
-
-  const formatNumber = (num: number): string => {
-    return num.toLocaleString();
-  };
-
   return (
     <div className={className}>
-      <div className="mb-6 p-4 text-white flex">
-        <div className="flex-1 flex items-center">
-          <h2 className="text-2xl">Benchmark Results</h2>
+      <h2 className="p-4 text-2xl text-white">Benchmark Results</h2>
+
+      <div className="flex items-end text-white px-4 mb-6">
+        <div className="flex-1 flex items-center space-x-2">
+          <Input
+            id="scenario-filter"
+            name="scenario-filter"
+            placeholder="Search scenario..."
+            value={
+              (table.getColumn("scenario_id")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn("scenario_id")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm text-gray-900"
+          />
         </div>
-        <div>
+        <div className="flex-none flex items-center">
           <div className="flex-none flex flex-wrap gap-4 items-end">
             <div>
               <label
@@ -167,45 +258,67 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
         </div>
       ) : null}
       {!loading && data && data.length > 0 && (
-        <Table className="text-white">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Scenario ID</TableHead>
-              <TableHead>Total Runs</TableHead>
-              <TableHead>Success</TableHead>
-              <TableHead>Failed</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((benchmark) => {
-              const successRate = calculateSuccessRate(
-                benchmark.success_count,
-                benchmark.runs,
-              );
-              const status = getBenchmarkStatus(benchmark);
-
-              return (
-                <TableRow key={benchmark.scenario_id}>
-                  <TableCell className="font-medium">
-                    {benchmark.scenario_id}
-                  </TableCell>
-                  <TableCell>{formatNumber(benchmark.runs)}</TableCell>
-                  <TableCell>{formatNumber(benchmark.success_count)}</TableCell>
-                  <TableCell>{formatNumber(benchmark.failed_count)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <BenchmarkStatusBadge status={status} />
-                      <span className="font-medium text-gray-300">
-                        ({successRate}%)
-                      </span>
-                    </div>
+        <div className="space-y-4">
+          <Table className="text-white">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          {...{
+                            className: header.column.getCanSort()
+                              ? "cursor-pointer select-none flex items-center space-x-1"
+                              : "",
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {{
+                            asc: " ▴",
+                            desc: " ▾",
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
                   </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );
