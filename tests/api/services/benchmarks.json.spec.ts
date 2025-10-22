@@ -1,5 +1,5 @@
 import { executeQuery } from "@/lib/db";
-import { getUrls } from "@/lib/parquet-datasource";
+import { getUrls, updateCacheExpiration } from "@/lib/parquet-datasource";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "@/pages/api/services/benchmarks.json";
@@ -11,6 +11,7 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/parquet-datasource", () => ({
   getUrls: vi.fn(),
   isCacheExpired: vi.fn().mockReturnValue(true),
+  updateCacheExpiration: vi.fn(),
   PARQUET_MONTH_COVERAGE: "2",
 }));
 

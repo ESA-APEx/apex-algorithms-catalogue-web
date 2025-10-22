@@ -6,6 +6,7 @@ import { executeQuery } from "@/lib/db";
 vi.mock("@/lib/parquet-datasource", () => ({
   getUrls: vi.fn(),
   isCacheExpired: vi.fn().mockReturnValue(true),
+  updateCacheExpiration: vi.fn(),
   PARQUET_MONTH_COVERAGE: "2",
 }));
 

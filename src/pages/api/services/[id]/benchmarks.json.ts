@@ -5,6 +5,7 @@ import { executeQuery } from "@/lib/db";
 import {
   getUrls,
   isCacheExpired,
+  updateCacheExpiration,
   PARQUET_MONTH_COVERAGE,
 } from "@/lib/parquet-datasource";
 
@@ -76,6 +77,7 @@ export const GET: APIRoute = async ({ params }) => {
       await executeQuery(
         `CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);`,
       );
+      updateCacheExpiration();
     }
 
     // Use default date filter for the last N months
