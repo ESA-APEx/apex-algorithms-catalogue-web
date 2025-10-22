@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/pages/api/admin/services/[id]/benchmarks.json";
-import { getUrls } from "@/lib/parquet-datasource";
+import { getUrlsFromRequest } from "@/lib/parquet-datasource";
 import { executeQuery } from "@/lib/db";
 import type { BenchmarkData } from "@/types/models/benchmark";
 
 vi.mock("@/lib/parquet-datasource", () => ({
-  getUrls: vi.fn(),
+  getUrlsFromRequest: vi.fn(),
   isCacheExpired: vi.fn().mockReturnValue(true),
   PARQUET_MONTH_COVERAGE: "2",
 }));
@@ -18,7 +18,6 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
   const mockScenarioId = "scenario-123";
   const mockUrls = ["https://example.com/data.parquet"];
 
-  // Helper function to create mock request with query parameters
   const createMockRequest = (queryParams: string = "") =>
     ({
       params: { id: mockScenarioId },
@@ -29,7 +28,11 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (getUrls as jest.Mock).mockResolvedValue(mockUrls);
+    (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+      startDate: undefined,
+      endDate: undefined,
+      urls: mockUrls,
+    });
   });
 
   describe("Basic functionality", () => {
@@ -48,7 +51,6 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
         },
       ];
 
-      // Mock scenario exists check, count query, then main query
       (executeQuery as jest.Mock)
         .mockResolvedValueOnce([{ count: 1 }])
         .mockResolvedValueOnce([{ total_count: 1 }])
@@ -74,7 +76,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 500 error when an exception occurs", async () => {
-      (getUrls as jest.Mock).mockRejectedValue(new Error("API failure"));
+      (getUrlsFromRequest as jest.Mock).mockRejectedValue(
+        new Error("API failure"),
+      );
 
       const response = await GET(createMockRequest());
 
@@ -109,12 +113,23 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should handle valid start and end dates", async () => {
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+        startDate: new Date("2025-01-01T00:00:00.000Z"),
+        endDate: new Date("2025-01-31T23:59:59.999Z"),
+        urls: mockUrls,
+      });
+
       const response = await GET(
         createMockRequest("?start=2025-01-01&end=2025-01-31"),
       );
       expect(response.status).toBe(200);
 
-      // Verify custom date filter in SQL
+      expect(getUrlsFromRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: `https://example.com/api/admin/scenarios/${mockScenarioId}/benchmarks.json?start=2025-01-01&end=2025-01-31`,
+        }),
+      );
+
       expect(executeQuery).toHaveBeenCalledWith(
         expect.stringContaining("2025-01-01T00:00:00.000Z"),
       );
@@ -124,10 +139,15 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should use default date range when no dates provided", async () => {
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+        startDate: undefined,
+        endDate: undefined,
+        urls: mockUrls,
+      });
+
       const response = await GET(createMockRequest());
       expect(response.status).toBe(200);
 
-      // Verify default date filter in SQL
       expect(executeQuery).toHaveBeenCalledWith(
         expect.stringContaining(
           "DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2' MONTH",
@@ -136,6 +156,14 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 400 for invalid start date format", async () => {
+      const errorResponse = new Response(
+        JSON.stringify({
+          message: "Invalid start date format. Use YYYY-MM-DD.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue(errorResponse);
+
       const response = await GET(createMockRequest("?start=invalid-date"));
 
       expect(response.status).toBe(400);
@@ -146,6 +174,12 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 400 for invalid end date format", async () => {
+      const errorResponse = new Response(
+        JSON.stringify({ message: "Invalid end date format. Use YYYY-MM-DD." }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue(errorResponse);
+
       const response = await GET(
         createMockRequest("?start=2025-01-01&end=invalid-date"),
       );
@@ -158,6 +192,14 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 400 when end date is provided without start date", async () => {
+      const errorResponse = new Response(
+        JSON.stringify({
+          message: "Start date is required when end date is provided.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue(errorResponse);
+
       const response = await GET(createMockRequest("?end=2025-01-31"));
 
       expect(response.status).toBe(400);
@@ -168,6 +210,12 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 400 when end date is before start date", async () => {
+      const errorResponse = new Response(
+        JSON.stringify({ message: "End date must be later than start date." }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue(errorResponse);
+
       const response = await GET(
         createMockRequest("?start=2025-01-31&end=2025-01-01"),
       );
@@ -180,6 +228,12 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should return 400 when dates are in the future", async () => {
+      const errorResponse = new Response(
+        JSON.stringify({ message: "Start date cannot be in the future." }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue(errorResponse);
+
       const response = await GET(
         createMockRequest("?start=2026-01-01&end=2026-01-31"),
       );
@@ -190,12 +244,17 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
     });
 
     it("should handle same start and end date", async () => {
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+        startDate: new Date("2025-01-15T00:00:00.000Z"),
+        endDate: new Date("2025-01-15T23:59:59.999Z"),
+        urls: mockUrls,
+      });
+
       const response = await GET(
         createMockRequest("?start=2025-01-15&end=2025-01-15"),
       );
 
       expect(response.status).toBe(200);
-      // Verify proper time boundaries
       expect(executeQuery).toHaveBeenCalledWith(
         expect.stringContaining("2025-01-15T00:00:00.000Z"),
       );
@@ -227,22 +286,35 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
         .mockResolvedValueOnce(mockData);
     });
 
-    it("should call getUrls with date parameters when provided", async () => {
-      await GET(createMockRequest("?start=2025-01-01&end=2025-01-31"));
+    it("should call getUrlsFromRequest with request object when dates provided", async () => {
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+        startDate: new Date("2025-01-01T00:00:00.000Z"),
+        endDate: new Date("2025-01-31T23:59:59.999Z"),
+        urls: mockUrls,
+      });
 
-      expect(getUrls).toHaveBeenCalledWith("2025-01-01", "2025-01-31");
+      const mockRequest = createMockRequest("?start=2025-01-01&end=2025-01-31");
+      await GET(mockRequest);
+
+      expect(getUrlsFromRequest).toHaveBeenCalledWith(mockRequest.request);
     });
 
-    it("should call getUrls without parameters when no dates provided", async () => {
-      await GET(createMockRequest());
+    it("should call getUrlsFromRequest with request object when no dates provided", async () => {
+      (getUrlsFromRequest as jest.Mock).mockResolvedValue({
+        startDate: undefined,
+        endDate: undefined,
+        urls: mockUrls,
+      });
 
-      expect(getUrls).toHaveBeenCalledWith();
+      const mockRequest = createMockRequest();
+      await GET(mockRequest);
+
+      expect(getUrlsFromRequest).toHaveBeenCalledWith(mockRequest.request);
     });
 
     it("should verify scenario ID is properly included in SQL queries", async () => {
       await GET(createMockRequest());
 
-      // Check that all SQL queries include the scenario ID filter
       expect(executeQuery).toHaveBeenCalledWith(
         expect.stringContaining(`WHERE "scenario_id" = '${mockScenarioId}'`),
       );

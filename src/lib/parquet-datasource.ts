@@ -1,4 +1,5 @@
 import { formatDate, compareAsc, add as addDate, startOfMonth } from "date-fns";
+import { validateDateParameters } from "@/lib/api-validation";
 
 export const PARQUET_MONTH_COVERAGE =
   import.meta.env.PARQUET_MONTH_COVERAGE || "2";
@@ -57,4 +58,38 @@ export const getUrls = async (
   } else {
     return [];
   }
+};
+
+interface UrlsFromRequest {
+  startDate?: Date;
+  endDate?: Date;
+  urls: string[];
+}
+
+export const getUrlsFromRequest = async (
+  request: Request,
+): Promise<UrlsFromRequest | Response> => {
+  const url = new URL(request.url);
+  const startDateParam = url.searchParams.get("start") || undefined;
+  const endDateParam = url.searchParams.get("end") || undefined;
+
+  const dateValidation = validateDateParameters(startDateParam, endDateParam);
+  if (!dateValidation.success) {
+    return dateValidation.errorResponse!;
+  }
+
+  const { startDate, endDate } = dateValidation;
+
+  let urls: string[];
+  if (startDate && endDate) {
+    urls = await getUrls(startDateParam, endDateParam);
+  } else {
+    urls = await getUrls();
+  }
+
+  return {
+    startDate,
+    endDate,
+    urls,
+  };
 };

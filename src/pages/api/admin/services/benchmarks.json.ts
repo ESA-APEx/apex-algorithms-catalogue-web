@@ -2,11 +2,9 @@ import type { APIRoute } from "astro";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { executeQuery } from "@/lib/db";
 import {
-  getUrls,
-  isCacheExpired,
   PARQUET_MONTH_COVERAGE,
+  getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
-import { validateDateParameters } from "@/lib/api-validation";
 
 /**
  * @openapi
@@ -71,23 +69,12 @@ import { validateDateParameters } from "@/lib/api-validation";
  */
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const url = new URL(request.url);
-    const startDateParam = url.searchParams.get("start") || undefined;
-    const endDateParam = url.searchParams.get("end") || undefined;
-
-    const dateValidation = validateDateParameters(startDateParam, endDateParam);
-    if (!dateValidation.success) {
-      return dateValidation.errorResponse!;
+    const urlResponse = await getUrlsFromRequest(request);
+    if (urlResponse instanceof Response) {
+      return urlResponse;
     }
 
-    const { startDate, endDate } = dateValidation;
-
-    let urls: string[];
-    if (startDate && endDate) {
-      urls = await getUrls(startDateParam, endDateParam);
-    } else {
-      urls = await getUrls();
-    }
+    const { startDate, endDate, urls } = urlResponse;
 
     let dateFilter = "";
     if (startDate && endDate) {
