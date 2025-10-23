@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro/middleware";
 
-const protectedPaths = ["/api/admin/services/benchmarks.json", "/admin"];
+const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
 
 export const onRequest = defineMiddleware((context, next) => {
   if (!protectedPaths.some((path) => context.request.url.includes(path))) {

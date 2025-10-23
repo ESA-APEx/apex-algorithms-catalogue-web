@@ -1,4 +1,7 @@
+import * as dotenv from "dotenv";
 import type { FullConfig } from "@playwright/test";
+
+dotenv.config();
 
 const globalSetup = async (_config: FullConfig): Promise<void> => {
   console.log(
