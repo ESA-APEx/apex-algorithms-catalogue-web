@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/AdminLayout.astro";
+import NavBar from "../../components/AdminNavBar.astro";
+import { AdminBenchmarksTable } from "../../components/react/AdminBenchmarksTable.tsx";
+
+const title = "Algorithm Services Catalogue";
+---
+
+<Layout title={title}>
+  <NavBar />
+  <div class="w-full max-w-screen-xl mx-auto">
+    <AdminBenchmarksTable client:only="react" />
+  </div>
+</Layout>

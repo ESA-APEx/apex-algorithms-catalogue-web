@@ -1,4 +1,4 @@
-import { loadEnv } from "vite";
+import * as dotenv from "dotenv";
 import { defineConfig, passthroughImageService } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
@@ -6,17 +6,7 @@ import node from "@astrojs/node";
 import markdownIntegration from "@astropub/md";
 import { RemarkNormalizeHeadings } from "./src/remark-plugins/normalize-headings";
 
-const {
-  PUBLIC_PRODUCTION_BASE_URL,
-  PUBLIC_STAGING_BASE_URL,
-  PUBLIC_PREVIEW_BASE_URL,
-  PUBLIC_PREVIEW_BASE_PATH,
-} = loadEnv(
-  // @ts-expect-error
-  process.env.NODE_ENV,
-  process.cwd(),
-  "",
-);
+dotenv.config();
 
 const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
   ? `/pr-preview/pr-${process.env.PR_NUMBER}`
@@ -24,19 +14,19 @@ const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
 
 const config = {
   preview: {
-    SITE_URL: PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: `${PUBLIC_PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
+    SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
+    BASE_PATH: `${process.env.PUBLIC_PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
   },
   "preview-homepage": {
-    SITE_URL: PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: PUBLIC_PREVIEW_BASE_PATH,
+    SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
+    BASE_PATH: process.env.PUBLIC_PREVIEW_BASE_PATH,
   },
   staging: {
-    SITE_URL: PUBLIC_STAGING_BASE_URL,
+    SITE_URL: process.env.PUBLIC_STAGING_BASE_URL,
     BASE_PATH: "",
   },
   production: {
-    SITE_URL: PUBLIC_PRODUCTION_BASE_URL,
+    SITE_URL: process.env.PUBLIC_PRODUCTION_BASE_URL,
     BASE_PATH: "",
   },
 };
