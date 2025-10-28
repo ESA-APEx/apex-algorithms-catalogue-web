@@ -29,6 +29,8 @@ test.describe("Catalog Tests", () => {
   });
 
   test("Should apply the type filtering", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
     const openEO = (
       await page.getByTestId("service-type").getByText("openEO").all()
     ).length;
@@ -60,6 +62,8 @@ test.describe("Catalog Tests", () => {
   });
 
   test("Should not show a private algorithm", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
     await page
       .getByRole("textbox", { name: /Search algorithms/i })
       .fill("private");

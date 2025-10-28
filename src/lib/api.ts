@@ -28,3 +28,22 @@ export const getCwlProcessDefinition = async (cwlUrl: string) => {
     throw error;
   }
 };
+
+export const getAdminBenchmarks = async (
+  startDate?: string,
+  endDate?: string,
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (startDate) params.append("start", startDate);
+    if (endDate) params.append("end", endDate);
+
+    const url = `/api/admin/services/benchmarks.json${params.toString() ? `?${params.toString()}` : ""}`;
+    const response = await fetch(url);
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (error) {
+    throw error;
+  }
+};
