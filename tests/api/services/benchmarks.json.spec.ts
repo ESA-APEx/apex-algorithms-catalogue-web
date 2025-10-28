@@ -1,5 +1,5 @@
 import { executeQuery } from "@/lib/db";
-import { getUrls, updateCacheExpiration } from "@/lib/parquet-datasource";
+import { getUrls } from "@/lib/parquet-datasource";
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "@/pages/api/services/benchmarks.json";
