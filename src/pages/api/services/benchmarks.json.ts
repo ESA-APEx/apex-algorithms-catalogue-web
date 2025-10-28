@@ -4,6 +4,7 @@ import { executeQuery } from "@/lib/db";
 import {
   getUrls,
   isCacheExpired,
+  updateCacheExpiration,
   PARQUET_MONTH_COVERAGE,
 } from "@/lib/parquet-datasource";
 
@@ -12,7 +13,7 @@ import {
  * /api/services/benchmarks.json:
  *   get:
  *     summary: Retrieve benchmark statistics from all services
- *     description: Fetches aggregated benchmark statistics including CPU usage, duration, costs, network received, input pixels, and success/failure counts.
+ *     description: Fetches aggregated benchmark statistics including CPU usage, duration, costs, network received, input pixels, and success/failure counts for the default time period.
  *     responses:
  *       200:
  *         description: A list of benchmark summary results grouped by scenario ID.
@@ -45,11 +46,14 @@ export const GET: APIRoute = async () => {
     if (isCacheExpired()) {
       console.log("Cache expired, updating benchmarks table");
       await executeQuery(
-        `
-                    CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);
-                `,
+        `CREATE OR REPLACE TABLE benchmarks AS SELECT * FROM parquet_scan([${(await getUrls()).map((url) => `"${url}"`)}]);`,
       );
+      updateCacheExpiration();
     }
+
+    // Use default date filter for the last N months
+    const dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
+
     const query = `
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
@@ -57,7 +61,7 @@ export const GET: APIRoute = async () => {
                 SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count"
             FROM benchmarks
             WHERE "scenario_id" IS NOT NULL
-              AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH
+              ${dateFilter}
             GROUP BY "scenario_id"
             ORDER BY "scenario_id"; 
         `;
@@ -68,8 +72,9 @@ export const GET: APIRoute = async () => {
     const message = "Fetching benchmark statistics from all services failed.";
     console.error(message, error);
 
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    return new Response(JSON.stringify({ message }), { status: 500, headers });
+    return new Response(JSON.stringify({ message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
