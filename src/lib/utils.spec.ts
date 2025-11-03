@@ -62,15 +62,19 @@ describe("Utility Functions", () => {
 
   describe("linkTo (Slug Generator)", () => {
     it("should generate correct link using BASE_PATH", () => {
-      expect(linkTo("about-us")).toBe("/base-path/about-us");
+      expect(linkTo("about-us")).toBe(
+        "http://localhost:4321/base-path/about-us",
+      );
     });
 
     it("should handle empty slug", () => {
-      expect(linkTo("")).toBe("/base-path/");
+      expect(linkTo("")).toBe("http://localhost:4321/base-path/");
     });
 
     it("should handle slashes in slug correctly", () => {
-      expect(linkTo("blog/post-1")).toBe("/base-path/blog/post-1");
+      expect(linkTo("blog/post-1")).toBe(
+        "http://localhost:4321/base-path/blog/post-1",
+      );
     });
   });
 
