@@ -95,8 +95,8 @@ const searchAndSortFilterCatalogues = ({
           type.toLowerCase().includes(normalizedQuery) ||
           properties.keywords.find((k) =>
             k.toLocaleLowerCase().includes(normalizedQuery),
-          );
-        properties.title.toLowerCase().includes(normalizedQuery) ||
+          ) ||
+          properties.title.toLowerCase().includes(normalizedQuery) ||
           properties.description.toLowerCase().includes(normalizedQuery);
 
         const hitLabels = [];
