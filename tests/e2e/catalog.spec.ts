@@ -21,7 +21,7 @@ test.describe("Catalog Tests", () => {
 
     await expect(card.getByTestId("service-type")).toHaveText("openEO");
     await expect(card.getByTestId("service-label").nth(0)).toContainText(
-      "agriculture",
+      "Agriculture",
     );
     await expect(card.getByTestId("service-label").nth(1)).toContainText(
       "crops",
