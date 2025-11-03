@@ -12,7 +12,7 @@ export interface BenchmarkData {
   input_pixel: number;
   max_executor_memory: number;
   network_received: number;
-  status: "success" | "failed";
+  status: "passed" | "failed";
 }
 
 export interface BenchmarkSummary {

@@ -1,0 +1,191 @@
+import { getAdminBenchmarksScenarioData } from "@/lib/api";
+import type { BenchmarkData } from "@/types/models/benchmark";
+import { addMonths } from "date-fns";
+import React, { useState, useEffect } from "react";
+import { Input } from "./Input";
+import { Button } from "./Button";
+import { Spinner } from "./Spinner";
+import { getBenchmarkStatus } from "@/lib/benchmark-status";
+import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
+
+interface AdminBenchmarksChartProps {
+  className?: string;
+  id: string;
+}
+
+export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
+  className,
+  id,
+}) => {
+  const [data, setData] = useState<BenchmarkData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+
+  useEffect(() => {
+    const defaultEndDate = new Date().toISOString().split("T")[0];
+    const defaultStartDate = addMonths(new Date(), -2)
+      .toISOString()
+      .split("T")[0];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlStartDate = urlParams.get("start") || defaultStartDate;
+    const urlEndDate = urlParams.get("end") || defaultEndDate;
+
+    console.log(`trigger useEffect for fetching data ${id}`);
+
+    setStartDate(urlStartDate);
+    setEndDate(urlEndDate);
+    fetchData(id, urlStartDate, urlEndDate);
+  }, []);
+
+  const updateURL = (newStartDate?: string, newEndDate?: string) => {
+    const url = new URL(window.location.href);
+
+    if (newStartDate) {
+      url.searchParams.set("start", newStartDate);
+    } else {
+      url.searchParams.delete("start");
+    }
+
+    if (newEndDate) {
+      url.searchParams.set("end", newEndDate);
+    } else {
+      url.searchParams.delete("end");
+    }
+
+    window.history.replaceState({}, "", url.toString());
+  };
+
+  const fetchData = async (id: string, start?: string, end?: string) => {
+    updateURL(start, end);
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await getAdminBenchmarksScenarioData(id, start, end);
+      setData(result || []);
+    } catch (err) {
+      console.error("Failed to fetch admin benchmark data:", err);
+      setError("Failed to load benchmark data. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDateFilter = () => {
+    fetchData(id, startDate || undefined, endDate || undefined);
+  };
+
+  const runs = data?.length;
+  const success = data?.filter((d) => d.status === "passed").length;
+  const failed = data?.filter((d) => d.status === "failed").length;
+  const successRate = (success / runs) * 100;
+  const status = getBenchmarkStatus({
+    runs: runs || 0,
+    scenario_id: id,
+    success_count: success || 0,
+    failed_count: failed || 0,
+  });
+
+  return (
+    <div className={className}>
+      <div className="flex items-end text-white px-4 mb-16">
+        <div className="flex-1 flex items-center space-x-2">
+          <h2 className="text-4xl">{id}</h2>
+        </div>
+        <div className="flex-none flex items-center">
+          <div className="flex-none flex flex-wrap gap-4 items-end">
+            <div>
+              <label
+                htmlFor="start-date"
+                className="block text-sm font-medium mb-1"
+              >
+                Start Date
+              </label>
+              <Input
+                id="start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                max={endDate || new Date().toISOString().split("T")[0]}
+                className="text-gray-900"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="end-date"
+                className="block text-sm font-medium mb-1"
+              >
+                End Date
+              </label>
+              <Input
+                id="end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate}
+                max={new Date().toISOString().split("T")[0]}
+                className="text-gray-900"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleDateFilter}
+                disabled={loading}
+                variant="default"
+              >
+                Apply
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {loading && (
+        <div className="flex justify-center items-center py-8 text-white">
+          <Spinner />
+        </div>
+      )}
+      {error && (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-red-500 text-center">
+            <p className="font-medium">Error loading data</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        </div>
+      )}
+      {!loading && data && data.length === 0 ? (
+        <div className="flex justify-center items-center py-8">
+          <p className="text-gray-500">No benchmark data available</p>
+        </div>
+      ) : null}
+      {!loading && data && data.length > 0 && (
+        <div className="flex gap-4 px-4 mb-6 text-white">
+          <div className="flex-1 flex flex-col">
+            <p>Total Runs</p>
+            <p className="text-4xl py-8">{runs}</p>
+          </div>
+          <div className="flex-1 flex flex-col">
+            <p>Successful Runs</p>
+            <p className="text-4xl py-8">{success}</p>
+          </div>
+          <div className="flex-1 flex flex-col">
+            <p>Failed Runs</p>
+            <p className="text-4xl py-8">{failed}</p>
+          </div>
+          <div className="flex-1 flex flex-col">
+            <p>Status</p>
+            <div className="flex-1 flex flex-col justify-center">
+              <div className="flex gap-1">
+                <BenchmarkStatusBadge status={status} />
+                <span className="font-medium text-gray-300">
+                  ({successRate.toFixed(2)}%)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

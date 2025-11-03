@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "./Table";
+import { navigate } from "astro:transitions/client";
 
 interface AdminBenchmarksTableProps {
   className?: string;
@@ -258,7 +259,7 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
         </div>
       ) : null}
       {!loading && data && data.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-4 px-4">
           <Table className="text-white">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -293,8 +294,14 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
+                    className="cursor-pointer"
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/scenarios/${row.getValue("scenario_id")}`,
+                      )
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

@@ -65,7 +65,7 @@ import {
  *                         description: Amount of data received over the network in bytes.
  *                       status:
  *                         type: string
- *                         description: Status of the benchmark ('success' or 'failed').
+ *                         description: Status of the benchmark ('passed' or 'failed').
  *       500:
  *         description: An error occurred while fetching the scenario data.
  */
