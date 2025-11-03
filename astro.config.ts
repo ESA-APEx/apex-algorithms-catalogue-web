@@ -44,6 +44,9 @@ export default defineConfig({
   image: {
     service: passthroughImageService(),
   },
+  redirects: {
+    "/dashboard/scenarios": "/dashboard",
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,
