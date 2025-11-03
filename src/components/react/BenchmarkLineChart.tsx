@@ -14,6 +14,7 @@ import {
 import "chartjs-adapter-date-fns";
 import type { BenchmarkData } from "@/types/models/benchmark";
 import { formatDate } from "date-fns";
+import { formatNumber } from "@/lib/utils";
 
 // Register Chart.js components
 ChartJS.register(
@@ -123,7 +124,7 @@ export const BenchmarkLineChart: React.FC<BenchmarkLineChartProps> = ({
                 return "";
               },
               label: function (context) {
-                return `${context.dataset.label}: ${context.parsed.y}`;
+                return `${context.dataset.label}: ${formatNumber(context.parsed.y)}`;
               },
             },
           },

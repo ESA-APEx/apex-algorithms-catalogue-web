@@ -33,3 +33,13 @@ export function generateUniqueOptions(arr: string[]) {
       value: label,
     }));
 }
+
+export function formatNumber(value: number | null, decimals: number = 2) {
+  if (value === null || value === undefined) return "N/A";
+  if (value === 0) return "0";
+  if (value < 0.01 && value > 0) return "< 0.01";
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}

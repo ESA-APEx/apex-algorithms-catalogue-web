@@ -1,4 +1,5 @@
 import React from "react";
+import { formatNumber } from "@/lib/utils";
 import type { BenchmarkData } from "@/types/models/benchmark";
 
 interface BenchmarkMetricsTableProps {
@@ -92,15 +93,6 @@ export const BenchmarkMetricsTable: React.FC<BenchmarkMetricsTableProps> = ({
   };
 
   const aggregated = calculateMetrics(data);
-
-  const formatNumber = (value: number, decimals: number = 2): string => {
-    if (value === 0) return "0";
-    if (value < 0.01 && value > 0) return "< 0.01";
-    return value.toLocaleString(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    });
-  };
 
   const tableData = [
     {
