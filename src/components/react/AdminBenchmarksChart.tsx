@@ -192,20 +192,20 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
           <div className="flex gap-4 px-4 mb-6 text-white">
             <div className="flex-1 flex flex-col">
               <p>Total Runs</p>
-              <p className="text-4xl py-8">{runs}</p>
+              <p className="text-6xl py-4">{runs}</p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Successful Runs</p>
-              <p className="text-4xl py-8">{success}</p>
+              <p className="text-6xl py-4">{success}</p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Failed Runs</p>
-              <p className="text-4xl py-8">{failed}</p>
+              <p className="text-6xl py-4">{failed}</p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Status</p>
               <div className="flex-1 flex flex-col justify-center">
-                <div className="flex gap-1">
+                <div className="flex gap-1 text-xl">
                   <BenchmarkStatusBadge status={status} />
                   <span className="font-medium text-gray-300">
                     ({successRate.toFixed(2)}%)

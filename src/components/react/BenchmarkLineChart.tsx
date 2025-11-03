@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import type { BenchmarkData } from "@/types/models/benchmark";
+import { formatDate } from "date-fns";
 
 // Register Chart.js components
 ChartJS.register(
@@ -116,7 +117,7 @@ export const BenchmarkLineChart: React.FC<BenchmarkLineChartProps> = ({
               title: function (context) {
                 if (context[0]?.parsed?.x) {
                   const date = new Date(context[0].parsed.x);
-                  return date.toLocaleString();
+                  return formatDate(date, "yyyy-MM-dd HH:mm:ss");
                 }
                 return "";
               },
