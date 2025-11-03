@@ -8,6 +8,7 @@ import { Spinner } from "./Spinner";
 import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { BenchmarkLineChart } from "./BenchmarkLineChart";
+import { BenchmarkMetricsTable } from "./BenchmarkMetricsTable";
 
 interface AdminBenchmarksChartProps {
   className?: string;
@@ -215,7 +216,11 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
             </div>
           </div>
 
-          <section className="grid grid-cols-2 grid-rows-2 gap-8">
+          <div className="px-4 mb-8">
+            <BenchmarkMetricsTable data={data} />
+          </div>
+
+          <section className="px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
             <BenchmarkLineChart
               data={data}
               loading={loading}

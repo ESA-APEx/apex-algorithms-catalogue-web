@@ -99,7 +99,8 @@ export const BenchmarkLineChart: React.FC<BenchmarkLineChartProps> = ({
             text: config.label,
             color: "white",
             font: {
-              size: 16,
+              size: 17.6,
+              weight: "normal",
               family: "'NotesEsa', system-ui, sans-serif",
             },
           },
