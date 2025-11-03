@@ -10,6 +10,7 @@ import {
 // Mock BASE_PATH for linkTo tests
 vi.mock("@/config", () => ({
   BASE_PATH: "/base-path",
+  SITE_URL: "http://localhost:4321",
 }));
 
 describe("Utility Functions", () => {
