@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm install
-      - run: npm run build
+      - run: BUILD_TARGET=production npm run build
 
   test:
     timeout-minutes: 60
