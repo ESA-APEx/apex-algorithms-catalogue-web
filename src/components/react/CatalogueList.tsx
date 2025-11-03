@@ -92,7 +92,11 @@ const searchAndSortFilterCatalogues = ({
           ? getBenchmarkStatus(benchmarkStatusData[id])
           : "no benchmark";
         const hitSearch =
-          properties.title.toLowerCase().includes(normalizedQuery) ||
+          type.toLowerCase().includes(normalizedQuery) ||
+          properties.keywords.find((k) =>
+            k.toLocaleLowerCase().includes(normalizedQuery),
+          );
+        properties.title.toLowerCase().includes(normalizedQuery) ||
           properties.description.toLowerCase().includes(normalizedQuery);
 
         const hitLabels = [];
