@@ -24,7 +24,7 @@ test.describe("Catalog Tests", () => {
       "Agriculture",
     );
     await expect(card.getByTestId("service-label").nth(1)).toContainText(
-      "crops",
+      "Sentinel-2",
     );
   });
 
