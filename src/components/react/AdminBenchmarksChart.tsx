@@ -7,11 +7,39 @@ import { Button } from "./Button";
 import { Spinner } from "./Spinner";
 import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
+import { BenchmarkLineChart } from "./BenchmarkLineChart";
 
 interface AdminBenchmarksChartProps {
   className?: string;
   id: string;
 }
+
+const chartConfig = {
+  cpu: {
+    label: "CPU usage (seconds)",
+    borderColor: "rgb(34, 197, 94)", // green-500
+    backgroundColor: "rgba(34, 197, 94, 0.1)",
+    pointBackgroundColor: "rgb(34, 197, 94)",
+  },
+  memory: {
+    label: "Memory Usage (seconds)",
+    borderColor: "rgb(59, 130, 246)", // blue-500
+    backgroundColor: "rgba(59, 130, 246, 0.1)",
+    pointBackgroundColor: "rgb(59, 130, 246)",
+  },
+  costs: {
+    label: "Costs (credits)",
+    borderColor: "rgb(234, 88, 12)", // orange-500
+    backgroundColor: "rgba(234, 88, 12, 0.1)",
+    pointBackgroundColor: "rgb(234, 88, 12)",
+  },
+  duration: {
+    label: "Duration (seconds)",
+    borderColor: "rgb(168, 85, 247)", // purple-500
+    backgroundColor: "rgba(168, 85, 247, 0.1)",
+    pointBackgroundColor: "rgb(168, 85, 247)",
+  },
+};
 
 export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   className,
@@ -160,31 +188,64 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
         </div>
       ) : null}
       {!loading && data && data.length > 0 && (
-        <div className="flex gap-4 px-4 mb-6 text-white">
-          <div className="flex-1 flex flex-col">
-            <p>Total Runs</p>
-            <p className="text-4xl py-8">{runs}</p>
-          </div>
-          <div className="flex-1 flex flex-col">
-            <p>Successful Runs</p>
-            <p className="text-4xl py-8">{success}</p>
-          </div>
-          <div className="flex-1 flex flex-col">
-            <p>Failed Runs</p>
-            <p className="text-4xl py-8">{failed}</p>
-          </div>
-          <div className="flex-1 flex flex-col">
-            <p>Status</p>
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="flex gap-1">
-                <BenchmarkStatusBadge status={status} />
-                <span className="font-medium text-gray-300">
-                  ({successRate.toFixed(2)}%)
-                </span>
+        <>
+          <div className="flex gap-4 px-4 mb-6 text-white">
+            <div className="flex-1 flex flex-col">
+              <p>Total Runs</p>
+              <p className="text-4xl py-8">{runs}</p>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <p>Successful Runs</p>
+              <p className="text-4xl py-8">{success}</p>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <p>Failed Runs</p>
+              <p className="text-4xl py-8">{failed}</p>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <p>Status</p>
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="flex gap-1">
+                  <BenchmarkStatusBadge status={status} />
+                  <span className="font-medium text-gray-300">
+                    ({successRate.toFixed(2)}%)
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          <section className="grid grid-cols-2 grid-rows-2 gap-8">
+            <BenchmarkLineChart
+              data={data}
+              loading={loading}
+              error={error}
+              metric="cpu"
+              config={chartConfig.cpu}
+            />
+            <BenchmarkLineChart
+              data={data}
+              loading={loading}
+              error={error}
+              metric="memory"
+              config={chartConfig.memory}
+            />
+            <BenchmarkLineChart
+              data={data}
+              loading={loading}
+              error={error}
+              metric="duration"
+              config={chartConfig.duration}
+            />
+            <BenchmarkLineChart
+              data={data}
+              loading={loading}
+              error={error}
+              metric="costs"
+              config={chartConfig.costs}
+            />
+          </section>
+        </>
       )}
     </div>
   );
