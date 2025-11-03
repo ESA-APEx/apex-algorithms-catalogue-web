@@ -206,7 +206,10 @@ export const BenchmarkLineChart: React.FC<BenchmarkLineChartProps> = ({
   }
 
   return (
-    <div className={`bg-gray-800 bg-opacity-50 rounded-lg p-6 ${className}`}>
+    <div
+      className={`bg-gray-800 bg-opacity-50 rounded-lg p-6 ${className}`}
+      data-testid="benchmark-line-chart"
+    >
       <div className="relative h-96">
         <canvas ref={canvasRef} className="w-full h-full" />
       </div>

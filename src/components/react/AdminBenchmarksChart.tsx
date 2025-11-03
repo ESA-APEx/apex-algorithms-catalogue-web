@@ -46,7 +46,7 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   className,
   id,
 }) => {
-  const [data, setData] = useState<BenchmarkData[]>([]);
+  const [data, setData] = useState<BenchmarkData[]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
@@ -61,8 +61,6 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
     const urlParams = new URLSearchParams(window.location.search);
     const urlStartDate = urlParams.get("start") || defaultStartDate;
     const urlEndDate = urlParams.get("end") || defaultEndDate;
-
-    console.log(`trigger useEffect for fetching data ${id}`);
 
     setStartDate(urlStartDate);
     setEndDate(urlEndDate);
@@ -97,9 +95,9 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
     } catch (err) {
       console.error("Failed to fetch admin benchmark data:", err);
       setError("Failed to load benchmark data. Please try again later.");
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const handleDateFilter = () => {
@@ -109,7 +107,8 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   const runs = data?.length;
   const success = data?.filter((d) => d.status === "passed").length;
   const failed = data?.filter((d) => d.status === "failed").length;
-  const successRate = (success / runs) * 100;
+  const successRate =
+    success !== undefined && runs !== undefined ? (success / runs) * 100 : 0;
   const status = getBenchmarkStatus({
     runs: runs || 0,
     scenario_id: id,
@@ -193,15 +192,21 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
           <div className="flex gap-4 px-4 mb-6 text-white">
             <div className="flex-1 flex flex-col">
               <p>Total Runs</p>
-              <p className="text-6xl py-4">{runs}</p>
+              <p className="text-6xl py-4" data-testid="stat-value">
+                {runs}
+              </p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Successful Runs</p>
-              <p className="text-6xl py-4">{success}</p>
+              <p className="text-6xl py-4" data-testid="stat-value">
+                {success}
+              </p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Failed Runs</p>
-              <p className="text-6xl py-4">{failed}</p>
+              <p className="text-6xl py-4" data-testid="stat-value">
+                {failed}
+              </p>
             </div>
             <div className="flex-1 flex flex-col">
               <p>Status</p>
