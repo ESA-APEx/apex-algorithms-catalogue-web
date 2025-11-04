@@ -15,8 +15,8 @@ import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { Spinner } from "./Spinner";
 import { Input } from "./Input";
-import { Button } from "./Button";
-import { addMonths } from "date-fns";
+import { DateRangeFilter } from "./DateRangeFilter";
+import { addMonths, formatDate } from "date-fns";
 import {
   Table,
   TableBody,
@@ -41,7 +41,12 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "scenario_id",
+      desc: false,
+    },
+  ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const calculateSuccessRate = (
@@ -77,6 +82,20 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
       columnHelper.accessor("failed_count", {
         header: "Failed",
         cell: (info) => formatNumber(info.getValue()),
+        enableSorting: true,
+      }),
+      columnHelper.accessor("last_test_datetime", {
+        header: "Last Test",
+        cell: (info) => (
+          <span className="text-sm text-gray-300">
+            {info.getValue() === undefined
+              ? "N/A"
+              : formatDate(
+                  new Date(info.getValue() as string),
+                  "yyyy-MM-dd HH:mm",
+                )}
+          </span>
+        ),
         enableSorting: true,
       }),
       columnHelper.display({
@@ -192,50 +211,15 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
           />
         </div>
         <div className="flex-none flex items-center">
-          <div className="flex-none flex flex-wrap gap-4 items-end">
-            <div>
-              <label
-                htmlFor="start-date"
-                className="block text-sm font-medium mb-1"
-              >
-                Start Date
-              </label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                max={endDate || new Date().toISOString().split("T")[0]}
-                className="text-gray-900"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="end-date"
-                className="block text-sm font-medium mb-1"
-              >
-                End Date
-              </label>
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-                max={new Date().toISOString().split("T")[0]}
-                className="text-gray-900"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={handleDateFilter}
-                disabled={loading}
-                variant="default"
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
+          <DateRangeFilter
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+            onApply={handleDateFilter}
+            loading={loading}
+            className="flex-none"
+          />
         </div>
       </div>
 

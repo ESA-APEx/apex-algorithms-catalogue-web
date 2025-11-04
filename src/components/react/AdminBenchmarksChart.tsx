@@ -2,13 +2,12 @@ import { getAdminBenchmarksScenarioData } from "@/lib/api";
 import type { BenchmarkData } from "@/types/models/benchmark";
 import { addMonths } from "date-fns";
 import React, { useState, useEffect } from "react";
-import { Input } from "./Input";
-import { Button } from "./Button";
 import { Spinner } from "./Spinner";
 import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { BenchmarkLineChart } from "./BenchmarkLineChart";
 import { BenchmarkMetricsTable } from "./BenchmarkMetricsTable";
+import { DateRangeFilter } from "./DateRangeFilter";
 
 interface AdminBenchmarksChartProps {
   className?: string;
@@ -123,50 +122,15 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
           <h2 className="text-4xl">{id}</h2>
         </div>
         <div className="flex-none flex items-center">
-          <div className="flex-none flex flex-wrap gap-4 items-end">
-            <div>
-              <label
-                htmlFor="start-date"
-                className="block text-sm font-medium mb-1"
-              >
-                Start Date
-              </label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                max={endDate || new Date().toISOString().split("T")[0]}
-                className="text-gray-900"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="end-date"
-                className="block text-sm font-medium mb-1"
-              >
-                End Date
-              </label>
-              <Input
-                id="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-                max={new Date().toISOString().split("T")[0]}
-                className="text-gray-900"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={handleDateFilter}
-                disabled={loading}
-                variant="default"
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
+          <DateRangeFilter
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+            onApply={handleDateFilter}
+            loading={loading}
+            className="flex-none"
+          />
         </div>
       </div>
       {loading && (

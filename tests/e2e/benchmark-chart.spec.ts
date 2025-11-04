@@ -31,8 +31,8 @@ test.describe("Benchmark Chart Tests", () => {
     });
 
     test("Should display date filter controls", async ({ page }) => {
-      await expect(page.getByLabel("Start Date")).toBeVisible();
-      await expect(page.getByLabel("End Date")).toBeVisible();
+      await expect(page.getByLabel("From")).toBeVisible();
+      await expect(page.getByLabel("To")).toBeVisible();
       await expect(page.getByRole("button", { name: "Apply" })).toBeVisible();
     });
   });
@@ -134,8 +134,8 @@ test.describe("Benchmark Chart Tests", () => {
     });
 
     test("Should allow setting custom date filters", async ({ page }) => {
-      const startDateInput = page.getByLabel("Start Date");
-      const endDateInput = page.getByLabel("End Date");
+      const startDateInput = page.getByLabel("From");
+      const endDateInput = page.getByLabel("To");
       const applyButton = page.getByRole("button", { name: "Apply" });
 
       await startDateInput.fill("2024-01-01");
@@ -165,8 +165,8 @@ test.describe("Benchmark Chart Tests", () => {
         timeout: 15000,
       });
 
-      const startDateInput = page.getByLabel("Start Date");
-      const endDateInput = page.getByLabel("End Date");
+      const startDateInput = page.getByLabel("From");
+      const endDateInput = page.getByLabel("To");
 
       await expect(startDateInput).toHaveValue("2024-06-01");
       await expect(endDateInput).toHaveValue("2024-06-30");

@@ -36,6 +36,10 @@ import {
  *                   failed_count:
  *                     type: integer
  *                     description: Total number of failed runs.
+ *                   last_test_datetime:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The datetime of the most recent test run for this scenario.
  *       500:
  *         description: Server error fetching benchmark statistics.
  *     tags:
@@ -58,7 +62,8 @@ export const GET: APIRoute = async () => {
             SELECT count()::INTEGER                                                   as "runs",
                 "scenario_id",
                 SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
-                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count"
+                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
+                MAX(CAST("test:start:datetime" AS TIMESTAMP)) as "last_test_datetime"
             FROM benchmarks
             WHERE "scenario_id" IS NOT NULL
               ${dateFilter}
