@@ -92,6 +92,10 @@ const searchAndSortFilterCatalogues = ({
           ? getBenchmarkStatus(benchmarkStatusData[id])
           : "no benchmark";
         const hitSearch =
+          type.toLowerCase().includes(normalizedQuery) ||
+          properties.keywords.find((k) =>
+            k.toLocaleLowerCase().includes(normalizedQuery),
+          ) ||
           properties.title.toLowerCase().includes(normalizedQuery) ||
           properties.description.toLowerCase().includes(normalizedQuery);
 
