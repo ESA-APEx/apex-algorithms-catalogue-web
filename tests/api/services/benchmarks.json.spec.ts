@@ -33,8 +33,20 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
 
   it("should return benchmark summary data for all scenarios", async () => {
     const mockData: BenchmarkSummary[] = [
-      { scenario_id: "A", runs: 5, success_count: 5, failed_count: 0 },
-      { scenario_id: "B", runs: 10, success_count: 8, failed_count: 2 },
+      {
+        scenario_id: "A",
+        runs: 5,
+        success_count: 5,
+        failed_count: 0,
+        last_test_datetime: "2024-11-01T10:00:00Z",
+      },
+      {
+        scenario_id: "B",
+        runs: 10,
+        success_count: 8,
+        failed_count: 2,
+        last_test_datetime: "2024-11-02T15:30:00Z",
+      },
     ];
 
     (executeQuery as jest.Mock).mockResolvedValue(mockData);
@@ -108,6 +120,7 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
         runs: Math.floor(Math.random() * 50) + 1,
         success_count: Math.floor(Math.random() * 40),
         failed_count: Math.floor(Math.random() * 10),
+        last_test_datetime: new Date(2024, 10, (i % 30) + 1).toISOString(),
       }),
     );
 

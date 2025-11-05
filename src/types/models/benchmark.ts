@@ -12,7 +12,7 @@ export interface BenchmarkData {
   input_pixel: number;
   max_executor_memory: number;
   network_received: number;
-  status: "success" | "failed";
+  status: "passed" | "failed";
 }
 
 export interface BenchmarkSummary {
@@ -20,6 +20,7 @@ export interface BenchmarkSummary {
   scenario_id: string;
   success_count: number;
   failed_count: number;
+  last_test_datetime?: string;
 }
 
 export type BenchmarkStatusKey = "stable" | "unstable" | "no benchmark";

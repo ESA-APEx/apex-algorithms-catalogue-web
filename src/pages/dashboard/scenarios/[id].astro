@@ -1,0 +1,23 @@
+---
+import Layout from "../../../layouts/AdminLayout.astro";
+import NavBar from "../../../components/AdminNavBar.astro";
+import Breadcrumb from "../../../components/Breadcrumb.astro";
+import { AdminBenchmarksChart } from "../../../components/react/AdminBenchmarksChart";
+
+const title = "Algorithm Services Catalogue";
+const { id } = Astro.params;
+---
+
+<Layout title={title}>
+  <NavBar />
+  <aside class="block my-8">
+    <Breadcrumb
+      enableHome={false}
+      path={`/dashboard/scenarios/${id}`}
+      class="w-full max-w-screen-xl mx-auto px-4"
+    />
+  </aside>
+  <div class="w-full max-w-screen-xl mx-auto">
+    <AdminBenchmarksChart id={id as string} client:only="react" />
+  </div>
+</Layout>

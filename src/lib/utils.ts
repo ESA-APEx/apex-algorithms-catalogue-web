@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { BASE_PATH } from "@/config";
+import { SITE_URL, BASE_PATH } from "@/config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,7 +21,10 @@ export function removeStripes(str: string) {
 }
 
 export function linkTo(slug: string) {
-  return `${BASE_PATH}/${slug}`;
+  if (BASE_PATH) {
+    return `${SITE_URL}${BASE_PATH}/${slug}`;
+  }
+  return `${SITE_URL}${slug}`;
 }
 
 export function generateUniqueOptions(arr: string[]) {
@@ -32,4 +35,14 @@ export function generateUniqueOptions(arr: string[]) {
       label: label,
       value: label,
     }));
+}
+
+export function formatNumber(value: number | null, decimals: number = 2) {
+  if (value === null || value === undefined) return "N/A";
+  if (value === 0) return "0";
+  if (value < 0.01 && value > 0) return "< 0.01";
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
 }

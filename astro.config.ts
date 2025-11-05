@@ -13,6 +13,10 @@ const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
   : "";
 
 const config = {
+  local: {
+    SITE_URL: "http://localhost:4321",
+    BASE_PATH: "",
+  },
   preview: {
     SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
     BASE_PATH: `${process.env.PUBLIC_PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
@@ -32,7 +36,7 @@ const config = {
 };
 
 const buildTarget = (process.env.BUILD_TARGET ??
-  "staging") as keyof typeof config;
+  "local") as keyof typeof config;
 
 const { SITE_URL, BASE_PATH } = config[buildTarget];
 
@@ -43,6 +47,9 @@ export default defineConfig({
   base: BASE_PATH,
   image: {
     service: passthroughImageService(),
+  },
+  redirects: {
+    "/dashboard/scenarios": "/dashboard",
   },
   integrations: [
     tailwind({

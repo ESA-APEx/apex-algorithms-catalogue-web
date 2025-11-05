@@ -47,6 +47,10 @@ import {
  *                   failed_count:
  *                     type: integer
  *                     description: Total number of failed runs.
+ *                   last_test_datetime:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The datetime of the most recent test run for this scenario.
  *                   success_rate:
  *                     type: number
  *                     format: float
@@ -90,6 +94,7 @@ export const GET: APIRoute = async ({ request }) => {
         "scenario_id",
         SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER as "success_count",
         SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER as "failed_count",
+        MAX(CAST("test:start:datetime" AS TIMESTAMP)) as "last_test_datetime"
       FROM parquet_scan([${urls.map((url) => `"${url}"`)}])
       WHERE "scenario_id" IS NOT NULL
         ${dateFilter}

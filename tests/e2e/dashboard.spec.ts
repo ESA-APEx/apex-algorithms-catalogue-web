@@ -52,8 +52,8 @@ test.describe("Dashboard Page Tests", () => {
         page.getByRole("heading", { name: /Benchmark Results/i }),
       ).toBeVisible();
 
-      await expect(page.getByLabel("Start Date")).toBeVisible();
-      await expect(page.getByLabel("End Date")).toBeVisible();
+      await expect(page.getByLabel("From")).toBeVisible();
+      await expect(page.getByLabel("To")).toBeVisible();
       await expect(page.getByRole("button", { name: "Apply" })).toBeVisible();
 
       await page.waitForSelector("table", { timeout: 10000 });
@@ -67,6 +67,7 @@ test.describe("Dashboard Page Tests", () => {
       await expect(page.getByText("Total Runs")).toBeVisible();
       await expect(page.getByText("Success")).toBeVisible();
       await expect(page.getByText("Failed")).toBeVisible();
+      await expect(page.getByText("Last Test")).toBeVisible();
       await expect(page.getByText("Status")).toBeVisible();
     });
 
@@ -84,7 +85,7 @@ test.describe("Dashboard Page Tests", () => {
         const firstRow = tableRows.first();
         const cells = firstRow.locator("td");
         const cellCount = await cells.count();
-        expect(cellCount).toBe(5);
+        expect(cellCount).toBe(6); // scenario_id, runs, success, failed, last_test, status
 
         const scenarioId = await cells.first().textContent();
         expect(scenarioId).toBeTruthy();
@@ -103,8 +104,8 @@ test.describe("Dashboard Page Tests", () => {
     });
 
     test("Should allow setting date filters", async ({ page }) => {
-      const startDateInput = page.getByLabel("Start Date");
-      const endDateInput = page.getByLabel("End Date");
+      const startDateInput = page.getByLabel("From");
+      const endDateInput = page.getByLabel("To");
       const applyButton = page.getByRole("button", { name: "Apply" });
 
       await startDateInput.fill("2024-01-01");
@@ -130,8 +131,8 @@ test.describe("Dashboard Page Tests", () => {
         timeout: 15000,
       });
 
-      const startDateInput = page.getByLabel("Start Date");
-      const endDateInput = page.getByLabel("End Date");
+      const startDateInput = page.getByLabel("From");
+      const endDateInput = page.getByLabel("To");
 
       await expect(startDateInput).toHaveValue("2024-06-01");
       await expect(endDateInput).toHaveValue("2024-06-30");
@@ -152,7 +153,7 @@ test.describe("Dashboard Page Tests", () => {
 
       const sortableHeaders = page
         .locator("th")
-        .filter({ hasText: /Scenario ID|Total Runs|Success|Failed/ });
+        .filter({ hasText: /Scenario ID|Total Runs|Success|Failed|Last Test/ });
       const headerCount = await sortableHeaders.count();
 
       if (headerCount > 0) {
