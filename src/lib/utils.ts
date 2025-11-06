@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { SITE_URL, BASE_PATH } from "@/config";
+import { BASE_PATH } from "@/config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,9 +22,9 @@ export function removeStripes(str: string) {
 
 export function linkTo(slug: string) {
   if (BASE_PATH) {
-    return `${SITE_URL}${BASE_PATH}/${slug}`;
+    return `${BASE_PATH}/${slug}`;
   }
-  return `${SITE_URL}${slug}`;
+  return `${slug}`;
 }
 
 export function generateUniqueOptions(arr: string[]) {
