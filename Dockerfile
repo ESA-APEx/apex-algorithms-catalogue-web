@@ -16,7 +16,7 @@ RUN npm install
 FROM build-deps AS build
 COPY . .
 RUN npm run download-source
-RUN npm run build
+RUN BUILD_TARGET=production npm run build
 
 FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules

@@ -1,6 +1,6 @@
 import { getAdminBenchmarksScenarioData } from "@/lib/api";
 import type { BenchmarkData } from "@/types/models/benchmark";
-import { addMonths } from "date-fns";
+import { addMonths, formatDate } from "date-fns";
 import React, { useState, useEffect } from "react";
 import { Spinner } from "./Spinner";
 import { getBenchmarkStatus } from "@/lib/benchmark-status";
@@ -115,6 +115,14 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
     failed_count: failed || 0,
   });
 
+  const lastTestTime =
+    data && data?.length > 0
+      ? formatDate(
+          new Date(data[data.length - 1].start_time),
+          "yyyy-MM-dd HH:mm",
+        )
+      : "";
+
   return (
     <div className={className}>
       <div className="flex items-end text-white px-4 mb-16">
@@ -183,6 +191,10 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="px-4 text-gray-300 text-sm mb-4">
+            <p>Last test run at {lastTestTime}</p>
           </div>
 
           <div className="px-4 mb-8">
