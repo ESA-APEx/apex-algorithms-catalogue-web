@@ -184,7 +184,7 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
               <p>Status</p>
               <div className="flex-1 flex flex-col justify-center">
                 <div className="flex gap-1 text-xl">
-                  <BenchmarkStatusBadge status={status} />
+                  <BenchmarkStatusBadge status={status} forcedEnabled />
                   <span className="font-medium text-gray-300">
                     ({successRate.toFixed(2)}%)
                   </span>

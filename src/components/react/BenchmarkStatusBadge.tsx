@@ -5,6 +5,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
 
 interface BenchmarkStatusBadgeProps {
   status: BenchmarkStatusKey;
+  forcedEnabled?: boolean;
 }
 
 const statusVariant = cva("inline-flex w-2 h-2 rounded-full", {
@@ -20,8 +21,12 @@ const statusVariant = cva("inline-flex w-2 h-2 rounded-full", {
   },
 });
 
-export const BenchmarkStatusBadge = ({ status }: BenchmarkStatusBadgeProps) => {
-  const isEnabled = isFeatureEnabled(window.location.href, "benchmarkStatus");
+export const BenchmarkStatusBadge = ({
+  status,
+  forcedEnabled = false,
+}: BenchmarkStatusBadgeProps) => {
+  const isEnabled =
+    isFeatureEnabled(window.location.href, "benchmarkStatus") || forcedEnabled;
 
   return isEnabled ? (
     <div

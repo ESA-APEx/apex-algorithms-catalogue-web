@@ -111,7 +111,7 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
 
           return (
             <div className="flex gap-2 items-center">
-              <BenchmarkStatusBadge status={status} />
+              <BenchmarkStatusBadge status={status} forcedEnabled />
               <span className="font-medium text-gray-300">
                 ({successRate}%)
               </span>
