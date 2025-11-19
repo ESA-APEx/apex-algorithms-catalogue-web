@@ -4,7 +4,7 @@ export const featureflag: Record<any, any> = {
     cwlParameterDetail: true,
   },
   production: {
-    benchmarkStatus: false,
+    benchmarkStatus: true,
     cwlParameterDetail: false,
   },
   preview: {
