@@ -25,6 +25,14 @@ import { InfoPopover } from "../../components/react/InfoPopover";
 import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
 import { AlgorithmType } from "../../types/models/algorithm";
+import { isFeatureEnabled } from "@/lib/featureflag";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/react/Select";
 
 export const prerender = true;
 
@@ -104,6 +112,8 @@ const webAppUrl = algorithm.links.find((link) => link.rel === "webapp")?.href;
 const cwlUrl = algorithm.links.find(
   (link) => link.rel === "application" && link.type === "application/cwl+yaml",
 )?.href;
+
+const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
 
 const serviceRequestWarning =
   "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
@@ -250,7 +260,9 @@ const serviceRequestWarning =
                       <p class="text-sm">{contact.organization}</p>
                     )}
                     <p class="text-white text-lg">{contact.name}</p>
-                    {contact.position && <p class="text-white text-sm">{contact.position}</p>}
+                    {contact.position && (
+                      <p class="text-white text-sm">{contact.position}</p>
+                    )}
                     <p class="mt-1 text-sm mb-2">{contact.roles.join(", ")}</p>
                     {contact.contactInstructions && (
                       <p class="mt-1 text-sm mb-2">
@@ -453,6 +465,35 @@ const serviceRequestWarning =
                 )}
               </li>
             )
+          }
+          {
+            notebooks &&
+              isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") && (
+                <li class="mt-2">
+                  <label for="notebook-select" class="sr-only">
+                    Open notebook
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="notebook-select"
+                      class="w-full btn btn-secondary"
+                      value=""
+                      onchange={
+                        "window.open('" +
+                        import.meta.env.JUPYTER_LITE_BASE_URL +
+                        "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
+                      }
+                    >
+                      <option value="">Execute notebook</option>
+                      {notebooks.map((notebook) => (
+                        <option value={notebook.href}>
+                          {notebook.title || "Open notebook"}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </li>
+              )
           }
         </ul>
       </aside>
