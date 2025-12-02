@@ -1,9 +1,8 @@
 ---
-import cookie from "cookie";
+import { getCsrf } from "@/lib/request";
 import { UserMenu } from "./react/UserMenu";
 
-const cookies = cookie.parse(Astro.request.headers.get("cookie") ?? "");
-const csrf = cookies["authjs.csrf-token"]?.split("|")[0];
+const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
 
 const user = Astro.locals.user;
 ---

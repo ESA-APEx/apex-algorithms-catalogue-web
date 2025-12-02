@@ -1,10 +1,8 @@
 ---
-import cookie from "cookie";
+import { getCsrf } from "@/lib/request";
 import Layout from "@/layouts/Layout.astro";
 
-const cookies = cookie.parse(Astro.request.headers.get("cookie") ?? "");
-
-const csrf = cookies["authjs.csrf-token"]?.split("|")[0];
+const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
 const callbackUrl = Astro.url.searchParams.get("callbackUrl");
 ---
 
