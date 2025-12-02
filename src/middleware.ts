@@ -60,7 +60,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // For page requests, redirect directly to Keycloak login
-  const keycloakLoginUrl = new URL("/api/auth/signin/keycloak", context.url);
+  const keycloakLoginUrl = new URL("/auth/signin", context.url);
   keycloakLoginUrl.searchParams.set("callbackUrl", requestUrl);
 
   return Response.redirect(keycloakLoginUrl.toString(), 302);
