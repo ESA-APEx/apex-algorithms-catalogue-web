@@ -30,7 +30,7 @@ const callbackUrl = Astro.url.searchParams.get("callbackUrl");
       <p class="text-base mb-8">
         Please wait while we redirect you to the authentication page...
       </p>
-      <form method="POST" action="/api/auth/signin/keycloak">
+      <form id="signin-form" method="POST" action="/api/auth/signin/keycloak">
         <input type="hidden" name="csrfToken" value={csrf} />
         {
           callbackUrl && (
@@ -51,7 +51,8 @@ const callbackUrl = Astro.url.searchParams.get("callbackUrl");
 
   <script>
     setTimeout(() => {
-      document.querySelector("form")?.submit();
+      const form = document.querySelector("#signin-form") as HTMLFormElement;
+      form?.submit();
     }, 500);
   </script>
 </Layout>
