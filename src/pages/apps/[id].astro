@@ -106,13 +106,7 @@ const cwlUrl = algorithm.links.find(
   (link) => link.rel === "application" && link.type === "application/cwl+yaml",
 )?.href;
 
-// const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
-const notebooks = [
-  {
-    href: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/utils/openeo_udp_cost_profiling/udp_profile_notebook.ipynb",
-    title: "WorldCover Statistics Notebook",
-  },
-];
+const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
 
 const serviceRequestWarning =
   "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
