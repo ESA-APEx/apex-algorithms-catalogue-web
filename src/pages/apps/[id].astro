@@ -26,13 +26,6 @@ import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
 import { AlgorithmType } from "../../types/models/algorithm";
 import { isFeatureEnabled } from "@/lib/featureflag";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/react/Select";
 
 export const prerender = true;
 
@@ -113,7 +106,13 @@ const cwlUrl = algorithm.links.find(
   (link) => link.rel === "application" && link.type === "application/cwl+yaml",
 )?.href;
 
-const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
+// const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
+const notebooks = [
+  {
+    href: "https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/utils/openeo_udp_cost_profiling/udp_profile_notebook.ipynb",
+    title: "WorldCover Statistics Notebook",
+  },
+];
 
 const serviceRequestWarning =
   "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
@@ -467,33 +466,33 @@ const serviceRequestWarning =
             )
           }
           {
-            notebooks &&
-              isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") && (
-                <li class="mt-2">
-                  <label for="notebook-select" class="sr-only">
-                    Open notebook
-                  </label>
-                  <div class="relative">
-                    <select
-                      id="notebook-select"
-                      class="w-full btn btn-secondary"
-                      value=""
-                      onchange={
-                        "window.open('" +
-                        import.meta.env.JUPYTER_LITE_BASE_URL +
-                        "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
-                      }
-                    >
-                      <option value="">Execute notebook</option>
-                      {notebooks.map((notebook) => (
-                        <option value={notebook.href}>
-                          {notebook.title || "Open notebook"}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </li>
-              )
+            notebooks.length &&
+            isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") ? (
+              <li class="mt-2">
+                <label for="notebook-select" class="sr-only">
+                  Open notebook
+                </label>
+                <div class="relative">
+                  <select
+                    id="notebook-select"
+                    class="w-full btn btn-secondary select"
+                    value=""
+                    onchange={
+                      "window.open('" +
+                      import.meta.env.JUPYTER_LITE_BASE_URL +
+                      "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
+                    }
+                  >
+                    <option value="">Execute notebook</option>
+                    {notebooks.map((notebook) => (
+                      <option value={notebook.href}>
+                        {notebook.title || "Open notebook"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </li>
+            ) : null
           }
         </ul>
       </aside>

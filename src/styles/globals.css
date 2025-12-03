@@ -1465,6 +1465,22 @@ fieldset:disabled .btn {
   transition: text-decoration-color 0.3s;
 }
 
+.select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: 5px;
+}
+
+.select.btn {
+  background-position-x: calc(100% - var(--apex-bs-btn-padding-x));
+  background-position-y: calc(0.5rem + var(--apex-bs-btn-padding-y));
+  font-weight: var(--apex-bs-btn-font-weight);
+}
+
 .c-sidebar {
   position: absolute;
   inset: 0;
