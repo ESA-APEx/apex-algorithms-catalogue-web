@@ -195,3 +195,47 @@ test.describe("Service Details Test", () => {
     );
   });
 });
+
+test.describe("Notebook Execution Test", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("http://localhost:4321/apps/parcel_delineation");
+  });
+
+  test("Should render execute notebook action", async ({ page }) => {
+    const notebookSelect = page.locator("#notebook-select");
+    await expect(notebookSelect).toBeVisible();
+
+    const options = notebookSelect.locator("option");
+    const defaultOption = options.first();
+    await expect(defaultOption).toHaveText("Execute notebook");
+
+    const count = await options.count();
+    expect(count).toBeGreaterThanOrEqual(2);
+  });
+
+  test("Should open notebook in new tab with correct URL when option is selected", async ({
+    page,
+    context,
+  }) => {
+    const notebookSelect = page.locator("#notebook-select");
+
+    const options = notebookSelect.locator("option");
+
+    const notebookOption = options.nth(1);
+    const notebookUrl = await notebookOption.getAttribute("value");
+
+    expect(notebookUrl).toBeTruthy();
+
+    const pagePromise = context.waitForEvent("page");
+
+    await notebookSelect.selectOption({ index: 1 });
+
+    const newPage = await pagePromise;
+    const newPageUrl = newPage.url();
+
+    expect(newPageUrl).toContain("?fromURL=");
+    expect(newPageUrl).toContain(encodeURIComponent(notebookUrl!));
+
+    await newPage.close();
+  });
+});
