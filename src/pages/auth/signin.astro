@@ -1,0 +1,56 @@
+---
+import { getCsrf } from "@/lib/request";
+import Layout from "@/layouts/Layout.astro";
+
+const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
+const callbackUrl = Astro.url.searchParams.get("callbackUrl");
+---
+
+<Layout title="Redirecting to Sign In">
+  <style>
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .spinner {
+      animation: spin 0.8s linear infinite;
+    }
+  </style>
+
+  <div class="flex items-center justify-center min-h-[60vh] text-brand-gray-50">
+    <div class="text-center max-w-md p-8">
+      <div
+        class="w-10 h-10 mx-auto mb-4 border-4 border-brand-teal-30 border-t-brand-teal-50 rounded-full spinner"
+      >
+      </div>
+      <h1 class="text-2xl text-white mb-4">Redirecting to Sign In</h1>
+      <p class="text-base mb-8">
+        Please wait while we redirect you to the authentication page...
+      </p>
+      <form id="signin-form" method="POST" action="/api/auth/signin/keycloak">
+        <input type="hidden" name="csrfToken" value={csrf} />
+        {
+          callbackUrl && (
+            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+          )
+        }
+        <noscript>
+          <p class="text-base mb-4">
+            JavaScript is disabled. Click the button below to continue.
+          </p>
+          <button type="submit" class="btn btn-primary"
+            >Continue to Sign In</button
+          >
+        </noscript>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      const form = document.querySelector("#signin-form") as HTMLFormElement;
+      form?.submit();
+    }, 500);
+  </script>
+</Layout>

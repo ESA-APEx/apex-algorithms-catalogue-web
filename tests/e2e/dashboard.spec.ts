@@ -15,18 +15,7 @@ test.describe("Dashboard Page Tests", () => {
     await setupBasicAuth(page);
   });
 
-  test.describe("Authentication", () => {
-    test("Should require basic auth to access dashboard page", async ({
-      page,
-    }) => {
-      await page.setExtraHTTPHeaders({});
-
-      const response = await page.goto("/dashboard", {
-        waitUntil: "networkidle",
-      });
-      expect(response?.status()).toBe(401);
-    });
-
+  test.describe("Authentication Basic Auth", () => {
     test("Should allow access with correct basic auth credentials", async ({
       page,
     }) => {

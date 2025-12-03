@@ -1,5 +1,26 @@
+---
+import { getCsrf } from "@/lib/request";
+import { UserMenu } from "./react/UserMenu";
+
+const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
+
+const user = Astro.locals.user;
+---
+
 <nav class="text-white w-full border-b border-brand-teal-50 top-0 sticky">
-  <div class="max-w-screen-xl mx-auto px-3 py-3">
+  <div
+    class="max-w-screen-xl mx-auto px-3 py-3 flex items-center justify-between"
+  >
     <h1 class="text-xl">APEX Algorithm Dashboard</h1>
+    {
+      user && (
+        <UserMenu
+          client:load
+          username={user.username}
+          email={user.email}
+          csrf={csrf}
+        />
+      )
+    }
   </div>
 </nav>

@@ -3,6 +3,7 @@ import { defineConfig, passthroughImageService } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
+import auth from "auth-astro";
 import markdownIntegration from "@astropub/md";
 import { RemarkNormalizeHeadings } from "./src/remark-plugins/normalize-headings";
 
@@ -52,6 +53,7 @@ export default defineConfig({
     "/dashboard/scenarios": "/dashboard",
   },
   integrations: [
+    auth(),
     tailwind({
       applyBaseStyles: false,
     }),
