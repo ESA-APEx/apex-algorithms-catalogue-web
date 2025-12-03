@@ -1,7 +1,7 @@
 {
   "name": "apex-algorithms-catalogue-web",
   "type": "module",
-  "version": "0.22.0",
+  "version": "0.24.1",
   "scripts": {
     "setup": "make-dir ./tmp && astro check && npm run download-source",
     "dev": "npm run setup && astro dev --force",
