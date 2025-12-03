@@ -16,6 +16,7 @@ const user = Astro.locals.user;
       user && (
         <UserMenu
           client:load
+          name={user.name}
           username={user.username}
           email={user.email}
           csrf={csrf}

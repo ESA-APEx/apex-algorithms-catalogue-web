@@ -45,6 +45,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     if (session?.user) {
       context.locals.user = {
+        name: session.user.name,
         username: session.user.username,
         email: session.user.email,
         roles: session.user.roles || [],

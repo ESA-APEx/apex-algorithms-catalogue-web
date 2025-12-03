@@ -9,6 +9,7 @@ import {
 } from "./DropdownMenu";
 
 interface UserMenuProps {
+  name?: string | null;
   username?: string;
   email?: string | null;
   csrf?: string;
@@ -16,13 +17,15 @@ interface UserMenuProps {
 }
 
 export function UserMenu({
+  name,
   username,
   email,
   csrf,
   signoutPath = "/api/auth/signout",
 }: UserMenuProps) {
-  const initials = username
-    ? username
+  const displayName = name || username;
+  const initials = displayName
+    ? displayName
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -50,7 +53,7 @@ export function UserMenu({
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">
-                {username || "User"}
+                {displayName || "User"}
               </p>
               {email && (
                 <p className="text-xs leading-none text-muted-foreground">
