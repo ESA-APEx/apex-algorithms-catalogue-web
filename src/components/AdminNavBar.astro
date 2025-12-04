@@ -1,8 +1,5 @@
 ---
-import { getCsrf } from "@/lib/request";
 import { UserMenu } from "./react/UserMenu";
-
-const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
 
 const user = Astro.locals.user;
 ---
@@ -19,7 +16,6 @@ const user = Astro.locals.user;
           name={user.name}
           username={user.username}
           email={user.email}
-          csrf={csrf}
         />
       )
     }

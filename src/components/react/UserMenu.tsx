@@ -12,17 +12,9 @@ interface UserMenuProps {
   name?: string | null;
   username?: string;
   email?: string | null;
-  csrf?: string;
-  signoutPath?: string;
 }
 
-export function UserMenu({
-  name,
-  username,
-  email,
-  csrf,
-  signoutPath = "/api/auth/signout",
-}: UserMenuProps) {
+export function UserMenu({ name, username, email }: UserMenuProps) {
   const displayName = name || username;
   const initials = displayName
     ? displayName
@@ -36,10 +28,8 @@ export function UserMenu({
       : "U";
 
   const handleSignOut = async () => {
-    const form = document.querySelector("#signout-form") as HTMLFormElement;
-    form?.submit();
+    window.signOut();
   };
-  const callbackUrl = globalThis?.location?.href;
 
   return (
     <div className="flex">
@@ -69,10 +59,6 @@ export function UserMenu({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <form id="signout-form" method="POST" action={signoutPath}>
-        {csrf && <input type="hidden" name="csrfToken" value={csrf} />}
-        <input type="hidden" name="callbackUrl" value={callbackUrl} />
-      </form>
     </div>
   );
 }

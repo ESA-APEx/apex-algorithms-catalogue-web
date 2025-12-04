@@ -27,4 +27,13 @@ const { title } = Astro.props;
       <slot />
     </div>
   </body>
+  <script>
+    declare global {
+      interface Window {
+        signOut: typeof import("auth-astro/client").signOut;
+      }
+    }
+    const { signOut } = await import("auth-astro/client");
+    window.signOut = signOut;
+  </script>
 </html>

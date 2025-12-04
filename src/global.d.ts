@@ -8,6 +8,13 @@ declare global {
   var dbInitPromise: Promise<Database> | null;
 }
 
+declare global {
+  interface Window {
+    signIn: typeof import("auth-astro/client").signIn;
+    signOut: typeof import("auth-astro/client").signOut;
+  }
+}
+
 declare module "@auth/core/types" {
   interface Session {
     user: {
