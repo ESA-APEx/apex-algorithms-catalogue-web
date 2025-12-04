@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro/middleware";
 import { getSession } from "auth-astro/server";
+import { isFeatureEnabled } from "./lib/featureflag";
 
 const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
 
@@ -17,7 +18,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (
     import.meta.env.BASIC_AUTH_USERNAME &&
-    import.meta.env.BASIC_AUTH_PASSWORD
+    import.meta.env.BASIC_AUTH_PASSWORD &&
+    isFeatureEnabled(context.request.url, "basicAuth")
   ) {
     // Basic auth check
     const basicAuth = context.request.headers.get("authorization");
