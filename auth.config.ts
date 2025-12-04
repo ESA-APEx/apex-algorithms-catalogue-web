@@ -44,6 +44,9 @@ export const config: FullAuthConfig = {
       return session;
     },
   },
+  pages: {
+    signOut: "/auth/signout",
+  },
 };
 
 export default defineConfig(config);

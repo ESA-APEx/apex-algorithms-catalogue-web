@@ -1,0 +1,36 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="Sign Out">
+  <div class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center max-w-md p-8">
+      <h1 class="text-5xl text-white mb-6">Sign Out</h1>
+      <p class="text-gray-300 mb-8">
+        Are you sure you want to sign out of your account?
+      </p>
+
+      <div class="flex gap-4 justify-center">
+        <button id="signout-button" class="btn btn-primary"> Sign Out </button>
+        <button id="cancel-button" class="btn btn-secondary"> Cancel </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { signOut } = await import("auth-astro/client");
+    const callbackUrl =
+      new URL(window.location.href).searchParams.get("callbackUrl") || "/";
+
+    document.querySelector("#signout-button")?.addEventListener(
+      "click",
+      async () =>
+        await signOut({
+          // @ts-ignore
+          callbackUrl,
+        }),
+    );
+    document.querySelector("#cancel-button")?.addEventListener("click", () => {
+      window.location.href = callbackUrl;
+    });
+  </script>
+</Layout>

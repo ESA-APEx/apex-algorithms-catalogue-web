@@ -28,7 +28,10 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
       : "U";
 
   const handleSignOut = async () => {
-    window.signOut();
+    const signoutPath = "/auth/signout";
+    const signoutUrl = new URL(signoutPath, window.location.origin);
+    signoutUrl.searchParams.set("callbackUrl", window.location.href);
+    window.location.href = signoutUrl.toString();
   };
 
   return (

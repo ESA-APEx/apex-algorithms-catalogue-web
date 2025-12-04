@@ -1,9 +1,5 @@
 ---
-import { getCsrf } from "@/lib/request";
 import Layout from "@/layouts/Layout.astro";
-
-const csrf = getCsrf(Astro.request.headers.get("cookie") ?? "");
-const callbackUrl = Astro.url.searchParams.get("callbackUrl");
 ---
 
 <Layout title="Redirecting to Sign In">
@@ -28,29 +24,22 @@ const callbackUrl = Astro.url.searchParams.get("callbackUrl");
       <p class="text-base mb-8">
         Please wait while we redirect you to the authentication page...
       </p>
-      <form id="signin-form" method="POST" action="/api/auth/signin/keycloak">
-        <input type="hidden" name="csrfToken" value={csrf} />
-        {
-          callbackUrl && (
-            <input type="hidden" name="callbackUrl" value={callbackUrl} />
-          )
-        }
-        <noscript>
-          <p class="text-base mb-4">
-            JavaScript is disabled. Click the button below to continue.
-          </p>
-          <button type="submit" class="btn btn-primary"
-            >Continue to Sign In</button
-          >
-        </noscript>
-      </form>
+      <noscript>
+        <p class="text-base mb-4">
+          JavaScript is disabled. Please enable JavaScript to continue.
+        </p>
+      </noscript>
     </div>
   </div>
 
   <script>
-    setTimeout(() => {
-      const form = document.querySelector("#signin-form") as HTMLFormElement;
-      form?.submit();
-    }, 500);
+    import { signIn } from "auth-astro/client";
+
+    const callbackUrl =
+      new URL(window.location.href).searchParams.get("callbackUrl") || "/";
+    setTimeout(async () => {
+      // @ts-ignore
+      await signIn("keycloak", { callbackUrl });
+    }, 1500);
   </script>
 </Layout>
