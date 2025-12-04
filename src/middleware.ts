@@ -22,7 +22,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (
     import.meta.env.BASIC_AUTH_USERNAME &&
     import.meta.env.BASIC_AUTH_PASSWORD &&
-    isFeatureEnabled(context.request.url, "basicAuth")
+    isFeatureEnabled(requestUrl, "basicAuth")
   ) {
     // Basic auth check
     const basicAuth = context.request.headers.get("authorization");
@@ -46,43 +46,49 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   } else {
     // Keycloak auth check
-    const session = await getSession(context.request);
+    try {
+      const session = await getSession(context.request);
 
-    if (session?.user) {
-      context.locals.user = {
-        name: session.user.name,
-        username: session.user.username,
-        email: session.user.email,
-        roles: session.user.roles || [],
-      };
+      if (session?.user) {
+        context.locals.user = {
+          name: session.user.name,
+          username: session.user.username,
+          email: session.user.email,
+          roles: session.user.roles || [],
+        };
 
-      // TODO: allow for more generic role
-      if (context.locals.user.roles?.includes("administrator")) {
-        return next();
+        // TODO: allow for more generic role
+        if (context.locals.user.roles?.includes("administrator")) {
+          return next();
+        }
+
+        if (apiRequest) {
+          return new Response("Forbidden", { status: 403 });
+        }
+
+        const notFoundUrl = new URL("/404", context.url);
+        return Response.redirect(notFoundUrl.toString(), 302);
       }
 
       if (apiRequest) {
-        return new Response("Forbidden", { status: 403 });
+        return new Response("Authentication required", {
+          status: 401,
+          headers: {
+            "WWW-Authenticate":
+              'Bearer realm="Protected Area", Basic realm="Secure Area"',
+          },
+        });
       }
 
-      const notFoundUrl = new URL("/404", context.url);
-      return Response.redirect(notFoundUrl.toString(), 302);
-    }
+      // For page requests, redirect directly to Keycloak login
+      const keycloakLoginUrl = new URL("/auth/signin", context.url);
+      keycloakLoginUrl.searchParams.set("callbackUrl", requestUrl);
 
-    if (apiRequest) {
-      return new Response("Authentication required", {
-        status: 401,
-        headers: {
-          "WWW-Authenticate":
-            'Bearer realm="Protected Area", Basic realm="Secure Area"',
-        },
+      return Response.redirect(keycloakLoginUrl.toString(), 302);
+    } catch (error: any) {
+      return new Response(error.message || "Internal Server Error", {
+        status: 500,
       });
     }
-
-    // For page requests, redirect directly to Keycloak login
-    const keycloakLoginUrl = new URL("/auth/signin", context.url);
-    keycloakLoginUrl.searchParams.set("callbackUrl", requestUrl);
-
-    return Response.redirect(keycloakLoginUrl.toString(), 302);
   }
 });
