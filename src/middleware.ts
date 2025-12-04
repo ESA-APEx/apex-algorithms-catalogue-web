@@ -12,7 +12,10 @@ function isApiRequest(url: string): boolean {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  if (!protectedPaths.some((path) => context.request.url.includes(path))) {
+  const requestUrl = context.request.url;
+  const apiRequest = isApiRequest(requestUrl);
+
+  if (!protectedPaths.some((path) => requestUrl.includes(path))) {
     return next();
   }
 
@@ -52,13 +55,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
         email: session.user.email,
         roles: session.user.roles || [],
       };
-      return next();
+
+      // TODO: allow for more generic role
+      if (context.locals.user.roles?.includes("administrator")) {
+        return next();
+      }
+
+      if (apiRequest) {
+        return new Response("Forbidden", { status: 403 });
+      }
+
+      const notFoundUrl = new URL("/404", context.url);
+      return Response.redirect(notFoundUrl.toString(), 302);
     }
 
-    const requestUrl = context.request.url;
-
-    // For API requests, return 401
-    if (isApiRequest(requestUrl)) {
+    if (apiRequest) {
       return new Response("Authentication required", {
         status: 401,
         headers: {

@@ -23,7 +23,7 @@ export const config: FullAuthConfig = {
           email: profile.email,
           image: profile.picture,
           username: profile.preferred_username,
-          roles: profile.realm_access?.roles || [],
+          roles: profile.client_roles || [],
         };
       },
     }),
@@ -32,7 +32,7 @@ export const config: FullAuthConfig = {
     jwt({ token, profile }) {
       if (profile) {
         token.username = profile.preferred_username;
-        token.roles = (profile as any).realm_access?.roles || [];
+        token.roles = (profile as any).client_roles || [];
       }
       return token;
     },
