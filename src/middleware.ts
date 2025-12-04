@@ -86,9 +86,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       return Response.redirect(keycloakLoginUrl.toString(), 302);
     } catch (error: any) {
-      return new Response(error.message || "Internal Server Error", {
-        status: 500,
-      });
+      console.error("Middleware error:", error);
+
+      return new Response(
+        JSON.stringify({
+          error: error.message || "Internal Server Error",
+          stack: error.stack,
+          trace: error.toString(),
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
     }
   }
 });
