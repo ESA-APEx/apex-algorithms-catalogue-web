@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro/middleware";
 import { getSession } from "auth-astro/server";
+import { config as authConfig } from "../auth.config";
 import { isFeatureEnabled } from "./lib/featureflag";
 
 const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
@@ -47,7 +48,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   } else {
     // Keycloak auth check
     try {
-      const session = await getSession(context.request);
+      const session = await getSession(context.request, authConfig);
 
       if (session?.user) {
         context.locals.user = {

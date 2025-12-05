@@ -47,6 +47,8 @@ export const config: FullAuthConfig = {
   pages: {
     signOut: "/auth/signout",
   },
+  secret: process.env.AUTH_SECRET,
+  trustHost: process.env.AUTH_TRUST_HOST === "true",
 };
 
 export default defineConfig(config);
