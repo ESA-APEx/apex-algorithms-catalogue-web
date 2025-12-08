@@ -25,7 +25,7 @@ test.describe("Dashboard Page Tests", () => {
       expect(response?.status()).toBe(200);
 
       await expect(page).toHaveURL(/dashboard/);
-      await expect(page).toHaveTitle(/Algorithm Services Catalogue/);
+      await expect(page).toHaveTitle(/Algorithm Catalogue/);
     });
   });
 

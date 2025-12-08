@@ -6,9 +6,9 @@ test.describe("Catalog Tests", () => {
   });
 
   test("Should render the homepage correctly", async ({ page }) => {
-    await expect(page).toHaveTitle("Algorithm Services Catalogue | APEx");
+    await expect(page).toHaveTitle("Algorithm Catalogue | APEx");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Algorithm Services Catalogue",
+      "Algorithm Catalogue",
     );
 
     await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
