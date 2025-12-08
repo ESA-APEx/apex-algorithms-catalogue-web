@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const title = "Algorithm Services Catalogue Preview";
+const title = "Algorithm Catalogue Preview";
 
 export const prerender = true;
 ---
@@ -113,7 +113,7 @@ export const prerender = true;
 
       try {
         const response = await fetch(
-          `${import.meta.env.PUBLIC_PREVIEW_BASE_PATH}/versions.csv`,
+          `${import.meta.env.PUBLIC_PREVIEW_BASE_PATH}/versions.csv`
         );
 
         if (!response.ok) {
@@ -136,7 +136,7 @@ export const prerender = true;
 
         // Sort by PR number (descending to show latest first)
         allVersions = records.sort(
-          (a, b) => parseInt(b.pr_number) - parseInt(a.pr_number),
+          (a, b) => parseInt(b.pr_number) - parseInt(a.pr_number)
         );
         filteredVersions = [...allVersions];
 
@@ -208,14 +208,14 @@ export const prerender = true;
             </a>
           </div>
         </div>
-      `,
+      `
         )
         .join("");
     }
 
     function setupSearch() {
       const searchInput = document.getElementById(
-        "search-input",
+        "search-input"
       ) as HTMLInputElement;
       const clearButton = document.getElementById("clear-search");
 
@@ -257,7 +257,7 @@ export const prerender = true;
         filteredVersions = [...allVersions];
       } else {
         filteredVersions = allVersions.filter((version) =>
-          version.pr_number.toLowerCase().includes(searchTerm),
+          version.pr_number.toLowerCase().includes(searchTerm)
         );
       }
 
@@ -270,7 +270,7 @@ export const prerender = true;
       if (!resultsCountEl) return;
 
       const searchInput = document.getElementById(
-        "search-input",
+        "search-input"
       ) as HTMLInputElement;
       const searchTerm = searchInput?.value.trim();
 
