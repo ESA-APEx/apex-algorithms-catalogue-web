@@ -69,10 +69,4 @@ export default defineConfig({
   adapter: node({
     mode: "standalone",
   }),
-  vite: {
-    define: {
-      // tweak for auth-astro to pick up the secret at run time
-      "import.meta.env.AUTH_SECRET": JSON.stringify(process.env.AUTH_SECRET),
-    },
-  },
 });

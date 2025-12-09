@@ -31,6 +31,7 @@ declare module "@auth/core/types" {
   interface JWT {
     username?: string;
     roles?: string[];
+    refresh_token?: string;
   }
 
   interface Profile {

@@ -29,10 +29,13 @@ export const config: FullAuthConfig = {
     }),
   ],
   callbacks: {
-    jwt({ token, profile }) {
+    jwt({ token, profile, account }) {
       if (profile) {
         token.username = profile.preferred_username;
         token.roles = (profile as any).client_roles || [];
+      }
+      if (account) {
+        token.refresh_token = account.refresh_token;
       }
       return token;
     },
@@ -42,6 +45,32 @@ export const config: FullAuthConfig = {
         session.user.roles = token.roles as string[];
       }
       return session;
+    },
+  },
+  events: {
+    async signOut(message) {
+      const token = "token" in message ? message.token : null;
+      if (token?.sub && process.env.KEYCLOAK_ISSUER) {
+        try {
+          const logoutUrl = `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/logout`;
+
+          const params = new URLSearchParams({
+            client_id: process.env.KEYCLOAK_CLIENT_ID || "",
+            client_secret: process.env.KEYCLOAK_CLIENT_SECRET || "",
+            refresh_token: token.refresh_token as string,
+          });
+
+          await fetch(logoutUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: params.toString(),
+          });
+        } catch (error) {
+          console.error("Error signing out from Keycloak:", error);
+        }
+      }
     },
   },
   pages: {
