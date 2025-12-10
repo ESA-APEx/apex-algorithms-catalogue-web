@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import NavBar from "../components/NavBar.astro";
 import Footer from "../components/Footer.astro";
 import HamburgerMenu from "../components/HamburgerMenu.astro";
+import { Toaster } from "../components/react/Toaster";
 
 interface Props {
   title: string;
@@ -33,6 +34,7 @@ const { title } = Astro.props;
       <Footer />
     </div>
     <HamburgerMenu />
+    <Toaster client:load />
     <script is:inline>
       document.addEventListener("DOMContentLoaded", () => {
         "use strict";
@@ -115,6 +117,37 @@ const { title } = Astro.props;
 
         new MegaMenu();
         new HamburgerMenu();
+      });
+    </script>
+    <script>
+      import { toast } from "@/lib/toast";
+      const currentUrl = new URL(window.location.href); 
+      const toastSuccess = currentUrl.searchParams.get("toastSuccess") as string;
+      const toastError = currentUrl.searchParams.get("toastError") as string;
+      const message: Record<string, Record<string, string>> = {
+        success: {
+          login: "Successfully logged in!",
+          logout: "Successfully logged out!",
+        },
+        error: {
+          login: "Error logging in. Please try again.",
+          logout: "Error logging out. Please try again.",
+        },
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        "use strict";
+
+        window.setTimeout(() => {
+          if (toastError && message.error[toastError]) {
+            toast.error(message.error[toastError]);
+          } else if (toastSuccess && message.success[toastSuccess]) {
+            toast.success(message.success[toastSuccess]);
+          }
+          // Clear URL parameters after displaying the toast
+          currentUrl.searchParams.delete("toastSuccess");
+          currentUrl.searchParams.delete("toastError");
+          window.history.replaceState({}, document.title, currentUrl.toString());
+        }, 1000);
       });
     </script>
   </body>

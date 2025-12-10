@@ -12,6 +12,7 @@ declare global {
   interface Window {
     signIn: typeof import("auth-astro/client").signIn;
     signOut: typeof import("auth-astro/client").signOut;
+    toast: typeof import("sonner").toast;
   }
 }
 

@@ -26,6 +26,14 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
     : email
       ? email[0].toUpperCase()
       : "U";
+  const handleSignOut = async () => {
+    const callbackUrl = new URL(window.location.origin);
+    callbackUrl.searchParams.set("toastSuccess", "logout");
+    await window.signOut({
+      // @ts-ignore
+      callbackUrl: callbackUrl.href,
+    });
+  }
 
   return (
     <div className="flex">
@@ -49,12 +57,7 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={async () => {
-            await window.signOut({
-              // @ts-ignore
-              callbackUrl: window.location.origin
-            });
-          }}>
+          <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Sign out</span>
           </DropdownMenuItem>
