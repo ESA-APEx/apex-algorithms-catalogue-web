@@ -72,6 +72,12 @@ describe("Utility Functions", () => {
     it("should handle slashes in slug correctly", () => {
       expect(linkTo("blog/post-1")).toBe("/base-path/blog/post-1");
     });
+
+    it("should handle custom basePath", () => {
+      expect(linkTo("", "")).toBe("/");
+      expect(linkTo("", "/custom")).toBe("/custom/");
+      expect(linkTo("services", "/custom")).toBe("/custom/services");
+    })
   });
 
   describe("generateUniqueOptions (Unique Array Mapper)", () => {

@@ -16,7 +16,7 @@ const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
 const config = {
   local: {
     SITE_URL: "http://localhost:4321",
-    BASE_PATH: "",
+    BASE_PATH: "/",
   },
   preview: {
     SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
@@ -28,11 +28,11 @@ const config = {
   },
   staging: {
     SITE_URL: process.env.PUBLIC_STAGING_BASE_URL,
-    BASE_PATH: "",
+    BASE_PATH: "/"
   },
   production: {
     SITE_URL: process.env.PUBLIC_PRODUCTION_BASE_URL,
-    BASE_PATH: "",
+    BASE_PATH: "/",
   },
 };
 
@@ -51,6 +51,7 @@ export default defineConfig({
   },
   redirects: {
     "/dashboard/scenarios": "/dashboard",
+    "/apps": "/"
   },
   integrations: [
     auth(),

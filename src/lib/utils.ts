@@ -20,11 +20,11 @@ export function removeStripes(str: string) {
   return str.replaceAll(/[-_]/gi, " ");
 }
 
-export function linkTo(slug: string) {
-  if (BASE_PATH) {
-    return `${BASE_PATH}/${slug}`;
+export function linkTo(slug: string, basePath: string = BASE_PATH) {
+  if (["", "/"].includes(basePath)) {
+    return slug ? slug : "/";
   }
-  return `${slug}`;
+  return `${basePath}/${slug}`;
 }
 
 export function generateUniqueOptions(arr: string[]) {
