@@ -54,7 +54,7 @@ export const getStaticPaths = (async () => {
   const result = [];
 
   for (const item of data) {
-    const { algorithm, applicationDetails } = item;
+    const { algorithm, applicationDetails, platform } = item;
 
     const description =
       applicationDetails?.description || algorithm.properties.description;
@@ -69,6 +69,7 @@ export const getStaticPaths = (async () => {
         data: {
           algorithm,
           applicationDetails,
+          platform,
         },
         description,
         toc,
@@ -82,7 +83,7 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { data, toc, description } = Astro.props;
-const { applicationDetails, algorithm } = data;
+const { applicationDetails, algorithm, platform } = data;
 
 const UDP_DOCS_URL =
   "https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube";

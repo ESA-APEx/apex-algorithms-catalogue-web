@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import https from "https";
+import type { Platform } from "../types/models/platform";
 import { type Algorithm, AlgorithmType } from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
 import type { UDP } from "../types/models/udp";
@@ -130,6 +131,29 @@ export const fetchApplicationDetails = async (
   }
 };
 
+export const fetchPlatformDetails = async (
+  url: string,
+  recordPath: string,
+): Promise<undefined | Platform> => {
+  if (!url) {
+    return undefined;
+  }
+  try {
+    if (url.includes('http')) {
+      const platform = (await fetchJson(url)) as Platform;
+      return platform;
+    }
+
+    const contentRecordDir = path.dirname(path.join(CATALOGUE_JSON_DIR, recordPath))
+    // the url might contain a relative path from record json to the platform json file
+    const platformFile = fs.readFileSync(path.join(contentRecordDir, url));
+    return JSON.parse(platformFile.toString()) as Platform;
+  } catch (e) {
+    console.error(`Could not retrieve platform details for ${url}`, e);
+    return undefined;
+  }
+};
+
 export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
   const jsonsInDir = getServiceRecords();
 
@@ -145,21 +169,28 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
 
       algorithm.type = getAlgorithmType(algorithm);
-
+      let applicationDetails: ApplicationDetails | undefined;
       if (applicationUrl) {
-        const applicationDetails = await fetchApplicationDetails(
+        applicationDetails = await fetchApplicationDetails(
           algorithm.type,
           applicationUrl,
         );
-        data.push({
-          algorithm,
-          applicationDetails,
-        });
-      } else {
-        data.push({
-          algorithm,
-        });
       }
+
+      const platform = algorithm.links.find(
+        (link) => link.rel === "platform",
+      )?.href;
+      let platformDetails: Platform | undefined;
+      if (platform) {
+        platformDetails = await fetchPlatformDetails(platform, file);
+      }
+
+      data.push({
+        algorithm,
+        applicationDetails,
+        platform: platformDetails,
+      });
+
     } catch (_err) {
       console.error(`Could not load data for ${file}`, _err);
     }
