@@ -61,18 +61,24 @@ const getServiceRecords = (): string[] =>
 export const loadCatalogueData = () => {
   const jsonsInDir = getServiceRecords();
 
-  const data: Algorithm[] = [];
+  const data: Omit<Catalogue, 'applicationDetails'>[] = [];
 
-  jsonsInDir.forEach((file) => {
+  jsonsInDir.forEach(async (file) => {
     const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
-    const json: Algorithm = JSON.parse(fileData.toString());
+    const algorithm: Algorithm = JSON.parse(fileData.toString());
 
-    json.type = getAlgorithmType(json);
+    algorithm.type = getAlgorithmType(algorithm);
 
-    const visible = (json.properties?.visibility || "public") === "public";
+    const visible = (algorithm.properties?.visibility || "public") === "public";
+
+    const platformLink = algorithm.links.find((link) => link.rel === "platform");
+    const platform = await fetchPlatformDetails(platformLink?.href || "", file);
 
     if (visible) {
-      data.push(json);
+      data.push({
+        algorithm,
+        platform,
+      });
     }
   });
 

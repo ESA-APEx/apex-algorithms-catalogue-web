@@ -15,7 +15,6 @@ import {
 import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
 import { BenchmarkStatus } from "./BenchmarkStatus";
 import { Spinner } from "./Spinner";
-import type { Algorithm } from "../../types/models/algorithm";
 import {
   MultiSelector,
   MultiSelectorTrigger,
@@ -32,9 +31,10 @@ import type {
 import { getBenchmarkSummary } from "@/lib/api";
 import { getBenchmarkStatus, STATUS_THRESHOLD } from "@/lib/benchmark-status";
 import { isFeatureEnabled } from "@/lib/featureflag";
+import type { Catalogue } from "@/types/models/catalogue";
 
 interface CatalogueListProps {
-  catalogues: Algorithm[];
+  catalogues: Omit<Catalogue, 'applicationDetails'>[];
 }
 
 const sortOptions = [
@@ -63,7 +63,7 @@ interface SearchAndSortFilterParams {
     types: string[];
     benchmarkStatus: string[];
   };
-  catalogues: Algorithm[];
+  catalogues: Catalogue[];
   benchmarkData?: BenchmarkSummary[];
 }
 
@@ -87,7 +87,8 @@ const searchAndSortFilterCatalogues = ({
     });
 
     return catalogues
-      .filter(({ type, properties, id }) => {
+      .filter(({ algorithm }) => {
+        const { type, properties, id } = algorithm;
         const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]
           ? getBenchmarkStatus(benchmarkStatusData[id])
           : "no benchmark";
@@ -132,21 +133,21 @@ const searchAndSortFilterCatalogues = ({
       .sort((a, b) => {
         if (sortBy === "last updated") {
           return (
-            new Date(b.properties.updated).getTime() -
-            new Date(a.properties.updated).getTime()
+            new Date(b.algorithm.properties.updated).getTime() -
+            new Date(a.algorithm.properties.updated).getTime()
           );
         } else if (sortBy === "name") {
-          return b.properties.title.toLowerCase() <
-            a.properties.title.toLowerCase()
+          return b.algorithm.properties.title.toLowerCase() <
+            a.algorithm.properties.title.toLowerCase()
             ? 1
             : -1;
         }
 
-        const benchmarkStatusDataA = benchmarkStatusData[a.id]
-          ? getBenchmarkStatus(benchmarkStatusData[a.id])
+        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id]
+          ? getBenchmarkStatus(benchmarkStatusData[a.algorithm.id])
           : "no benchmark";
-        const benchmarkStatusDataB = benchmarkStatusData[b.id]
-          ? getBenchmarkStatus(benchmarkStatusData[b.id])
+        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id]
+          ? getBenchmarkStatus(benchmarkStatusData[b.algorithm.id])
           : "no benchmark";
 
         return (
@@ -157,18 +158,19 @@ const searchAndSortFilterCatalogues = ({
   return catalogues;
 };
 
-const getCataloguesFilterList = (catalogues: Algorithm[]) => {
+const getCataloguesFilterList = (catalogues: Catalogue[]) => {
   let labels: string[] = [];
   const licenses: string[] = [];
   const types: string[] = [];
 
   for (const catalogue of catalogues) {
+    const { algorithm } = catalogue;
     labels = [
       ...labels,
-      ...catalogue.properties.keywords.map((keyword) => keyword.toLowerCase()),
+      ...algorithm.properties.keywords.map((keyword) => keyword.toLowerCase()),
     ];
-    licenses.push(catalogue.properties.license);
-    types.push(catalogue.type);
+    licenses.push(algorithm.properties.license);
+    types.push(algorithm.type);
   }
 
   return {
@@ -397,13 +399,13 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
           <li key={id} data-testid="apps-item">
             <Card
               key={id}
-              href={`apps/${item.id}`}
-              type={item.type}
-              title={item.properties.title}
-              body={item.properties.description}
-              labels={item.properties.keywords}
+              href={`apps/${item.algorithm.id}`}
+              type={item.algorithm.type}
+              title={item.algorithm.properties.title}
+              body={item.algorithm.properties.description}
+              labels={item.algorithm.properties.keywords}
               thumbnail={
-                item.links.find((link) => link.rel === "thumbnail")?.href
+                item.algorithm.links.find((link) => link.rel === "thumbnail")?.href
               }
             >
               {isBenchmarkStatusEnabled ? (
@@ -411,7 +413,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                   {benchmarkData ? (
                     <BenchmarkStatus
                       key={`status-${id}`}
-                      scenarioId={item.id}
+                      scenarioId={item.algorithm.id}
                       data={benchmarkData}
                     />
                   ) : (
