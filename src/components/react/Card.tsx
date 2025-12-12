@@ -1,6 +1,9 @@
-import * as React from "react";
+import type { BenchmarkSummary } from "@/types/models/benchmark";
+import { BenchmarkStatus } from "./BenchmarkStatus";
+import { Spinner } from "./Spinner";
 
 interface CardProps {
+  id: string;
   title: string;
   type: string;
   body: string;
@@ -9,6 +12,13 @@ interface CardProps {
   labels?: string[];
   children?: React.ReactNode;
   maxDisplayedLabels?: number;
+  platform?: {
+    name: string;
+    logoUrl?: string;
+    website?: string;
+  };
+  benchmarkData?: BenchmarkSummary[];
+  isBenchmarkStatusEnabled?: boolean;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -21,14 +31,18 @@ const truncateBody = (text: string, wordLimit = 20) => {
 };
 
 export const Card = ({
+  id,
   title,
   thumbnail,
   type,
   body,
   href,
   labels,
+  platform,
   children,
   maxDisplayedLabels = 3,
+  benchmarkData = [],
+  isBenchmarkStatusEnabled = false,
 }: CardProps) => {
   const truncatedBody = truncateBody(body);
   const displayedLabels = labels?.slice(0, maxDisplayedLabels);
@@ -42,10 +56,23 @@ export const Card = ({
         <div className="card-thumbnail -mx-4 -mt-3 rounded-t-lg mb-2 bg-gray-200 h-36 overflow-clip">
           <img className="w-full rounded-t-lg" src={imageUrl} alt="thumbnail" />
         </div>
-        <div className="card-header mb-2">
+        <div className="card-header mt-1 mb-2 flex items-center justify-between">
           <span className="text-sm" data-testid="service-type">
             {type}
           </span>
+          {isBenchmarkStatusEnabled ? (
+            <div className="text-brand-teal-80 text-sm">
+              {benchmarkData ? (
+                <BenchmarkStatus
+                  key={`status-${id}`}
+                  scenarioId={id}
+                  data={benchmarkData}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          ) : null}
         </div>
 
         <h2 className="card-title text-lg font-extrabold text-brand-teal-80">
@@ -57,6 +84,17 @@ export const Card = ({
         </p>
 
         {children}
+
+        <div>
+          {platform?.logoUrl && (
+            <div className="inline-flex flex-col gap-1 mt-4">
+              <a href={platform.website} target="_blank" rel="noopener noreferrer" className="bg-brand-teal-80 rounded-md px-3 py-2 flex flex-col">
+                <span className="text-xs text-white mb-1">Powered by</span>
+                <img src={platform.logoUrl} alt={platform.name} className="h-8" />
+              </a>
+            </div>
+          )}
+        </div>
 
         {displayedLabels?.length && (
           <div className="card-labels">

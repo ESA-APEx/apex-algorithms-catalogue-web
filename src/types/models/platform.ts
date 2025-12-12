@@ -12,6 +12,7 @@ export interface Properties {
   updated: string
   type: string
   title: string
+  short_title?: string
   description: string
   keywords: any[]
   language: Language

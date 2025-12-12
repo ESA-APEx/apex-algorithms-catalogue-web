@@ -399,6 +399,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
           <li key={id} data-testid="apps-item">
             <Card
               key={id}
+              id={item.algorithm.id}
               href={`apps/${item.algorithm.id}`}
               type={item.algorithm.type}
               title={item.algorithm.properties.title}
@@ -407,21 +408,14 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               thumbnail={
                 item.algorithm.links.find((link) => link.rel === "thumbnail")?.href
               }
-            >
-              {isBenchmarkStatusEnabled ? (
-                <div className="text-brand-teal-80 text-sm mt-2">
-                  {benchmarkData ? (
-                    <BenchmarkStatus
-                      key={`status-${id}`}
-                      scenarioId={item.algorithm.id}
-                      data={benchmarkData}
-                    />
-                  ) : (
-                    <Spinner />
-                  )}
-                </div>
-              ) : null}
-            </Card>
+              platform={{
+                name: item.platform?.properties?.short_title || item.platform?.properties.title || '',
+                logoUrl: item.platform?.links?.find((link) => link.rel === "logo")?.href,
+                website: item.platform?.links?.find((link) => link.rel === "website")?.href,
+              }} 
+              benchmarkData={benchmarkData}
+              isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}
+            />
           </li>
         ))}
       </ul>
