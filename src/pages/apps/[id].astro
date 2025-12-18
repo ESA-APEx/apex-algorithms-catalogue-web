@@ -396,24 +396,15 @@ const serviceRequestWarning =
             platformDetail && (
               <li>
                 <div class="text-white mb-2">Powered by</div>
-                <div class="flex flex-col gap-2">
-                  {platformDetail.logoUrl && (
-                    <a href={platformDetail.website} target="__blank">
-                      <img
-                        src={platformDetail.logoUrl}
-                        alt={platformDetail.name}
-                        class="h-8 object-contain mb-1"
-                      />
-                    </a>
-                  )}
-                  <a
-                    href={platformDetail.website}
-                    target="__blank"
-                    class="text-sm hover:underline"
-                  >
-                    {platformDetail.name}
+                {platformDetail.logoUrl && (
+                  <a href={platformDetail.website} target="__blank">
+                    <img
+                      src={platformDetail.logoUrl}
+                      alt={platformDetail.name}
+                      class="h-8 object-contain mb-1"
+                    />
                   </a>
-                </div>
+                )}
               </li>
             )
           }
@@ -421,24 +412,15 @@ const serviceRequestWarning =
             providerDetail && (
               <li>
                 <div class="text-white mb-2">Provided by</div>
-                <div class="flex flex-col gap-2">
-                  {providerDetail.logoUrl && (
-                    <a href={providerDetail.website} target="__blank">
-                      <img
-                        src={providerDetail.logoUrl}
-                        alt={providerDetail.name}
-                        class="h-8 object-contain mb-1"
-                      />
-                    </a>
-                  )}
-                  <a
-                    href={providerDetail.website}
-                    target="__blank"
-                    class="text-sm hover:underline"
-                  >
-                    {providerDetail.name}
+                {providerDetail.logoUrl && (
+                  <a href={providerDetail.website} target="__blank">
+                    <img
+                      src={providerDetail.logoUrl}
+                      alt={providerDetail.name}
+                      class="h-8 object-contain mb-1"
+                    />
                   </a>
-                </div>
+                )}
               </li>
             )
           }

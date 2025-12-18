@@ -91,12 +91,12 @@ export const Card = ({
 
         {children}
 
-        <div className="flex gap-4">
+        <div className="flex justify-between">
           {platform?.logoUrl && (
             <div className="mt-4">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Powered by</span>
-                <a href={platform.website} target="_blank" rel="noopener noreferrer" title={platform.name} className="bg-brand-teal-80 rounded-sm px-3 py-2 flex flex-col">
+                <a href={platform.website} target="_blank" rel="noopener noreferrer" title={platform.name} className="rounded-sm flex flex-col">
                   <img src={platform.logoUrl} alt={platform.name} className="h-6" />
                 </a>
               </div>
@@ -106,7 +106,7 @@ export const Card = ({
             <div className="mt-4">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Provided by</span>
-                <a href={provider.website} target="_blank" rel="noopener noreferrer" title={provider.name} className="bg-brand-teal-80 rounded-sm px-3 py-2 flex flex-col">
+                <a href={provider.website} target="_blank" rel="noopener noreferrer" title={provider.name} className="rounded-sm flex flex-col">
                   <img src={provider.logoUrl} alt={provider.name} className="h-6" />
                 </a>
               </div>
