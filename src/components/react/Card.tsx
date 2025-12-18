@@ -17,6 +17,11 @@ interface CardProps {
     logoUrl?: string;
     website?: string;
   };
+  provider?: {
+    name: string;
+    logoUrl?: string;
+    website?: string;
+  };
   benchmarkData?: BenchmarkSummary[];
   isBenchmarkStatusEnabled?: boolean;
 }
@@ -39,6 +44,7 @@ export const Card = ({
   href,
   labels,
   platform,
+  provider,
   children,
   maxDisplayedLabels = 3,
   benchmarkData = [],
@@ -85,13 +91,25 @@ export const Card = ({
 
         {children}
 
-        <div>
+        <div className="flex gap-4">
           {platform?.logoUrl && (
-            <div className="inline-flex flex-col gap-1 mt-4">
-              <a href={platform.website} target="_blank" rel="noopener noreferrer" className="bg-brand-teal-80 rounded-md px-3 py-2 flex flex-col">
-                <span className="text-xs text-white mb-1">Powered by</span>
-                <img src={platform.logoUrl} alt={platform.name} className="h-8" />
-              </a>
+            <div className="mt-4">
+              <div className="inline-flex flex-col gap-1">
+                <span className="text-xs mb-1">Powered by</span>
+                <a href={platform.website} target="_blank" rel="noopener noreferrer" title={platform.name} className="bg-brand-teal-80 rounded-sm px-3 py-2 flex flex-col">
+                  <img src={platform.logoUrl} alt={platform.name} className="h-6" />
+                </a>
+              </div>
+            </div>
+          )}
+          {provider?.logoUrl && (
+            <div className="mt-4">
+              <div className="inline-flex flex-col gap-1">
+                <span className="text-xs mb-1">Provided by</span>
+                <a href={provider.website} target="_blank" rel="noopener noreferrer" title={provider.name} className="bg-brand-teal-80 rounded-sm px-3 py-2 flex flex-col">
+                  <img src={provider.logoUrl} alt={provider.name} className="h-6" />
+                </a>
+              </div>
             </div>
           )}
         </div>

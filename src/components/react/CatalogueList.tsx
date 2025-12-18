@@ -413,6 +413,11 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                 logoUrl: item.platform?.links?.find((link) => link.rel === "logo")?.href,
                 website: item.platform?.links?.find((link) => link.rel === "website")?.href,
               }} 
+              provider={{
+                name: item.provider?.properties?.title || '',
+                logoUrl: item.provider?.links?.find((link) => link.rel === "logo")?.href,
+                website: item.provider?.links?.find((link) => link.rel === "website")?.href,
+              }}
               benchmarkData={benchmarkData}
               isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}
             />

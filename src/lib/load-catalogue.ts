@@ -6,6 +6,7 @@ import { type Algorithm, AlgorithmType } from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
 import type { UDP } from "../types/models/udp";
 import type { ApplicationDetails } from "@/types/models/application.ts";
+import type { Provider } from "@/types/models/provider";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms/algorithm_catalog`;
 
@@ -72,12 +73,17 @@ export const loadCatalogueData = () => {
     const visible = (algorithm.properties?.visibility || "public") === "public";
 
     const platformLink = algorithm.links.find((link) => link.rel === "platform");
-    const platform = await fetchPlatformDetails(platformLink?.href || "", file);
+    const platform = await fetchPlatformProviderDetails(platformLink?.href || "", file) as Platform;
+
+    const providerLink = algorithm.links.find((link) => link.rel === "provider");
+    const provider = await fetchPlatformProviderDetails(providerLink?.href || "", file) as Provider;
+
 
     if (visible) {
       data.push({
         algorithm,
         platform,
+        provider,
       });
     }
   });
@@ -137,25 +143,25 @@ export const fetchApplicationDetails = async (
   }
 };
 
-export const fetchPlatformDetails = async (
+export const fetchPlatformProviderDetails = async (
   url: string,
   recordPath: string,
-): Promise<undefined | Platform> => {
+): Promise<undefined | Platform | Provider> => {
   if (!url) {
     return undefined;
   }
   try {
     if (url.includes('http')) {
-      const platform = (await fetchJson(url)) as Platform;
-      return platform;
+      const details = (await fetchJson(url));
+      return details;
     }
 
     const contentRecordDir = path.dirname(path.join(CATALOGUE_JSON_DIR, recordPath))
-    // the url might contain a relative path from record json to the platform json file
-    const platformFile = fs.readFileSync(path.join(contentRecordDir, url));
-    return JSON.parse(platformFile.toString()) as Platform;
+    // the url might contain a relative path from record json to the platform/provider json file
+    const targetFile = fs.readFileSync(path.join(contentRecordDir, url));
+    return JSON.parse(targetFile.toString());
   } catch (e) {
-    console.error(`Could not retrieve platform details for ${url}`, e);
+    console.error(`Could not retrieve platform/provider details for ${url}`, e);
     return undefined;
   }
 };
@@ -188,13 +194,22 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
       let platformDetails: Platform | undefined;
       if (platform) {
-        platformDetails = await fetchPlatformDetails(platform, file);
+        platformDetails = await fetchPlatformProviderDetails(platform, file) as Platform;
+      }
+
+      const provider = algorithm.links.find(
+        (link) => link.rel === "provider",
+      )?.href;
+      let providerDetails: Provider | undefined;
+      if (provider) {
+        providerDetails = await fetchPlatformProviderDetails(provider, file) as Provider;
       }
 
       data.push({
         algorithm,
         applicationDetails,
         platform: platformDetails,
+        provider: providerDetails,
       });
 
     } catch (_err) {
