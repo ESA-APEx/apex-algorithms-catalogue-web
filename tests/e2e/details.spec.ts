@@ -24,12 +24,12 @@ test.describe("Service Details Test", () => {
     ).toHaveAttribute("href", "https://open-eo.github.io/FuseTS/");
     await expect(
       page.getByRole("link").getByText("Show code repository"),
-    ).toHaveAttribute("href", "https://github.com/Open-EO/FuseTS");
+    ).toHaveAttribute("href", "https://github.com/VITObelgium/openeo_algorithm_catalog");
     await expect(
       page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
       "href",
-      "https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu",
+      "https://editor.openeo.org/?wizard=UDP&wizard~process=mogpr_s1s2&wizard~processUrl=https://raw.githubusercontent.com/VITObelgium/openeo_algorithm_catalog/refs/heads/main/mogpr_s1s2/openeo_udp/mogpr_s1s2.json&server=https://openeofed.dataspace.copernicus.eu",
     );
   });
 
