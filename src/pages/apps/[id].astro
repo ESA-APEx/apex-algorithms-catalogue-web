@@ -110,6 +110,11 @@ const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
 
 const serviceRequestWarning =
   "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
+
+
+const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.cost_unit
+  ? `${algorithm.properties.cost_estimate} ${algorithm.properties.cost_unit}`
+  : "N/A";
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx`}>
@@ -335,8 +340,7 @@ const serviceRequestWarning =
           <li>
             <div class="text-white mb-1">Cost estimation</div>
             <div>
-              {algorithm.properties.cost_estimate}
-              {algorithm.properties.cost_unit}
+              {costEstimate}
             </div>
           </li>
           <li>
