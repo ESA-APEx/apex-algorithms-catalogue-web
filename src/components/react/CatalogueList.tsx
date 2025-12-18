@@ -13,8 +13,6 @@ import {
   SelectValue,
 } from "./Select";
 import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
-import { BenchmarkStatus } from "./BenchmarkStatus";
-import { Spinner } from "./Spinner";
 import {
   MultiSelector,
   MultiSelectorTrigger,
@@ -23,7 +21,7 @@ import {
   MultiSelectorList,
   MultiSelectorItem,
 } from "./MultiSelect";
-import { generateUniqueOptions } from "../../lib/utils";
+import { generateUniqueOptions, getLogoRel } from "../../lib/utils";
 import type {
   BenchmarkStatusKey,
   BenchmarkSummary,
@@ -408,16 +406,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               thumbnail={
                 item.algorithm.links.find((link) => link.rel === "thumbnail")?.href
               }
-              platform={{
-                name: item.platform?.properties?.short_title || item.platform?.properties.title || '',
-                logoUrl: item.platform?.links?.find((link) => link.rel === "logo")?.href,
-                website: item.platform?.links?.find((link) => link.rel === "website")?.href,
-              }} 
-              provider={{
-                name: item.provider?.properties?.title || '',
-                logoUrl: item.provider?.links?.find((link) => link.rel === "logo")?.href,
-                website: item.provider?.links?.find((link) => link.rel === "website")?.href,
-              }}
+              platform={getLogoRel(item.platform, true)} 
+              provider={getLogoRel(item.provider)}
               benchmarkData={benchmarkData}
               isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}
             />

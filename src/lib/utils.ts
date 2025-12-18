@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BASE_PATH } from "@/config";
+import type { Platform } from "@/types/models/platform";
+import type { Provider } from "@/types/models/provider";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -45,4 +47,23 @@ export function formatNumber(value: number | null, decimals: number = 2) {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+}
+
+export function getLogoRel(data: Platform | Provider | undefined, useShortTitle = false) {
+  let details: {
+    name: string;
+    website?: string;
+    logoUrl?: string;
+  } | undefined = undefined;
+
+  if (data) {
+    details = {
+      name: (useShortTitle ? data?.properties?.short_title : data?.properties?.title) || data?.properties?.title || '',
+      website: data?.links?.find((link) => link.rel === "website")?.href,
+      logoUrl: data?.links?.find((link) => link.rel === "logo")?.href,
+    };
+    return details;
+  }
+
+  return details;
 }
