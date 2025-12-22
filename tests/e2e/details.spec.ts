@@ -194,6 +194,46 @@ test.describe("Service Details Test", () => {
       "CWL Definition protected",
     );
   });
+
+  test("Should display powered by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLogo = page.getByTestId("powered-by");
+    await expect(poweredByLogo).toBeVisible();
+
+    await expect(poweredByLogo.getByText("Powered by")).toBeVisible();
+
+    const logoImage = poweredByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should display provided by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const providedByLogo = page.getByTestId("provided-by");
+    await expect(providedByLogo).toBeVisible();
+
+    await expect(providedByLogo.getByText("Provided by")).toBeVisible();
+
+    const logoImage = providedByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should have clickable logo links in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLink = page.getByTestId("powered-by").locator("a");
+    await expect(poweredByLink).toHaveAttribute("href");
+    await expect(poweredByLink).toHaveAttribute("target", "__blank");
+
+    const providedByLink = page.getByTestId("provided-by").locator("a");
+    await expect(providedByLink).toHaveAttribute("href");
+    await expect(providedByLink).toHaveAttribute("target", "__blank");
+  });
 });
 
 test.describe("Notebook Execution Test", () => {

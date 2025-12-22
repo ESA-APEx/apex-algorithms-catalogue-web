@@ -75,4 +75,61 @@ test.describe("Catalog Tests", () => {
         .locator(".."),
     ).toHaveCount(0);
   });
+
+  test("Should display powered by logo in service cards", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
+    const serviceCard = page
+      .getByTestId("service-card")
+      .getByText("ESA worldcereal global crop type detector")
+      .locator("..");
+
+    const poweredByLogo = serviceCard.getByTestId("powered-by");
+    await expect(poweredByLogo).toBeVisible();
+
+    await expect(poweredByLogo.getByText("Powered by")).toBeVisible();
+
+    const logoImage = poweredByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+  });
+
+  test("Should display provided by logo in service cards", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
+    await page
+      .getByRole("textbox", { name: /Search algorithms/i })
+      .fill("worldcereal");
+
+    const serviceCard = page
+      .getByTestId("service-card")
+      .getByText("ESA worldcereal global crop type detector")
+      .locator("..");
+
+    const providedByLogo = serviceCard.getByTestId("provided-by");
+    await expect(providedByLogo).toBeVisible();
+
+    await expect(providedByLogo.getByText("Provided by")).toBeVisible();
+
+    const logoImage = providedByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+  });
+
+  test("Should have clickable logo links in service cards", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
+    const serviceCard = page
+      .getByTestId("service-card")
+      .getByText("ESA worldcereal global crop type detector")
+      .locator("..");
+
+    const poweredByLink = serviceCard.getByTestId("powered-by").locator("a");
+    await expect(poweredByLink).toHaveAttribute("href");
+    await expect(poweredByLink).toHaveAttribute("target", "_blank");
+
+    const providedByLink = serviceCard.getByTestId("provided-by").locator("a");
+    await expect(providedByLink).toHaveAttribute("href");
+    await expect(providedByLink).toHaveAttribute("target", "_blank");
+  });
 });

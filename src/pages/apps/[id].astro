@@ -394,7 +394,7 @@ const serviceRequestWarning =
           </li>
           {
             platformDetail && (
-              <li>
+              <li data-testid="powered-by">
                 <div class="text-white mb-2">Powered by</div>
                 {platformDetail.logoUrl && (
                   <a href={platformDetail.website} target="__blank">
@@ -410,7 +410,7 @@ const serviceRequestWarning =
           }
           {
             providerDetail && (
-              <li>
+              <li data-testid="provided-by">
                 <div class="text-white mb-2">Provided by</div>
                 {providerDetail.logoUrl && (
                   <a href={providerDetail.website} target="__blank">

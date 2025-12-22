@@ -93,7 +93,7 @@ export const Card = ({
 
         <div className="flex justify-between">
           {platform?.logoUrl && (
-            <div className="mt-4">
+            <div className="mt-4" data-testid="powered-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Powered by</span>
                 <a href={platform.website} target="_blank" rel="noopener noreferrer" title={platform.name} className="rounded-sm flex flex-col">
@@ -103,7 +103,7 @@ export const Card = ({
             </div>
           )}
           {provider?.logoUrl && (
-            <div className="mt-4">
+            <div className="mt-4" data-testid="provided-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Provided by</span>
                 <a href={provider.website} target="_blank" rel="noopener noreferrer" title={provider.name} className="rounded-sm flex flex-col">
