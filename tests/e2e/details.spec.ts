@@ -24,7 +24,7 @@ test.describe("Service Details Test", () => {
     ).toHaveAttribute("href", "https://open-eo.github.io/FuseTS/");
     await expect(
       page.getByRole("link").getByText("Show code repository"),
-    ).toHaveAttribute("href", "https://github.com/Open-EO/FuseTS");
+    ).toHaveAttribute("href", "https://github.com/VITObelgium/openeo_algorithm_catalog");
     await expect(
       page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
