@@ -55,6 +55,14 @@ export const Card = ({
   const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
   const imageUrl =
     thumbnail || `${import.meta.env.BASE_URL}images/default-thumbnail.png`;
+  
+  const onClickUrl = (e: React.MouseEvent, url?: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
 
   return (
     <a href={href} data-testid="service-card">
@@ -96,9 +104,9 @@ export const Card = ({
             <div className="mt-4" data-testid="powered-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Powered by</span>
-                <a href={platform.website} target="_blank" rel="noopener noreferrer" title={platform.name} className="rounded-sm flex flex-col">
+                <div title={platform.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, platform.website)}>
                   <img src={platform.logoUrl} alt={platform.name} className="h-6" />
-                </a>
+                </div>
               </div>
             </div>
           )}
@@ -106,9 +114,9 @@ export const Card = ({
             <div className="mt-4" data-testid="provided-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Provided by</span>
-                <a href={provider.website} target="_blank" rel="noopener noreferrer" title={provider.name} className="rounded-sm flex flex-col">
+                <div title={provider.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, provider.website)}>
                   <img src={provider.logoUrl} alt={provider.name} className="h-6" />
-                </a>
+                </div>
               </div>
             </div>
           )}

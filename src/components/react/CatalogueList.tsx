@@ -394,9 +394,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         data-testid="apps"
       >
         {data.map((item, id) => (
-          <li key={id} data-testid="apps-item">
+          <li key={item.algorithm.id} data-testid="apps-item">
             <Card
-              key={id}
+              key={item.algorithm.id}
               id={item.algorithm.id}
               href={`apps/${item.algorithm.id}`}
               type={item.algorithm.type}
