@@ -406,8 +406,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               thumbnail={
                 item.algorithm.links.find((link) => link.rel === "thumbnail")?.href
               }
-              platform={getLogoRel(item.platform, true)} 
-              provider={getLogoRel(item.provider)}
+              platform={getLogoRel(item.platform, { darkLogo: true, useShortTitle: true })} 
+              provider={getLogoRel(item.provider, { darkLogo: true })}
               benchmarkData={benchmarkData}
               isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}
             />

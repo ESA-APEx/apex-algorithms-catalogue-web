@@ -49,7 +49,15 @@ export function formatNumber(value: number | null, decimals: number = 2) {
   });
 }
 
-export function getLogoRel(data: Platform | Provider | undefined, useShortTitle = false) {
+interface LogoRelOptions {
+  darkLogo?: boolean;
+  useShortTitle?: boolean;
+}
+
+export function getLogoRel(data: Platform | Provider | undefined, { darkLogo, useShortTitle }: LogoRelOptions = {
+  darkLogo: false,
+  useShortTitle: false,
+}) {
   let details: {
     name: string;
     website?: string;
@@ -60,7 +68,7 @@ export function getLogoRel(data: Platform | Provider | undefined, useShortTitle 
     details = {
       name: (useShortTitle ? data?.properties?.short_title : data?.properties?.title) || data?.properties?.title || '',
       website: data?.links?.find((link) => link.rel === "website")?.href,
-      logoUrl: data?.links?.find((link) => link.rel === "logo")?.href,
+      logoUrl: data?.links?.find((link) => link.rel === (darkLogo ? "logo-dark" : "logo-light"))?.href,
     };
     return details;
   }
