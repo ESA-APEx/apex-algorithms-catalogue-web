@@ -29,7 +29,7 @@ test.describe("Service Details Test", () => {
       page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
       "href",
-      "https://editor.openeo.org/?wizard=UDP&wizard~process=fusets_mogpr&wizard~processUrl=https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/vito/fusets_mogpr/openeo_udp/fusets_mogpr.json&server=https://openeofed.dataspace.copernicus.eu",
+      "https://editor.openeo.org/?wizard=UDP&wizard~process=mogpr_s1s2&wizard~processUrl=https://raw.githubusercontent.com/VITObelgium/openeo_algorithm_catalog/refs/heads/main/mogpr_s1s2/openeo_udp/mogpr_s1s2.json&server=https://openeofed.dataspace.copernicus.eu",
     );
   });
 
@@ -102,13 +102,13 @@ test.describe("Service Details Test", () => {
   test("Should show parameters in the details page for OpenEO service", async ({
     page,
   }) => {
-    await openService(page, "Multi output gaussian process regression");
+    await openService(page, "Biophysical parameters calculation");
 
     const parametersTable = page.getByTestId("parameters-table");
     await expect(parametersTable).toBeVisible();
 
     const rows = parametersTable.locator("tr");
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(4);
 
     // Check if the first row contains header information
     const headerCells = rows.first().locator("th");
@@ -127,7 +127,8 @@ test.describe("Service Details Test", () => {
     await expect(contentCells.nth(2)).toHaveText("");
   });
 
-  test("Should show parameters in the details page for public OGC API Process service", async ({
+  // Skipped test due to no public OGC API Process service with parameters shown in the details page
+  test.skip("Should show parameters in the details page for public OGC API Process service", async ({
     page,
   }) => {
     // Note: This test is working because the application url is patched for the test.
