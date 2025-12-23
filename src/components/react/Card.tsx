@@ -1,6 +1,9 @@
-import * as React from "react";
+import type { BenchmarkSummary } from "@/types/models/benchmark";
+import { BenchmarkStatus } from "./BenchmarkStatus";
+import { Spinner } from "./Spinner";
 
 interface CardProps {
+  id: string;
   title: string;
   type: string;
   body: string;
@@ -9,6 +12,18 @@ interface CardProps {
   labels?: string[];
   children?: React.ReactNode;
   maxDisplayedLabels?: number;
+  platform?: {
+    name: string;
+    logoUrl?: string;
+    website?: string;
+  };
+  provider?: {
+    name: string;
+    logoUrl?: string;
+    website?: string;
+  };
+  benchmarkData?: BenchmarkSummary[];
+  isBenchmarkStatusEnabled?: boolean;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -21,20 +36,33 @@ const truncateBody = (text: string, wordLimit = 20) => {
 };
 
 export const Card = ({
+  id,
   title,
   thumbnail,
   type,
   body,
   href,
   labels,
+  platform,
+  provider,
   children,
   maxDisplayedLabels = 3,
+  benchmarkData = [],
+  isBenchmarkStatusEnabled = false,
 }: CardProps) => {
   const truncatedBody = truncateBody(body);
   const displayedLabels = labels?.slice(0, maxDisplayedLabels);
   const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
   const imageUrl =
     thumbnail || `${import.meta.env.BASE_URL}images/default-thumbnail.png`;
+  
+  const onClickUrl = (e: React.MouseEvent, url?: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
 
   return (
     <a href={href} data-testid="service-card">
@@ -42,10 +70,23 @@ export const Card = ({
         <div className="card-thumbnail -mx-4 -mt-3 rounded-t-lg mb-2 bg-gray-200 h-36 overflow-clip">
           <img className="w-full rounded-t-lg" src={imageUrl} alt="thumbnail" />
         </div>
-        <div className="card-header mb-2">
+        <div className="card-header mt-1 mb-2 flex items-center justify-between">
           <span className="text-sm" data-testid="service-type">
             {type}
           </span>
+          {isBenchmarkStatusEnabled ? (
+            <div className="text-brand-teal-80 text-sm">
+              {benchmarkData ? (
+                <BenchmarkStatus
+                  key={`status-${id}`}
+                  scenarioId={id}
+                  data={benchmarkData}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
+          ) : null}
         </div>
 
         <h2 className="card-title text-lg font-extrabold text-brand-teal-80">
@@ -57,6 +98,29 @@ export const Card = ({
         </p>
 
         {children}
+
+        <div className="flex justify-between">
+          {platform?.logoUrl && (
+            <div className="mt-4" data-testid="powered-by">
+              <div className="inline-flex flex-col gap-1">
+                <span className="text-xs mb-1">Powered by</span>
+                <div title={platform.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, platform.website)}>
+                  <img src={platform.logoUrl} alt={platform.name} className="h-6" />
+                </div>
+              </div>
+            </div>
+          )}
+          {provider?.logoUrl && (
+            <div className="mt-4" data-testid="provided-by">
+              <div className="inline-flex flex-col gap-1">
+                <span className="text-xs mb-1">Provided by</span>
+                <div title={provider.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, provider.website)}>
+                  <img src={provider.logoUrl} alt={provider.name} className="h-6" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {displayedLabels?.length && (
           <div className="card-labels">

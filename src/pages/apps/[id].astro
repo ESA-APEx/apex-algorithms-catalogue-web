@@ -14,7 +14,7 @@ import Layout from "../../layouts/Layout.astro";
 import Prose from "../../components/Prose.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import { loadCatalogueDetailData } from "../../lib/load-catalogue";
-import { getDate } from "../../lib/utils";
+import { getDate, getLogoRel } from "../../lib/utils";
 import { generateToC } from "../../lib/toc-generator";
 import { CatalogueDetailParametersTable } from "../../components/react/CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "../../components/react/CatalogueCwlDetailParametersTable";
@@ -54,7 +54,7 @@ export const getStaticPaths = (async () => {
   const result = [];
 
   for (const item of data) {
-    const { algorithm, applicationDetails } = item;
+    const { algorithm, applicationDetails, platform, provider } = item;
 
     const description =
       applicationDetails?.description || algorithm.properties.description;
@@ -69,6 +69,8 @@ export const getStaticPaths = (async () => {
         data: {
           algorithm,
           applicationDetails,
+          platform,
+          provider,
         },
         description,
         toc,
@@ -82,7 +84,7 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { data, toc, description } = Astro.props;
-const { applicationDetails, algorithm } = data;
+const { applicationDetails, algorithm, platform, provider } = data;
 
 const UDP_DOCS_URL =
   "https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube";
@@ -107,6 +109,9 @@ const cwlUrl = algorithm.links.find(
 )?.href;
 
 const notebooks = algorithm.links.filter((link) => link.rel === "notebook");
+
+const platformDetail = getLogoRel(platform);
+const providerDetail = getLogoRel(provider);
 
 const serviceRequestWarning =
   "Access to this service requires a valid account and authorization on the platform. Please ensure you have the necessary credentials and permissions, or request access, before attempting to execute this service.";
@@ -391,6 +396,38 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
               }
             </div>
           </li>
+          {
+            platformDetail && (
+              <li data-testid="powered-by">
+                <div class="text-white mb-2">Powered by</div>
+                {platformDetail.logoUrl && (
+                  <a href={platformDetail.website} target="__blank">
+                    <img
+                      src={platformDetail.logoUrl}
+                      alt={platformDetail.name}
+                      class="h-8 object-contain mb-1"
+                    />
+                  </a>
+                )}
+              </li>
+            )
+          }
+          {
+            providerDetail && (
+              <li data-testid="provided-by">
+                <div class="text-white mb-2">Provided by</div>
+                {providerDetail.logoUrl && (
+                  <a href={providerDetail.website} target="__blank">
+                    <img
+                      src={providerDetail.logoUrl}
+                      alt={providerDetail.name}
+                      class="h-8 object-contain mb-1"
+                    />
+                  </a>
+                )}
+              </li>
+            )
+          }
           <li>
             <div class="text-white mb-1">Last updated</div>
             <div>{getDate(algorithm.properties.updated)}</div>

@@ -102,13 +102,13 @@ test.describe("Service Details Test", () => {
   test("Should show parameters in the details page for OpenEO service", async ({
     page,
   }) => {
-    await openService(page, "Multi output gaussian process regression");
+    await openService(page, "ESA worldcereal global crop extent detector");
 
     const parametersTable = page.getByTestId("parameters-table");
     await expect(parametersTable).toBeVisible();
 
     const rows = parametersTable.locator("tr");
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(6);
 
     // Check if the first row contains header information
     const headerCells = rows.first().locator("th");
@@ -122,12 +122,13 @@ test.describe("Service Details Test", () => {
       "spatial_extent (required)",
     );
     await expect(contentCells.nth(1)).toHaveText(
-      "object/bounding-box, object/datacube",
+      "object/bounding-box",
     );
     await expect(contentCells.nth(2)).toHaveText("");
   });
 
-  test("Should show parameters in the details page for public OGC API Process service", async ({
+  // Skipped test due to no public OGC API Process service with parameters shown in the details page
+  test.skip("Should show parameters in the details page for public OGC API Process service", async ({
     page,
   }) => {
     // Note: This test is working because the application url is patched for the test.
@@ -193,6 +194,46 @@ test.describe("Service Details Test", () => {
     await expect(executionLabel.last()).toContainText(
       "CWL Definition protected",
     );
+  });
+
+  test("Should display powered by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLogo = page.getByTestId("powered-by");
+    await expect(poweredByLogo).toBeVisible();
+
+    await expect(poweredByLogo.getByText("Powered by")).toBeVisible();
+
+    const logoImage = poweredByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should display provided by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const providedByLogo = page.getByTestId("provided-by");
+    await expect(providedByLogo).toBeVisible();
+
+    await expect(providedByLogo.getByText("Provided by")).toBeVisible();
+
+    const logoImage = providedByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should have clickable logo links in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLink = page.getByTestId("powered-by").locator("a");
+    await expect(poweredByLink).toHaveAttribute("href");
+    await expect(poweredByLink).toHaveAttribute("target", "__blank");
+
+    const providedByLink = page.getByTestId("provided-by").locator("a");
+    await expect(providedByLink).toHaveAttribute("href");
+    await expect(providedByLink).toHaveAttribute("target", "__blank");
   });
 });
 

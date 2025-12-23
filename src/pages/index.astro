@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { CatalogueList } from "../components/react/CatalogueList.tsx";
 import { loadCatalogueData } from "../lib/load-catalogue.ts";
 
-const data = loadCatalogueData();
+const data = await loadCatalogueData();
 const title = "Algorithm Catalogue";
 
 export const prerender = true;
