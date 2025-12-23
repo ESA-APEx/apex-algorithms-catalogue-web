@@ -1,5 +1,6 @@
 import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { BenchmarkStatus } from "./BenchmarkStatus";
+import { isFeatureEnabled } from "@/lib/featureflag";
 import { Spinner } from "./Spinner";
 
 interface CardProps {
@@ -55,6 +56,7 @@ export const Card = ({
   const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
   const imageUrl =
     thumbnail || `${import.meta.env.BASE_URL}images/default-thumbnail.png`;
+  const isProviderPlatformLogoEnabled = isFeatureEnabled(window.location.href, "providerPlatformLogo");
   
   const onClickUrl = (e: React.MouseEvent, url?: string) => {
     e.preventDefault();
@@ -100,7 +102,7 @@ export const Card = ({
         {children}
 
         <div className="flex justify-between">
-          {platform?.logoUrl && (
+          {platform?.logoUrl && isProviderPlatformLogoEnabled ? (
             <div className="mt-4" data-testid="powered-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Powered by</span>
@@ -109,8 +111,8 @@ export const Card = ({
                 </div>
               </div>
             </div>
-          )}
-          {provider?.logoUrl && (
+          ) : null}
+          {provider?.logoUrl && isProviderPlatformLogoEnabled ? (
             <div className="mt-4" data-testid="provided-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Provided by</span>
@@ -119,7 +121,7 @@ export const Card = ({
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
 
         {displayedLabels?.length && (

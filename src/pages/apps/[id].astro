@@ -397,7 +397,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
             </div>
           </li>
           {
-            platformDetail && (
+            platformDetail && isFeatureEnabled(Astro.url.href, "providerPlatformLogo") ? (
               <li data-testid="powered-by">
                 <div class="text-white mb-2">Powered by</div>
                 {platformDetail.logoUrl && (
@@ -410,10 +410,10 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
                   </a>
                 )}
               </li>
-            )
+            ) : null
           }
           {
-            providerDetail && (
+            providerDetail && isFeatureEnabled(Astro.url.href, "providerPlatformLogo") ? (
               <li data-testid="provided-by">
                 <div class="text-white mb-2">Provided by</div>
                 {providerDetail.logoUrl && (
@@ -426,7 +426,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
                   </a>
                 )}
               </li>
-            )
+            ) : null
           }
           <li>
             <div class="text-white mb-1">Last updated</div>
