@@ -108,7 +108,7 @@ test.describe("Service Details Test", () => {
     await expect(parametersTable).toBeVisible();
 
     const rows = parametersTable.locator("tr");
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(6);
 
     // Check if the first row contains header information
     const headerCells = rows.first().locator("th");
