@@ -6,7 +6,7 @@ test.describe("Catalog Tests", () => {
   });
 
   test("Should render the homepage correctly", async ({ page }) => {
-    await expect(page).toHaveTitle("Algorithm Catalogue | APEx");
+    await expect(page).toHaveTitle("APEx Algorithm Catalogue");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Algorithm Catalogue",
     );
