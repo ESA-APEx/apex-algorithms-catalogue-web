@@ -21,6 +21,7 @@ import { CatalogueCwlDetailParametersTable } from "../../components/react/Catalo
 import { CollapsibleText } from "../../components/react/CollapsibleText";
 import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStatusSideNavItem";
 import { InfoPopover } from "../../components/react/InfoPopover";
+import { PlatformProviderLogos } from "../../components/react/PlatformProviderLogos";
 
 import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
@@ -396,38 +397,11 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
               }
             </div>
           </li>
-          {
-            platformDetail && isFeatureEnabled(Astro.url.href, "providerPlatformLogo") ? (
-              <li data-testid="powered-by">
-                <div class="text-white mb-2">Powered by</div>
-                {platformDetail.logoUrl && (
-                  <a href={platformDetail.website} target="__blank">
-                    <img
-                      src={platformDetail.logoUrl}
-                      alt={platformDetail.name}
-                      class="h-8 object-contain mb-1"
-                    />
-                  </a>
-                )}
-              </li>
-            ) : null
-          }
-          {
-            providerDetail && isFeatureEnabled(Astro.url.href, "providerPlatformLogo") ? (
-              <li data-testid="provided-by">
-                <div class="text-white mb-2">Provided by</div>
-                {providerDetail.logoUrl && (
-                  <a href={providerDetail.website} target="__blank">
-                    <img
-                      src={providerDetail.logoUrl}
-                      alt={providerDetail.name}
-                      class="h-8 object-contain mb-1"
-                    />
-                  </a>
-                )}
-              </li>
-            ) : null
-          }
+          <PlatformProviderLogos
+            platform={platformDetail}
+            provider={providerDetail}
+            client:only="react"
+          />
           <li>
             <div class="text-white mb-1">Last updated</div>
             <div>{getDate(algorithm.properties.updated)}</div>

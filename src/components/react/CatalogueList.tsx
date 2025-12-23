@@ -393,7 +393,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         data-testid="apps"
       >
-        {data.map((item, id) => (
+        {data.map((item) => (
           <li key={item.algorithm.id} data-testid="apps-item">
             <Card
               key={item.algorithm.id}
