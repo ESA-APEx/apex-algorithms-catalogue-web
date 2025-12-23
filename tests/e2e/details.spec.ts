@@ -102,13 +102,13 @@ test.describe("Service Details Test", () => {
   test("Should show parameters in the details page for OpenEO service", async ({
     page,
   }) => {
-    await openService(page, "Biophysical parameters calculation");
+    await openService(page, "ESA worldcereal global crop extent detector");
 
     const parametersTable = page.getByTestId("parameters-table");
     await expect(parametersTable).toBeVisible();
 
     const rows = parametersTable.locator("tr");
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(5);
 
     // Check if the first row contains header information
     const headerCells = rows.first().locator("th");
@@ -122,7 +122,7 @@ test.describe("Service Details Test", () => {
       "spatial_extent (required)",
     );
     await expect(contentCells.nth(1)).toHaveText(
-      "object/bounding-box, object/datacube",
+      "object/bounding-box",
     );
     await expect(contentCells.nth(2)).toHaveText("");
   });
