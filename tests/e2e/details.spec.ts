@@ -70,7 +70,7 @@ test.describe("Service Details Test", () => {
   });
 
   test("Should show benchmark status", async ({ page }) => {
-    await openService(page, "Sentinel-1 statistics");
+    await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await expect(page.getByText("Benchmark status")).toBeVisible();
 
