@@ -8,6 +8,7 @@ declare namespace App {
       username?: string;
       email?: string | null;
       roles?: string[];
+      emailDomain?: string | null;
     };
   }
 }

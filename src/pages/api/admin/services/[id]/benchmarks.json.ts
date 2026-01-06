@@ -5,6 +5,7 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
+import aclMapping from "@/acl-mapping.json";
 
 /**
  * @openapi
@@ -92,13 +93,21 @@ import {
  *       - Benchmark
  *       - Scenario
  */
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params, request, locals }) => {
   const scenario = params.id;
 
   if (!scenario) {
     return new Response(
       JSON.stringify({ message: "Scenario ID is required." }),
       { status: 400, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  // @ts-expect-error
+  if (!aclMapping.records[scenario]?.includes(locals.user?.emailDomain)) {
+    return new Response(
+      JSON.stringify({ message: "Scenario not found." }),
+      { status: 404, headers: { "Content-Type": "application/json" } },
     );
   }
 
