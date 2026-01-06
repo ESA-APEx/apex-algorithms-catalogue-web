@@ -50,7 +50,6 @@ function copyAclMapping() {
   const targetPath = path.resolve("./dist/server/acl-mapping.json");
   const distServerPath = path.dirname(targetPath);
 
-  fs.copyFileSync(sourcePath, targetPath);
   if (!fs.existsSync(distServerPath)) {
     fs.mkdirSync(distServerPath, { recursive: true });
   }
