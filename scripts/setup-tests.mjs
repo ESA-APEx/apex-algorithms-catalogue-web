@@ -45,9 +45,16 @@ function createPrivateAlgorithm() {
 
 function copyAclMapping() {
   console.log("Copying ACL mapping for tests...");
+
   const sourcePath = path.resolve("./src/acl-mapping.json");
   const targetPath = path.resolve("./dist/server/acl-mapping.json");
+  const distServerPath = path.dirname(targetPath);
 
   fs.copyFileSync(sourcePath, targetPath);
+  if (!fs.existsSync(distServerPath)) {
+    fs.mkdirSync(distServerPath, { recursive: true });
+  }
+  fs.copyFileSync(sourcePath, targetPath);
+
   console.log("Copying ACL mapping completed ✅.");
 }
