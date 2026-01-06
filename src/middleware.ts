@@ -6,12 +6,6 @@ import aclMapping from "./acl-mapping.json";
 
 const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
 
-interface AclMapping {
-  acl: {
-    admin: string[];
-  };
-  records: Record<string, string[]>;
-}
 /**
  * Check if the request is for an API endpoint
  */
