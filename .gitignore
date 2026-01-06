@@ -36,3 +36,6 @@ terraform.tfstate.backup
 /blob-report/
 /playwright/.cache/
 /public/versions.csv
+
+# generated files
+acl-mapping.json

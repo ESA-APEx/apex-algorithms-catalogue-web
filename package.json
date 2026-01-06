@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.24.2",
   "scripts": {
-    "setup": "make-dir ./tmp && astro check && npm run download-source",
+    "setup": "make-dir ./tmp && astro check && npm run download-source && npm run generate-acl",
     "dev": "npm run setup && astro dev --force",
     "build": "npm run setup && astro build",
     "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",
@@ -14,7 +14,8 @@
     "test-e2e": "npm run build-test && playwright test",
     "test-e2e-ui": "npm run build-test && playwright test --ui",
     "download-source": "node ./scripts/download-source.mjs",
-    "download-navbar-footer": "node ./scripts/download-navbar-footer.mjs"
+    "download-navbar-footer": "node ./scripts/download-navbar-footer.mjs",
+    "generate-acl": "node ./scripts/generate-acl.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.3",

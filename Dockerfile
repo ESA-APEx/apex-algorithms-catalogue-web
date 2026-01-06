@@ -15,12 +15,12 @@ RUN npm install
 
 FROM build-deps AS build
 COPY . .
-RUN npm run download-source
 RUN BUILD_TARGET=production npm run build
 
 FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/src/acl-mapping.json ./dist/acl-mapping.json
 
 RUN mkdir -p ./tmp
 RUN chown -R node:node ./tmp
