@@ -73,6 +73,7 @@ function extractAclMapping() {
 function getAlgorithmRecordIds(providerDir) {
   try {
     const targetDir = path.join(ALGORITHM_CATALOG_DIR, providerDir);
+
     const records = fs
       .readdirSync(targetDir, { recursive: true })
       .map((file) => file.toString())
@@ -81,13 +82,16 @@ function getAlgorithmRecordIds(providerDir) {
           file.endsWith(".json") &&
           (file.includes("/records/") || file.includes("\\records\\")), // support linux and windows based path
       );
+
     const recordIds = [];
+
     for (const recordFile of records) {
       const recordPath = path.join(targetDir, recordFile);
       const recordContent = fs.readFileSync(recordPath, "utf-8");
       const recordJson = JSON.parse(recordContent);
       recordIds.push(recordJson.id);
     }
+
     return recordIds;
   } catch (error) {
     console.error(
