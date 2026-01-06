@@ -2,9 +2,16 @@ import { defineMiddleware } from "astro/middleware";
 import { getSession } from "auth-astro/server";
 import { config as authConfig } from "../auth.config";
 import { isFeatureEnabled } from "./lib/featureflag";
+import aclMapping from "./acl-mapping.json";
 
 const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
 
+interface AclMapping {
+  acl: {
+    admin: string[];
+  };
+  records: Record<string, string[]>;
+}
 /**
  * Check if the request is for an API endpoint
  */
@@ -58,8 +65,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
           roles: session.user.roles || [],
         };
 
-        // TODO: allow for more generic role
-        if (context.locals.user.roles?.includes("administrator")) {
+        const emailDomain = `@${context.locals.user.email?.split("@").pop()}`;
+        if (context.locals.user.roles?.includes("administrator") || aclMapping.acl.admin.includes(emailDomain)) {
           return next();
         }
 
