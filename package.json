@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.24.2",
   "scripts": {
-    "setup": "make-dir ./tmp && astro check && npm run download-source && npm run generate-acl",
+    "setup": "make-dir ./tmp && npm run download-source && npm run generate-acl && astro check",
     "dev": "npm run setup && astro dev --force",
     "build": "npm run setup && astro build",
     "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",

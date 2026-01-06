@@ -3,6 +3,7 @@ import path from "path";
 
 modifySarCoinJson();
 createPrivateAlgorithm();
+copyAclMapping();
 
 function modifySarCoinJson() {
   console.log("Modifying sar_coin.json...");
@@ -40,4 +41,19 @@ function createPrivateAlgorithm() {
 
   fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), "utf-8");
   console.log("Creation of private algorithm complete ✅.");
+}
+
+function copyAclMapping() {
+  console.log("Copying ACL mapping for tests...");
+
+  const sourcePath = path.resolve("./src/acl-mapping.json");
+  const targetPath = path.resolve("./dist/server/acl-mapping.json");
+  const distServerPath = path.dirname(targetPath);
+
+  if (!fs.existsSync(distServerPath)) {
+    fs.mkdirSync(distServerPath, { recursive: true });
+  }
+  fs.copyFileSync(sourcePath, targetPath);
+
+  console.log("Copying ACL mapping completed ✅.");
 }

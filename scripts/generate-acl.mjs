@@ -18,7 +18,12 @@ function main() {
 
 
 function extractAclMapping() {
-  const aclMapping = {};
+  const aclMapping = {
+    acl: {
+      admin: [],
+    },
+    records: {}
+  };
 
   try {
     const providers = fs.readdirSync(ALGORITHM_CATALOG_DIR, { withFileTypes: true });
@@ -41,13 +46,14 @@ function extractAclMapping() {
         const acl = providerRecord?.properties?.acl;
 
         if (acl && Array.isArray(acl.admin)) {
+          aclMapping.acl.admin = [...aclMapping.acl.admin, ...acl.admin];
           const recordIds = getAlgorithmRecordIds(provider.name);
           // Assign each algorithm record id with the provider ACL
           for (const recordId of recordIds) {
-            if (aclMapping[recordId]) {
-              aclMapping[recordId] = [...aclMapping[recordId], ...acl.admin];
+            if (aclMapping.records[recordId]) {
+              aclMapping.records[recordId] = [...aclMapping.records[recordId], ...acl.admin];
             } else {
-              aclMapping[recordId] = acl.admin;
+              aclMapping.records[recordId] = acl.admin;
             }
           }
         } else {
