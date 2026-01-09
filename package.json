@@ -1,7 +1,7 @@
 {
   "name": "apex-algorithms-catalogue-web",
-  "type": "module",
   "version": "0.24.2",
+  "type": "module",
   "scripts": {
     "setup": "make-dir ./tmp && npm run download-source && npm run generate-acl && astro check",
     "dev": "npm run setup && astro dev --force",
@@ -9,6 +9,8 @@
     "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "test": "npm run test-unit && npm run test-e2e",
     "test-unit": "vitest run",
     "test-e2e": "npm run build-test && playwright test",
@@ -64,21 +66,24 @@
     "@types/react-dom": "^18.3.0",
     "@types/react-stickynode": "^4.0.3",
     "cheerio": "^1.0.0",
+    "lint-staged": "^16.2.7",
     "make-dir-cli": "^4.0.0",
-    "prettier": "3.6.2",
-    "prettier-plugin-astro": "0.14.1",
+    "oxfmt": "^0.23.0",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
     "unzipper": "^0.12.3",
     "vitest": "^3.0.7"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.21.3"
+  },
+  "lint-staged": {
+    "*": "oxfmt --no-error-on-unmatched-pattern"
   },
   "engines": {
     "node": "20.x"
   },
   "volta": {
     "node": "20.17.0"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.21.3"
   }
 }

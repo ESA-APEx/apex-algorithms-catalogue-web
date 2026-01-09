@@ -28,7 +28,7 @@ const config = {
   },
   staging: {
     SITE_URL: process.env.PUBLIC_STAGING_BASE_URL,
-    BASE_PATH: "/"
+    BASE_PATH: "/",
   },
   production: {
     SITE_URL: process.env.PUBLIC_PRODUCTION_BASE_URL,
@@ -51,7 +51,7 @@ export default defineConfig({
   },
   redirects: {
     "/dashboard/scenarios": "/dashboard",
-    "/apps": "/"
+    "/apps": "/",
   },
   integrations: [
     auth(),
