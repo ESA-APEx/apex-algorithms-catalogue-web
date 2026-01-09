@@ -11,14 +11,14 @@ export const featureflag: Record<any, any> = {
     cwlParameterDetail: false,
     jupyterLiteIntegration: false,
     basicAuth: true,
-    providerPlatformLogo: false,
+    providerPlatformLogo: true,
   },
   preview: {
     benchmarkStatus: false,
     cwlParameterDetail: false,
     jupyterLiteIntegration: true,
     basicAuth: true,
-    providerPlatformLogo: false,
+    providerPlatformLogo: true,
   },
   default: {
     benchmarkStatus: true,

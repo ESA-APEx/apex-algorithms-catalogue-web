@@ -1,48 +1,47 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-const ALGORITHM_CATALOG_DIR = 'contents/apex_algorithms/algorithm_catalog';
-const OUTPUT_FILE = 'src/acl-mapping.json';
+const ALGORITHM_CATALOG_DIR = "contents/apex_algorithms/algorithm_catalog";
+const OUTPUT_FILE = "src/acl-mapping.json";
 
 main();
 
 function main() {
-  console.log('Extracting ACL mappings from provider records...');
+  console.log("Extracting ACL mappings from provider records...");
 
   const aclMapping = extractAclMapping();
 
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(aclMapping, null, 2), 'utf-8');
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(aclMapping, null, 2), "utf-8");
 
-  console.log(`ACL mapping generated successfully! Output file: ${OUTPUT_FILE}`);
+  console.log(
+    `ACL mapping generated successfully! Output file: ${OUTPUT_FILE}`,
+  );
 }
-
 
 function extractAclMapping() {
   const aclMapping = {
     acl: {
       admin: [],
     },
-    records: {}
+    records: {},
   };
 
   try {
-    const providers = fs.readdirSync(ALGORITHM_CATALOG_DIR, { withFileTypes: true });
+    const providers = fs.readdirSync(ALGORITHM_CATALOG_DIR, {
+      withFileTypes: true,
+    });
 
     for (const provider of providers) {
       if (!provider.isDirectory()) {
         continue;
       }
-      const providerDir = path.join(
-        ALGORITHM_CATALOG_DIR,
-        provider.name,
-      );
-      const providerRecordPath = path.join(
-        providerDir,
-        'record.json'
-      );
+      const providerDir = path.join(ALGORITHM_CATALOG_DIR, provider.name);
+      const providerRecordPath = path.join(providerDir, "record.json");
 
       try {
-        const providerRecord = JSON.parse(fs.readFileSync(providerRecordPath, 'utf-8'));
+        const providerRecord = JSON.parse(
+          fs.readFileSync(providerRecordPath, "utf-8"),
+        );
         const acl = providerRecord?.properties?.acl;
 
         if (acl && Array.isArray(acl.admin)) {
@@ -51,27 +50,28 @@ function extractAclMapping() {
           // Assign each algorithm record id with the provider ACL
           for (const recordId of recordIds) {
             if (aclMapping.records[recordId]) {
-              aclMapping.records[recordId] = [...aclMapping.records[recordId], ...acl.admin];
+              aclMapping.records[recordId] = [
+                ...aclMapping.records[recordId],
+                ...acl.admin,
+              ];
             } else {
               aclMapping.records[recordId] = acl.admin;
             }
           }
         } else {
-          console.warn(
-            `Warning: No ACL found for provider ${provider.name}`
-          );
+          console.warn(`Warning: No ACL found for provider ${provider.name}`);
         }
       } catch (error) {
         console.error(
           `Error reading record.json for provider ${provider.name}:`,
-          error.message
+          error.message,
         );
       }
     }
 
     return aclMapping;
   } catch (error) {
-    console.error('Error reading algorithm catalog directory:', error.message);
+    console.error("Error reading algorithm catalog directory:", error.message);
     throw error;
   }
 }
@@ -102,7 +102,7 @@ function getAlgorithmRecordIds(providerDir) {
   } catch (error) {
     console.error(
       `Error reading records for provider ${providerDir}:`,
-      error.message
+      error.message,
     );
     return [];
   }

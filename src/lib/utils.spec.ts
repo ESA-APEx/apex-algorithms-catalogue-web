@@ -77,7 +77,7 @@ describe("Utility Functions", () => {
       expect(linkTo("", "")).toBe("/");
       expect(linkTo("", "/custom")).toBe("/custom/");
       expect(linkTo("services", "/custom")).toBe("/custom/services");
-    })
+    });
   });
 
   describe("generateUniqueOptions (Unique Array Mapper)", () => {

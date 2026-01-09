@@ -62,7 +62,7 @@ const getServiceRecords = (): string[] =>
 export const loadCatalogueData = () => {
   const jsonsInDir = getServiceRecords();
 
-  const data: Omit<Catalogue, 'applicationDetails'>[] = [];
+  const data: Omit<Catalogue, "applicationDetails">[] = [];
 
   jsonsInDir.forEach(async (file) => {
     const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
@@ -72,12 +72,21 @@ export const loadCatalogueData = () => {
 
     const visible = (algorithm.properties?.visibility || "public") === "public";
 
-    const platformLink = algorithm.links.find((link) => link.rel === "platform");
-    const platform = await fetchPlatformProviderDetails(platformLink?.href || "", file) as Platform;
+    const platformLink = algorithm.links.find(
+      (link) => link.rel === "platform",
+    );
+    const platform = (await fetchPlatformProviderDetails(
+      platformLink?.href || "",
+      file,
+    )) as Platform;
 
-    const providerLink = algorithm.links.find((link) => link.rel === "provider");
-    const provider = await fetchPlatformProviderDetails(providerLink?.href || "", file) as Provider;
-
+    const providerLink = algorithm.links.find(
+      (link) => link.rel === "provider",
+    );
+    const provider = (await fetchPlatformProviderDetails(
+      providerLink?.href || "",
+      file,
+    )) as Provider;
 
     if (visible) {
       data.push({
@@ -151,12 +160,14 @@ export const fetchPlatformProviderDetails = async (
     return undefined;
   }
   try {
-    if (url.includes('http')) {
-      const details = (await fetchJson(url));
+    if (url.includes("http")) {
+      const details = await fetchJson(url);
       return details;
     }
 
-    const contentRecordDir = path.dirname(path.join(CATALOGUE_JSON_DIR, recordPath))
+    const contentRecordDir = path.dirname(
+      path.join(CATALOGUE_JSON_DIR, recordPath),
+    );
     // the url might contain a relative path from record json to the platform/provider json file
     const targetFile = fs.readFileSync(path.join(contentRecordDir, url));
     return JSON.parse(targetFile.toString());
@@ -194,7 +205,10 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
       let platformDetails: Platform | undefined;
       if (platform) {
-        platformDetails = await fetchPlatformProviderDetails(platform, file) as Platform;
+        platformDetails = (await fetchPlatformProviderDetails(
+          platform,
+          file,
+        )) as Platform;
       }
 
       const provider = algorithm.links.find(
@@ -202,7 +216,10 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
       let providerDetails: Provider | undefined;
       if (provider) {
-        providerDetails = await fetchPlatformProviderDetails(provider, file) as Provider;
+        providerDetails = (await fetchPlatformProviderDetails(
+          provider,
+          file,
+        )) as Provider;
       }
 
       data.push({
@@ -211,7 +228,6 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
         platform: platformDetails,
         provider: providerDetails,
       });
-
     } catch (_err) {
       console.error(`Could not load data for ${file}`, _err);
     }

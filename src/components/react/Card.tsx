@@ -56,15 +56,18 @@ export const Card = ({
   const hiddenLabels = labels?.slice(maxDisplayedLabels - 1);
   const imageUrl =
     thumbnail || `${import.meta.env.BASE_URL}images/default-thumbnail.png`;
-  const isProviderPlatformLogoEnabled = isFeatureEnabled(window.location.href, "providerPlatformLogo");
-  
+  const isProviderPlatformLogoEnabled = isFeatureEnabled(
+    window.location.href,
+    "providerPlatformLogo",
+  );
+
   const onClickUrl = (e: React.MouseEvent, url?: string) => {
     e.preventDefault();
     e.stopPropagation();
     if (url) {
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     }
-  }
+  };
 
   return (
     <a href={href} data-testid="service-card">
@@ -106,8 +109,16 @@ export const Card = ({
             <div className="mt-4" data-testid="powered-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Powered by</span>
-                <div title={platform.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, platform.website)}>
-                  <img src={platform.logoUrl} alt={platform.name} className="h-6" />
+                <div
+                  title={platform.name}
+                  className="rounded-sm flex flex-col"
+                  onClick={(e) => onClickUrl(e, platform.website)}
+                >
+                  <img
+                    src={platform.logoUrl}
+                    alt={platform.name}
+                    className="h-6"
+                  />
                 </div>
               </div>
             </div>
@@ -116,8 +127,16 @@ export const Card = ({
             <div className="mt-4" data-testid="provided-by">
               <div className="inline-flex flex-col gap-1">
                 <span className="text-xs mb-1">Provided by</span>
-                <div title={provider.name} className="rounded-sm flex flex-col" onClick={(e) => onClickUrl(e, provider.website)}>
-                  <img src={provider.logoUrl} alt={provider.name} className="h-6" />
+                <div
+                  title={provider.name}
+                  className="rounded-sm flex flex-col"
+                  onClick={(e) => onClickUrl(e, provider.website)}
+                >
+                  <img
+                    src={provider.logoUrl}
+                    alt={provider.name}
+                    className="h-6"
+                  />
                 </div>
               </div>
             </div>

@@ -33,7 +33,7 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
       // @ts-ignore
       callbackUrl: callbackUrl.href,
     });
-  }
+  };
 
   return (
     <div className="flex">
