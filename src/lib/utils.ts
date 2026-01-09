@@ -54,21 +54,33 @@ interface LogoRelOptions {
   useShortTitle?: boolean;
 }
 
-export function getLogoRel(data: Platform | Provider | undefined, { darkLogo, useShortTitle }: LogoRelOptions = {
-  darkLogo: false,
-  useShortTitle: false,
-}) {
-  let details: {
-    name: string;
-    website?: string;
-    logoUrl?: string;
-  } | undefined = undefined;
+export function getLogoRel(
+  data: Platform | Provider | undefined,
+  { darkLogo, useShortTitle }: LogoRelOptions = {
+    darkLogo: false,
+    useShortTitle: false,
+  },
+) {
+  let details:
+    | {
+        name: string;
+        website?: string;
+        logoUrl?: string;
+      }
+    | undefined = undefined;
 
   if (data) {
     details = {
-      name: (useShortTitle ? data?.properties?.short_title : data?.properties?.title) || data?.properties?.title || '',
+      name:
+        (useShortTitle
+          ? data?.properties?.short_title
+          : data?.properties?.title) ||
+        data?.properties?.title ||
+        "",
       website: data?.links?.find((link) => link.rel === "website")?.href,
-      logoUrl: data?.links?.find((link) => link.rel === (darkLogo ? "logo-dark" : "logo-light"))?.href,
+      logoUrl: data?.links?.find(
+        (link) => link.rel === (darkLogo ? "logo-dark" : "logo-light"),
+      )?.href,
     };
     return details;
   }

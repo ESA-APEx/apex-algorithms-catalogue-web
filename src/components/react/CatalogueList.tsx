@@ -32,7 +32,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
 import type { Catalogue } from "@/types/models/catalogue";
 
 interface CatalogueListProps {
-  catalogues: Omit<Catalogue, 'applicationDetails'>[];
+  catalogues: Omit<Catalogue, "applicationDetails">[];
 }
 
 const sortOptions = [
@@ -404,9 +404,13 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               body={item.algorithm.properties.description}
               labels={item.algorithm.properties.keywords}
               thumbnail={
-                item.algorithm.links.find((link) => link.rel === "thumbnail")?.href
+                item.algorithm.links.find((link) => link.rel === "thumbnail")
+                  ?.href
               }
-              platform={getLogoRel(item.platform, { darkLogo: true, useShortTitle: true })} 
+              platform={getLogoRel(item.platform, {
+                darkLogo: true,
+                useShortTitle: true,
+              })}
               provider={getLogoRel(item.provider, { darkLogo: true })}
               benchmarkData={benchmarkData}
               isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}

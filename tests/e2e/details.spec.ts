@@ -24,7 +24,10 @@ test.describe("Service Details Test", () => {
     ).toHaveAttribute("href", "https://open-eo.github.io/FuseTS/");
     await expect(
       page.getByRole("link").getByText("Show code repository"),
-    ).toHaveAttribute("href", "https://github.com/VITObelgium/openeo_algorithm_catalog");
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/VITObelgium/openeo_algorithm_catalog",
+    );
     await expect(
       page.getByRole("link").getByText("Execute service"),
     ).toHaveAttribute(
@@ -121,9 +124,7 @@ test.describe("Service Details Test", () => {
     await expect(contentCells.nth(0)).toContainText(
       "spatial_extent (required)",
     );
-    await expect(contentCells.nth(1)).toHaveText(
-      "object/bounding-box",
-    );
+    await expect(contentCells.nth(1)).toHaveText("object/bounding-box");
     await expect(contentCells.nth(2)).toHaveText("");
   });
 

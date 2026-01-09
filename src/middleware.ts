@@ -60,7 +60,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
         };
 
         const emailDomain = `@${context.locals.user.email?.split("@").pop()}`;
-        if (context.locals.user.roles?.includes("administrator") || aclMapping.acl.admin.includes(emailDomain)) {
+        if (
+          context.locals.user.roles?.includes("administrator") ||
+          aclMapping.acl.admin.includes(emailDomain)
+        ) {
           return next();
         }
 
