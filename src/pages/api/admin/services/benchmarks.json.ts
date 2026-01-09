@@ -5,6 +5,7 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
+import aclMapping from "@/acl-mapping.json";
 
 /**
  * @openapi
@@ -71,7 +72,7 @@ import {
  *       - Admin
  *       - Benchmark
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
     const urlResponse = await getUrlsFromRequest(request);
     if (urlResponse instanceof Response) {
@@ -102,7 +103,11 @@ export const GET: APIRoute = async ({ request }) => {
       ORDER BY "scenario_id";
     `;
 
-    const data = (await executeQuery(query)) as BenchmarkSummary[];
+    let data = (await executeQuery(query)) as BenchmarkSummary[];
+    data = data.filter((benchmark) => {
+      // @ts-expect-error
+      return aclMapping.records[benchmark.scenario_id]?.includes(locals.user?.emailDomain)
+    });
 
     return Response.json(data);
   } catch (error) {
