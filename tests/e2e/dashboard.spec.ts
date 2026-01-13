@@ -19,9 +19,12 @@ test.describe("Dashboard Page Tests", () => {
     test("Should allow access with correct basic auth credentials", async ({
       page,
     }) => {
-      const response = await page.goto("/dashboard", {
-        waitUntil: "networkidle",
-      });
+      const response = await page.goto(
+        "/dashboard?start=2025-09-01&end=2025-11-30",
+        {
+          waitUntil: "networkidle",
+        },
+      );
       expect(response?.status()).toBe(200);
 
       await expect(page).toHaveURL(/dashboard/);
@@ -31,7 +34,9 @@ test.describe("Dashboard Page Tests", () => {
 
   test.describe("Dashboard Content", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard", { waitUntil: "networkidle" });
+      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+        waitUntil: "networkidle",
+      });
     });
 
     test("Should display the dashboard with benchmark table", async ({
@@ -130,7 +135,9 @@ test.describe("Dashboard Page Tests", () => {
 
   test.describe("Table Functionality", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard", { waitUntil: "networkidle" });
+      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+        waitUntil: "networkidle",
+      });
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
         timeout: 15000,
@@ -200,6 +207,86 @@ test.describe("Dashboard Page Tests", () => {
           firstStatusCell.locator("text=/\\(\\d+\\.?\\d*%\\)/"),
         ).toBeVisible();
       }
+    });
+  });
+
+  test.describe("Benchmark Detail Navigation", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+        waitUntil: "networkidle",
+      });
+      await page.waitForSelector('[data-testid="spinner"]', {
+        state: "hidden",
+        timeout: 15000,
+      });
+    });
+
+    test("Should navigate to benchmark detail page with correct query params when clicking table row", async ({
+      page,
+    }) => {
+      await page.waitForSelector("table tbody tr", { timeout: 10000 });
+
+      const tableRows = page.locator("tbody tr");
+      const rowCount = await tableRows.count();
+      expect(rowCount).toBeGreaterThan(0);
+
+      if (rowCount > 0) {
+        const firstRow = tableRows.first();
+        const scenarioId = await firstRow
+          .locator("td:first-child")
+          .textContent();
+        expect(scenarioId).toBeTruthy();
+
+        await firstRow.click();
+
+        await page.waitForURL(/\/dashboard\/scenarios\/.*/, { timeout: 10000 });
+
+        const currentUrl = new URL(page.url());
+
+        expect(currentUrl.pathname).toMatch(/^\/dashboard\/scenarios\/.+/);
+        expect(currentUrl.pathname).toContain(scenarioId?.trim());
+
+        expect(currentUrl.searchParams.get("start")).toBe("2025-09-01");
+        expect(currentUrl.searchParams.get("end")).toBe("2025-11-30");
+      }
+    });
+
+    test("Should preserve custom date filters in navigation to detail page", async ({
+      page,
+    }) => {
+      const startDateInput = page.getByLabel("From");
+      const endDateInput = page.getByLabel("To");
+      const applyButton = page.getByRole("button", { name: "Apply" });
+
+      await startDateInput.fill("2025-08-01");
+      await endDateInput.fill("2025-10-31");
+      await applyButton.click();
+
+      await page.waitForSelector('[data-testid="spinner"]', {
+        state: "hidden",
+        timeout: 15000,
+      });
+
+      let currentUrl = new URL(page.url());
+      expect(currentUrl.searchParams.get("start")).toBe("2025-08-01");
+      expect(currentUrl.searchParams.get("end")).toBe("2025-10-31");
+
+      await page.waitForSelector("table tbody tr", { timeout: 10000 });
+
+      const tableRows = page.locator("tbody tr");
+
+      const firstRow = tableRows.first();
+      const scenarioId = await firstRow.locator("td:first-child").textContent();
+
+      await firstRow.click();
+
+      await page.waitForURL(/\/dashboard\/scenarios\/.*/, { timeout: 10000 });
+
+      currentUrl = new URL(page.url());
+
+      expect(currentUrl.searchParams.get("start")).toBe("2025-08-01");
+      expect(currentUrl.searchParams.get("end")).toBe("2025-10-31");
+      expect(currentUrl.pathname).toContain(scenarioId?.trim());
     });
   });
 });

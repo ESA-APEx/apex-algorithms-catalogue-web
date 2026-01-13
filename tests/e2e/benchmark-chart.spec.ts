@@ -19,9 +19,12 @@ test.describe("Benchmark Chart Tests", () => {
 
   test.describe("Page Structure and Navigation", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/dashboard/scenarios/${TEST_SCENARIO_ID}`, {
-        waitUntil: "networkidle",
-      });
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
     });
 
     test("Should display title", async ({ page }) => {
@@ -39,9 +42,12 @@ test.describe("Benchmark Chart Tests", () => {
 
   test.describe("Benchmark Statistics Display", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/dashboard/scenarios/${TEST_SCENARIO_ID}`, {
-        waitUntil: "networkidle",
-      });
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
         timeout: 15000,
@@ -71,9 +77,12 @@ test.describe("Benchmark Chart Tests", () => {
 
   test.describe("Metrics Table Display", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/dashboard/scenarios/${TEST_SCENARIO_ID}`, {
-        waitUntil: "networkidle",
-      });
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
         timeout: 15000,
@@ -100,9 +109,12 @@ test.describe("Benchmark Chart Tests", () => {
 
   test.describe("Charts Display", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/dashboard/scenarios/${TEST_SCENARIO_ID}`, {
-        waitUntil: "networkidle",
-      });
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
         timeout: 15000,
