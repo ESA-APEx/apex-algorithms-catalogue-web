@@ -10,6 +10,9 @@ const setupBasicAuth = async (page: Page) => {
   });
 };
 
+// NOTE: These dates should correspond to available fixture files
+const DEFAULT_QUERY_PARAMS = "?start=2025-09-01&end=2025-11-30";
+
 test.describe("Dashboard Page Tests", () => {
   test.beforeEach(async ({ page }) => {
     await setupBasicAuth(page);
@@ -19,12 +22,9 @@ test.describe("Dashboard Page Tests", () => {
     test("Should allow access with correct basic auth credentials", async ({
       page,
     }) => {
-      const response = await page.goto(
-        "/dashboard?start=2025-09-01&end=2025-11-30",
-        {
-          waitUntil: "networkidle",
-        },
-      );
+      const response = await page.goto(`/dashboard${DEFAULT_QUERY_PARAMS}`, {
+        waitUntil: "networkidle",
+      });
       expect(response?.status()).toBe(200);
 
       await expect(page).toHaveURL(/dashboard/);
@@ -34,7 +34,7 @@ test.describe("Dashboard Page Tests", () => {
 
   test.describe("Dashboard Content", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+      await page.goto(`/dashboard${DEFAULT_QUERY_PARAMS}`, {
         waitUntil: "networkidle",
       });
     });
@@ -50,13 +50,10 @@ test.describe("Dashboard Page Tests", () => {
       await expect(page.getByLabel("To")).toBeVisible();
       await expect(page.getByRole("button", { name: "Apply" })).toBeVisible();
 
-      await page.waitForSelector("table", { timeout: 10000 });
       await expect(page.locator("table")).toBeVisible();
     });
 
     test("Should display table headers correctly", async ({ page }) => {
-      await page.waitForSelector("th", { timeout: 10000 });
-
       await expect(page.getByText("Scenario ID")).toBeVisible();
       await expect(page.getByText("Total Runs")).toBeVisible();
       await expect(page.getByText("Success")).toBeVisible();
@@ -68,7 +65,6 @@ test.describe("Dashboard Page Tests", () => {
     test("Should load and display benchmark data", async ({ page }) => {
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
 
       const tableRows = page.locator("tbody tr");
@@ -90,63 +86,49 @@ test.describe("Dashboard Page Tests", () => {
 
   test.describe("Date Filtering", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard", { waitUntil: "networkidle" });
+      await page.goto(`/dashboard${DEFAULT_QUERY_PARAMS}`, {
+        waitUntil: "networkidle",
+      });
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
     test("Should allow setting date filters", async ({ page }) => {
       const startDateInput = page.getByLabel("From");
       const endDateInput = page.getByLabel("To");
+
+      await expect(startDateInput).toHaveValue("2025-09-01");
+      await expect(endDateInput).toHaveValue("2025-11-30");
+
       const applyButton = page.getByRole("button", { name: "Apply" });
 
-      await startDateInput.fill("2024-01-01");
-      await endDateInput.fill("2024-12-31");
+      await startDateInput.fill("2025-08-01");
+      await endDateInput.fill("2025-10-31");
 
       await applyButton.click();
 
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
 
       const url = new URL(page.url());
-      expect(url.searchParams.get("start")).toBe("2024-01-01");
-      expect(url.searchParams.get("end")).toBe("2024-12-31");
-    });
-
-    test("Should preserve date filters in URL", async ({ page }) => {
-      await page.goto("/dashboard?start=2024-06-01&end=2024-06-30");
-
-      await page.waitForSelector('[data-testid="spinner"]', {
-        state: "hidden",
-        timeout: 15000,
-      });
-
-      const startDateInput = page.getByLabel("From");
-      const endDateInput = page.getByLabel("To");
-
-      await expect(startDateInput).toHaveValue("2024-06-01");
-      await expect(endDateInput).toHaveValue("2024-06-30");
+      expect(url.searchParams.get("start")).toBe("2025-08-01");
+      expect(url.searchParams.get("end")).toBe("2025-10-31");
     });
   });
 
   test.describe("Table Functionality", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+      await page.goto(`/dashboard${DEFAULT_QUERY_PARAMS}`, {
         waitUntil: "networkidle",
       });
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
     test("Should support column sorting", async ({ page }) => {
-      await page.waitForSelector("table tbody tr", { timeout: 10000 });
-
       const sortableHeaders = page
         .locator("th")
         .filter({ hasText: /Scenario ID|Total Runs|Success|Failed|Last Test/ });
@@ -155,15 +137,13 @@ test.describe("Dashboard Page Tests", () => {
       if (headerCount > 0) {
         await sortableHeaders.first().click();
 
-        await expect(page.locator("th").filter({ hasText: /▴|▾/ })).toBeVisible(
-          { timeout: 5000 },
-        );
+        await expect(
+          page.locator("th").filter({ hasText: /▴|▾/ }),
+        ).toBeVisible();
       }
     });
 
     test("Should support filtering by scenario ID", async ({ page }) => {
-      await page.waitForSelector("table tbody tr", { timeout: 10000 });
-
       const firstScenarioId = await page
         .locator("tbody tr:first-child td:first-child")
         .textContent();
@@ -192,8 +172,6 @@ test.describe("Dashboard Page Tests", () => {
     });
 
     test("Should display benchmark status badges", async ({ page }) => {
-      await page.waitForSelector("table tbody tr", { timeout: 10000 });
-
       const statusCells = page.locator("tbody tr td:last-child");
       const cellCount = await statusCells.count();
 
@@ -212,20 +190,17 @@ test.describe("Dashboard Page Tests", () => {
 
   test.describe("Benchmark Detail Navigation", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard?start=2025-09-01&end=2025-11-30", {
+      await page.goto(`/dashboard${DEFAULT_QUERY_PARAMS}`, {
         waitUntil: "networkidle",
       });
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
     test("Should navigate to benchmark detail page with correct query params when clicking table row", async ({
       page,
     }) => {
-      await page.waitForSelector("table tbody tr", { timeout: 10000 });
-
       const tableRows = page.locator("tbody tr");
       const rowCount = await tableRows.count();
       expect(rowCount).toBeGreaterThan(0);
@@ -239,7 +214,7 @@ test.describe("Dashboard Page Tests", () => {
 
         await firstRow.click();
 
-        await page.waitForURL(/\/dashboard\/scenarios\/.*/, { timeout: 10000 });
+        await page.waitForURL(/\/dashboard\/scenarios\/.*/);
 
         const currentUrl = new URL(page.url());
 
@@ -264,14 +239,11 @@ test.describe("Dashboard Page Tests", () => {
 
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
 
       let currentUrl = new URL(page.url());
       expect(currentUrl.searchParams.get("start")).toBe("2025-08-01");
       expect(currentUrl.searchParams.get("end")).toBe("2025-10-31");
-
-      await page.waitForSelector("table tbody tr", { timeout: 10000 });
 
       const tableRows = page.locator("tbody tr");
 
@@ -280,7 +252,7 @@ test.describe("Dashboard Page Tests", () => {
 
       await firstRow.click();
 
-      await page.waitForURL(/\/dashboard\/scenarios\/.*/, { timeout: 10000 });
+      await page.waitForURL(/\/dashboard\/scenarios\/.*/);
 
       currentUrl = new URL(page.url());
 

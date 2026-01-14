@@ -11,6 +11,8 @@ const setupBasicAuth = async (page: Page) => {
 };
 
 const TEST_SCENARIO_ID = "max_ndvi_composite";
+// NOTE: These dates should correspond to available fixture files
+const DEFAULT_QUERY_PARAMS = "?start=2025-09-01&end=2025-11-30";
 
 test.describe("Benchmark Chart Tests", () => {
   test.beforeEach(async ({ page }) => {
@@ -20,7 +22,7 @@ test.describe("Benchmark Chart Tests", () => {
   test.describe("Page Structure and Navigation", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(
-        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}${DEFAULT_QUERY_PARAMS}`,
         {
           waitUntil: "networkidle",
         },
@@ -43,14 +45,13 @@ test.describe("Benchmark Chart Tests", () => {
   test.describe("Benchmark Statistics Display", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(
-        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}${DEFAULT_QUERY_PARAMS}`,
         {
           waitUntil: "networkidle",
         },
       );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
@@ -78,14 +79,13 @@ test.describe("Benchmark Chart Tests", () => {
   test.describe("Metrics Table Display", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(
-        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}${DEFAULT_QUERY_PARAMS}`,
         {
           waitUntil: "networkidle",
         },
       );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
@@ -110,14 +110,13 @@ test.describe("Benchmark Chart Tests", () => {
   test.describe("Charts Display", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(
-        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}${DEFAULT_QUERY_PARAMS}`,
         {
           waitUntil: "networkidle",
         },
       );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
@@ -136,52 +135,38 @@ test.describe("Benchmark Chart Tests", () => {
 
   test.describe("Date Filtering Functionality", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/dashboard/scenarios/${TEST_SCENARIO_ID}`, {
-        waitUntil: "networkidle",
-      });
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}${DEFAULT_QUERY_PARAMS}`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
     });
 
     test("Should allow setting custom date filters", async ({ page }) => {
       const startDateInput = page.getByLabel("From");
       const endDateInput = page.getByLabel("To");
+
+      await expect(startDateInput).toHaveValue("2025-09-01");
+      await expect(endDateInput).toHaveValue("2025-11-30");
+
       const applyButton = page.getByRole("button", { name: "Apply" });
 
-      await startDateInput.fill("2024-01-01");
-      await endDateInput.fill("2024-12-31");
+      await startDateInput.fill("2025-08-01");
+      await endDateInput.fill("2025-10-31");
 
       await applyButton.click();
 
       await page.waitForSelector('[data-testid="spinner"]', {
         state: "hidden",
-        timeout: 15000,
       });
 
       const url = new URL(page.url());
-      expect(url.searchParams.get("start")).toBe("2024-01-01");
-      expect(url.searchParams.get("end")).toBe("2024-12-31");
-    });
-
-    test("Should preserve date filters in URL and reload correctly", async ({
-      page,
-    }) => {
-      await page.goto(
-        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2024-06-01&end=2024-06-30`,
-      );
-
-      await page.waitForSelector('[data-testid="spinner"]', {
-        state: "hidden",
-        timeout: 15000,
-      });
-
-      const startDateInput = page.getByLabel("From");
-      const endDateInput = page.getByLabel("To");
-
-      await expect(startDateInput).toHaveValue("2024-06-01");
-      await expect(endDateInput).toHaveValue("2024-06-30");
+      expect(url.searchParams.get("start")).toBe("2025-08-01");
+      expect(url.searchParams.get("end")).toBe("2025-10-31");
     });
   });
 });
