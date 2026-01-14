@@ -229,7 +229,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   };
 
   useEffect(() => {
