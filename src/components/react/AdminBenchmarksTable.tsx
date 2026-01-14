@@ -283,7 +283,7 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() =>
                       navigate(
-                        `/dashboard/scenarios/${row.getValue("scenario_id")}`,
+                        `/dashboard/scenarios/${row.getValue("scenario_id")}?start=${startDate}&end=${endDate}`,
                       )
                     }
                   >

@@ -5,7 +5,7 @@ export const PARQUET_MONTH_COVERAGE =
   import.meta.env.PARQUET_MONTH_COVERAGE || "2";
 const PARQUET_FILE_TEMPLATE =
   import.meta.env.PARQUET_FILE_TEMPLATE ||
-  "https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet";
+  "http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet";
 const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || "1"; // in hours
 
 const urlExists = async (url: string) => {

@@ -67,6 +67,8 @@ jobs:
       - name: Setup tmp directory for DuckDB
         run: mkdir -p ./tmp
       - name: Run Playwright tests
+        env:
+          PARQUET_FILE_TEMPLATE: http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet
         run: npm run test-e2e
       - uses: actions/upload-artifact@v4
         if: always()

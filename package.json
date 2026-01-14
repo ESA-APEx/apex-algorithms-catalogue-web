@@ -6,7 +6,7 @@
     "setup": "make-dir ./tmp && npm run download-source && npm run generate-acl && astro check",
     "dev": "npm run setup && astro dev --force",
     "build": "npm run setup && astro build",
-    "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build",
+    "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build && node ./scripts/post-setup-tests.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "format": "oxfmt",
