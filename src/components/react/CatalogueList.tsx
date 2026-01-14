@@ -5,6 +5,7 @@ import { Input } from "./Input";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
+import { Pagination } from "./Pagination";
 import {
   Select,
   SelectContent,
@@ -51,6 +52,8 @@ const sortOptions = [
 ] as const;
 
 type SortOption = (typeof sortOptions)[number]["value"];
+
+const ITEMS_PER_PAGE = 15;
 
 interface SearchAndSortFilterParams {
   query: string;
@@ -192,6 +195,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
   const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<
     string[]
   >([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>();
   const { labels, licenses, types, benchmarkStatus } =
     getCataloguesFilterList(catalogues);
@@ -216,6 +220,30 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses.length +
     filterByTypes.length +
     filterByBenchmarkStatus.length;
+
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    query,
+    sortBy,
+    filterByLabels,
+    filterByLicenses,
+    filterByTypes,
+    filterByBenchmarkStatus,
+  ]);
 
   const clearFilters = () => {
     setFilterByLabels([]);
@@ -389,11 +417,18 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
           </Select>
         </div>
       </div>
+
+      <div className="mb-4 text-sm text-brand-gray-50">
+        Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of{" "}
+        {totalItems} algorithms
+        {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
+      </div>
+
       <ul
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         data-testid="apps"
       >
-        {data.map((item) => (
+        {paginatedData.map((item) => (
           <li key={item.algorithm.id} data-testid="apps-item">
             <Card
               key={item.algorithm.id}
@@ -418,6 +453,12 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
           </li>
         ))}
       </ul>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+      />
     </>
   );
 };
