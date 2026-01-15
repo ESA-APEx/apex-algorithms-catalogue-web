@@ -25,35 +25,15 @@ export const BenchmarkMetricsTable: React.FC<BenchmarkMetricsTableProps> = ({
   data,
   className = "",
 }) => {
+  const formatMetricValue = (
+    stats: MetricStats,
+    key: keyof Omit<MetricStats, "count">,
+  ): string => {
+    return stats.count > 0 ? formatNumber(stats[key]) : "-";
+  };
+
   const calculateMetrics = (data: BenchmarkData[]): AggregatedMetrics => {
     if (data.length === 0) {
-      const emptyStats: MetricStats = {
-        min: 0,
-        max: 0,
-        average: 0,
-        count: 0,
-      };
-      return {
-        cpu: emptyStats,
-        memory: emptyStats,
-        duration: emptyStats,
-        costs: emptyStats,
-      };
-    }
-
-    const validData = data.filter(
-      (item) =>
-        item.cpu !== null &&
-        item.cpu !== undefined &&
-        item.memory !== null &&
-        item.memory !== undefined &&
-        item.duration !== null &&
-        item.duration !== undefined &&
-        item.costs !== null &&
-        item.costs !== undefined,
-    );
-
-    if (validData.length === 0) {
       const emptyStats: MetricStats = {
         min: 0,
         max: 0,
@@ -72,7 +52,7 @@ export const BenchmarkMetricsTable: React.FC<BenchmarkMetricsTableProps> = ({
     const result: Partial<AggregatedMetrics> = {};
 
     metrics.forEach((metric) => {
-      const values = validData
+      const values = data
         .map((item) => item[metric])
         .filter((val) => val !== null && val !== undefined);
 
@@ -98,30 +78,30 @@ export const BenchmarkMetricsTable: React.FC<BenchmarkMetricsTableProps> = ({
     {
       metric: "CPU usage",
       unit: "seconds",
-      min: formatNumber(aggregated.cpu.min),
-      max: formatNumber(aggregated.cpu.max),
-      average: formatNumber(aggregated.cpu.average),
+      min: formatMetricValue(aggregated.cpu, "min"),
+      max: formatMetricValue(aggregated.cpu, "max"),
+      average: formatMetricValue(aggregated.cpu, "average"),
     },
     {
       metric: "Memory usage",
-      unit: "seconds",
-      min: formatNumber(aggregated.memory.min),
-      max: formatNumber(aggregated.memory.max),
-      average: formatNumber(aggregated.memory.average),
+      unit: "MB",
+      min: formatMetricValue(aggregated.memory, "min"),
+      max: formatMetricValue(aggregated.memory, "max"),
+      average: formatMetricValue(aggregated.memory, "average"),
     },
     {
       metric: "Duration",
       unit: "seconds",
-      min: formatNumber(aggregated.duration.min),
-      max: formatNumber(aggregated.duration.max),
-      average: formatNumber(aggregated.duration.average),
+      min: formatMetricValue(aggregated.duration, "min"),
+      max: formatMetricValue(aggregated.duration, "max"),
+      average: formatMetricValue(aggregated.duration, "average"),
     },
     {
       metric: "Credits",
       unit: "credits",
-      min: formatNumber(aggregated.costs.min),
-      max: formatNumber(aggregated.costs.max),
-      average: formatNumber(aggregated.costs.average),
+      min: formatMetricValue(aggregated.costs, "min"),
+      max: formatMetricValue(aggregated.costs, "max"),
+      average: formatMetricValue(aggregated.costs, "average"),
     },
   ];
 
