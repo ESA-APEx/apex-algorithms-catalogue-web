@@ -107,6 +107,83 @@ test.describe("Benchmark Chart Tests", () => {
     });
   });
 
+  test.describe("Metrics Table Values", () => {
+    test("Should display metric values when data exists (full period)", async ({
+      page,
+    }) => {
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-09-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
+      await page.waitForSelector('[data-testid="spinner"]', {
+        state: "hidden",
+      });
+
+      const metricsTable = page.locator("table");
+      await expect(metricsTable).toBeVisible();
+
+      const tableRows = metricsTable.locator("tbody tr");
+      const rowCount = await tableRows.count();
+
+      for (let i = 0; i < rowCount; i++) {
+        const row = tableRows.nth(i);
+        const cells = row.locator("td");
+
+        // Check minimum, maximum, and average columns (skip the metric name column)
+        for (let j = 1; j <= 3; j++) {
+          const cellText = await cells.nth(j).textContent();
+          expect(cellText).not.toBe("-");
+        }
+      }
+    });
+
+    test("Should display dashes for empty metrics (partial period)", async ({
+      page,
+    }) => {
+      await page.goto(
+        `/dashboard/scenarios/${TEST_SCENARIO_ID}?start=2025-10-01&end=2025-11-30`,
+        {
+          waitUntil: "networkidle",
+        },
+      );
+      await page.waitForSelector('[data-testid="spinner"]', {
+        state: "hidden",
+      });
+
+      const metricsTable = page.locator("table");
+      await expect(metricsTable).toBeVisible();
+
+      const cpuRow = metricsTable.locator("tr", { hasText: "CPU usage" });
+      const memoryRow = metricsTable.locator("tr", { hasText: "Memory usage" });
+      const durationRow = metricsTable.locator("tr", { hasText: "Duration" });
+      const creditsRow = metricsTable.locator("tr", { hasText: "Credits" });
+
+      await expect(cpuRow.locator("td").nth(1)).toHaveText("-");
+      await expect(cpuRow.locator("td").nth(2)).toHaveText("-");
+      await expect(cpuRow.locator("td").nth(3)).toHaveText("-");
+
+      await expect(memoryRow.locator("td").nth(1)).toHaveText("-");
+      await expect(memoryRow.locator("td").nth(2)).toHaveText("-");
+      await expect(memoryRow.locator("td").nth(3)).toHaveText("-");
+
+      const durationMin = await durationRow.locator("td").nth(1).textContent();
+      const durationMax = await durationRow.locator("td").nth(2).textContent();
+      const durationAvg = await durationRow.locator("td").nth(3).textContent();
+      expect(durationMin).toMatch(/^\d+(\.\d+)?$/);
+      expect(durationMax).toMatch(/^\d+(\.\d+)?$/);
+      expect(durationAvg).toMatch(/^\d+(\.\d+)?$/);
+
+      const creditsMin = await creditsRow.locator("td").nth(1).textContent();
+      const creditsMax = await creditsRow.locator("td").nth(2).textContent();
+      const creditsAvg = await creditsRow.locator("td").nth(3).textContent();
+      expect(creditsMin).toMatch(/^\d+(\.\d+)?$/);
+      expect(creditsMax).toMatch(/^\d+(\.\d+)?$/);
+      expect(creditsAvg).toMatch(/^\d+(\.\d+)?$/);
+    });
+  });
+
   test.describe("Charts Display", () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(
