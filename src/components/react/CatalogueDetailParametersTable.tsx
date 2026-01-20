@@ -46,7 +46,7 @@ export const CatalogueDetailParametersTable = ({
                 <span>{parameter.schema}</span>
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell className="break-all">
               {parameter.hasOwnProperty("default") &&
               typeof parameter.default === "object"
                 ? JSON.stringify(parameter.default)
