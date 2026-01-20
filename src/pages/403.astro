@@ -1,10 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-const title = "404 Not Found";
+import { LogOutButton } from "../components/react/LogOutButton";
+const title = "403 Forbidden";
 
 export const prerender = true;
 
-Astro.response.status = 404;
+Astro.response.status = 403;
 ---
 
 <Layout title={`${title} | APEx`}>
@@ -19,9 +20,17 @@ Astro.response.status = 404;
           {title}
         </h1>
         <p class="text-balance text-brand-gray-50">
-          Your requested page is not found.
+          You do not have permission to access this page.
         </p>
+        <div class="mt-6">
+          <LogOutButton client:only="react" />
+        </div>
       </div>
     </main>
   </div>
+  <script>
+    const { signOut } = await import("auth-astro/client");
+
+    window.signOut = signOut; 
+  </script>
 </Layout>

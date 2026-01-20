@@ -59,10 +59,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
           username: session.user.username,
           email: session.user.email,
           roles: session.user.roles || [],
-          emailDomain, 
+          emailDomain,
         };
 
-        if (context.locals.user.roles?.includes("administrator") || aclMapping.acl.admin.includes(emailDomain)) {
+        if (
+          context.locals.user.roles?.includes("administrator") ||
+          aclMapping.acl.admin.includes(emailDomain)
+        ) {
           return next();
         }
 
@@ -70,7 +73,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
           return new Response("Forbidden", { status: 403 });
         }
 
-        const notFoundUrl = new URL("/404", context.url);
+        const notFoundUrl = new URL("/403", context.url);
         return Response.redirect(notFoundUrl.toString(), 302);
       }
 

@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
+import { logOut as handleLogOut } from "@/lib/auth";
 
 interface UserMenuProps {
   name?: string | null;
@@ -26,14 +27,6 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
     : email
       ? email[0].toUpperCase()
       : "U";
-  const handleSignOut = async () => {
-    const callbackUrl = new URL(window.location.origin);
-    callbackUrl.searchParams.set("toastSuccess", "logout");
-    await window.signOut({
-      // @ts-ignore
-      callbackUrl: callbackUrl.href,
-    });
-  };
 
   return (
     <div className="flex">
@@ -57,7 +50,7 @@ export function UserMenu({ name, username, email }: UserMenuProps) {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
+          <DropdownMenuItem className="cursor-pointer" onClick={handleLogOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Sign out</span>
           </DropdownMenuItem>
