@@ -16,28 +16,46 @@ export const Pagination = ({
 
   const getVisiblePages = () => {
     const delta = 2; // Number of pages to show on each side of current page
-    const range = [];
+
+    // If total pages is small enough, show all pages
+    if (totalPages <= delta * 2 + 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
     const rangeWithDots = [];
 
-    for (
-      let i = Math.max(2, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
-      range.push(i);
+    // Always show first page
+    rangeWithDots.push(1);
+
+    // Calculate the start and end of the middle section
+    let startPage = Math.max(2, currentPage - delta);
+    let endPage = Math.min(totalPages - 1, currentPage + delta);
+
+    // Ensure we show at least delta*2+1 pages in the middle section when possible
+    const middleSectionSize = endPage - startPage + 1;
+    const targetSize = delta * 2 + 1;
+
+    if (middleSectionSize < targetSize) {
+      if (startPage === 2) {
+        endPage = Math.min(totalPages - 1, startPage + targetSize - 1);
+      } else if (endPage === totalPages - 1) {
+        startPage = Math.max(2, endPage - targetSize + 1);
+      }
     }
 
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, "...");
-    } else {
-      rangeWithDots.push(1);
+    if (startPage > 2) {
+      rangeWithDots.push("...");
     }
 
-    rangeWithDots.push(...range);
+    for (let i = startPage; i <= endPage; i++) {
+      rangeWithDots.push(i);
+    }
 
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push("...", totalPages);
-    } else {
+    if (endPage < totalPages - 1) {
+      rangeWithDots.push("...");
+    }
+
+    if (totalPages > 1) {
       rangeWithDots.push(totalPages);
     }
 
@@ -78,7 +96,7 @@ export const Pagination = ({
             return (
               <span
                 key={`dots-${index}`}
-                className="px-2 py-1 text-gray-500"
+                className="px-2 py-1 text-brand-gray-50"
                 data-testid="pagination-ellipsis"
               >
                 ...
