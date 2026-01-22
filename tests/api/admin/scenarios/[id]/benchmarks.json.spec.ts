@@ -14,15 +14,32 @@ vi.mock("@/lib/db", () => ({
   executeQuery: vi.fn(),
 }));
 
+vi.mock("@/acl-mapping.json", () => ({
+  default: {
+    acl: {
+      admin: ["@vito.be"],
+    },
+    records: {
+      "scenario-123": ["@vito.be"],
+    },
+  },
+}));
+
 describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => {
   const mockScenarioId = "scenario-123";
   const mockUrls = ["https://example.com/data.parquet"];
 
-  const createMockRequest = (queryParams: string = "") =>
+  const createMockRequest = (queryParams: string = "", locals: any = {}) =>
     ({
       params: { id: mockScenarioId },
       request: {
         url: `https://example.com/api/admin/scenarios/${mockScenarioId}/benchmarks.json${queryParams}`,
+      },
+      locals: {
+        user: {
+          emailDomain: "@vito.be",
+        },
+        ...locals,
       },
     }) as any;
 

@@ -5,6 +5,9 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
+import { canAccessBenchmarkData } from "@/lib/api-validation";
+import { is } from "date-fns/locale";
+import { isFeatureEnabled } from "@/lib/featureflag";
 
 /**
  * @openapi
@@ -92,7 +95,7 @@ import {
  *       - Benchmark
  *       - Scenario
  */
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params, request, locals }) => {
   const scenario = params.id;
 
   if (!scenario) {
@@ -100,6 +103,16 @@ export const GET: APIRoute = async ({ params, request }) => {
       JSON.stringify({ message: "Scenario ID is required." }),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
+  }
+
+  if (
+    !isFeatureEnabled(request.url, "basicAuth") &&
+    !canAccessBenchmarkData(scenario, locals.user?.emailDomain as string)
+  ) {
+    return new Response(JSON.stringify({ message: "Permission denied." }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {

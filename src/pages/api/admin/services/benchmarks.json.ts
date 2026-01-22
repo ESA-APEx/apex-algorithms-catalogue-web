@@ -5,6 +5,8 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
+import { canAccessBenchmarkData } from "@/lib/api-validation";
+import { isFeatureEnabled } from "@/lib/featureflag";
 
 /**
  * @openapi
@@ -71,7 +73,7 @@ import {
  *       - Admin
  *       - Benchmark
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
     const urlResponse = await getUrlsFromRequest(request);
     if (urlResponse instanceof Response) {
@@ -102,7 +104,16 @@ export const GET: APIRoute = async ({ request }) => {
       ORDER BY "scenario_id";
     `;
 
-    const data = (await executeQuery(query)) as BenchmarkSummary[];
+    let data = (await executeQuery(query)) as BenchmarkSummary[];
+
+    if (!isFeatureEnabled(request.url, "basicAuth")) {
+      data = data.filter((benchmark) => {
+        return canAccessBenchmarkData(
+          benchmark.scenario_id,
+          locals.user?.emailDomain as string,
+        );
+      });
+    }
 
     return Response.json(data);
   } catch (error) {

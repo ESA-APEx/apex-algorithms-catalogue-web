@@ -46,16 +46,16 @@ function extractAclMapping() {
 
         if (acl && Array.isArray(acl.admin)) {
           aclMapping.acl.admin = [...aclMapping.acl.admin, ...acl.admin];
-          const recordIds = getAlgorithmRecordIds(provider.name);
-          // Assign each algorithm record id with the provider ACL
-          for (const recordId of recordIds) {
-            if (aclMapping.records[recordId]) {
-              aclMapping.records[recordId] = [
-                ...aclMapping.records[recordId],
+          const scenarioIds = getBenchmarkScenarioIds(provider.name);
+          // Assign each benchmark scenario id with the provider ACL
+          for (const scenarioId of scenarioIds) {
+            if (aclMapping.records[scenarioId]) {
+              aclMapping.records[scenarioId] = [
+                ...aclMapping.records[scenarioId],
                 ...acl.admin,
               ];
             } else {
-              aclMapping.records[recordId] = acl.admin;
+              aclMapping.records[scenarioId] = acl.admin;
             }
           }
         } else {
@@ -76,32 +76,39 @@ function extractAclMapping() {
   }
 }
 
-function getAlgorithmRecordIds(providerDir) {
+function getBenchmarkScenarioIds(providerDir) {
   try {
     const targetDir = path.join(ALGORITHM_CATALOG_DIR, providerDir);
 
-    const records = fs
+    const scenarios = fs
       .readdirSync(targetDir, { recursive: true })
       .map((file) => file.toString())
       .filter(
         (file) =>
           file.endsWith(".json") &&
-          (file.includes("/records/") || file.includes("\\records\\")), // support linux and windows based path
+          (file.includes("/benchmark_scenarios/") ||
+            file.includes("\\benchmark_scenarios\\")), // support linux and windows based path
       );
 
-    const recordIds = [];
+    const scenarioIds = [];
 
-    for (const recordFile of records) {
-      const recordPath = path.join(targetDir, recordFile);
-      const recordContent = fs.readFileSync(recordPath, "utf-8");
-      const recordJson = JSON.parse(recordContent);
-      recordIds.push(recordJson.id);
+    for (const scenarioFile of scenarios) {
+      const scenarioPath = path.join(targetDir, scenarioFile);
+      const scenarioContent = fs.readFileSync(scenarioPath, "utf-8");
+      const scenarioJson = JSON.parse(scenarioContent);
+      if (Array.isArray(scenarioJson)) {
+        for (const scenario of scenarioJson) {
+          scenarioIds.push(scenario.id);
+        }
+      } else {
+        scenarioIds.push(scenarioJson.id);
+      }
     }
 
-    return recordIds;
+    return scenarioIds;
   } catch (error) {
     console.error(
-      `Error reading records for provider ${providerDir}:`,
+      `Error reading benchmark scenarios for provider ${providerDir}:`,
       error.message,
     );
     return [];

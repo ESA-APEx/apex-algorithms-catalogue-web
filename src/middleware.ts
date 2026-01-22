@@ -4,14 +4,11 @@ import { config as authConfig } from "../auth.config";
 import { isFeatureEnabled } from "./lib/featureflag";
 import aclMapping from "./acl-mapping.json";
 
-const protectedPaths = ["/api/admin/services/benchmarks.json", "/dashboard"];
+const protectedPaths = ["/api/admin/services/", "/dashboard"];
 
-/**
- * Check if the request is for an API endpoint
- */
-function isApiRequest(url: string): boolean {
+const isApiRequest = (url: string): boolean => {
   return url.includes("/api/");
-}
+};
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const requestUrl = context.request.url;
@@ -52,14 +49,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const session = await getSession(context.request, authConfig);
 
       if (session?.user) {
+        const emailDomain = `@${session.user.email?.split("@").pop()}`;
+
         context.locals.user = {
           name: session.user.name,
           username: session.user.username,
           email: session.user.email,
           roles: session.user.roles || [],
+          emailDomain,
         };
 
-        const emailDomain = `@${context.locals.user.email?.split("@").pop()}`;
         if (
           context.locals.user.roles?.includes("administrator") ||
           aclMapping.acl.admin.includes(emailDomain)
@@ -71,8 +70,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
           return new Response("Forbidden", { status: 403 });
         }
 
-        const notFoundUrl = new URL("/404", context.url);
-        return Response.redirect(notFoundUrl.toString(), 302);
+        return Response.redirect("/403", 302);
       }
 
       if (apiRequest) {
