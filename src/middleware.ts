@@ -70,8 +70,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
           return new Response("Forbidden", { status: 403 });
         }
 
-        const notFoundUrl = new URL("/403", context.url);
-        return Response.redirect(notFoundUrl.toString(), 302);
+        return Response.redirect("/403", 302);
       }
 
       if (apiRequest) {
