@@ -5,7 +5,9 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
-import aclMapping from "@/acl-mapping.json";
+import { canAccessBenchmarkData } from "@/lib/api-validation";
+import { is } from "date-fns/locale";
+import { isFeatureEnabled } from "@/lib/featureflag";
 
 /**
  * @openapi
@@ -103,12 +105,14 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     );
   }
 
-  // @ts-expect-error
-  if (!aclMapping.records[scenario]?.includes(locals.user?.emailDomain)) {
-    return new Response(
-      JSON.stringify({ message: "Scenario not found." }),
-      { status: 404, headers: { "Content-Type": "application/json" } },
-    );
+  if (
+    !isFeatureEnabled(request.url, "basicAuth") &&
+    !canAccessBenchmarkData(scenario, locals.user?.emailDomain as string)
+  ) {
+    return new Response(JSON.stringify({ message: "Permission denied." }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {

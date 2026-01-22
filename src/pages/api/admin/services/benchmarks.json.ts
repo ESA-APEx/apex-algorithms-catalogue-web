@@ -5,7 +5,8 @@ import {
   PARQUET_MONTH_COVERAGE,
   getUrlsFromRequest,
 } from "@/lib/parquet-datasource";
-import aclMapping from "@/acl-mapping.json";
+import { canAccessBenchmarkData } from "@/lib/api-validation";
+import { isFeatureEnabled } from "@/lib/featureflag";
 
 /**
  * @openapi
@@ -104,10 +105,15 @@ export const GET: APIRoute = async ({ request, locals }) => {
     `;
 
     let data = (await executeQuery(query)) as BenchmarkSummary[];
-    data = data.filter((benchmark) => {
-      // @ts-expect-error
-      return aclMapping.records[benchmark.scenario_id]?.includes(locals.user?.emailDomain)
-    });
+
+    if (!isFeatureEnabled(request.url, "basicAuth")) {
+      data = data.filter((benchmark) => {
+        return canAccessBenchmarkData(
+          benchmark.scenario_id,
+          locals.user?.emailDomain as string,
+        );
+      });
+    }
 
     return Response.json(data);
   } catch (error) {

@@ -6,12 +6,9 @@ import aclMapping from "./acl-mapping.json";
 
 const protectedPaths = ["/api/admin/services/", "/dashboard"];
 
-/**
- * Check if the request is for an API endpoint
- */
-function isApiRequest(url: string): boolean {
+const isApiRequest = (url: string): boolean => {
   return url.includes("/api/");
-}
+};
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const requestUrl = context.request.url;

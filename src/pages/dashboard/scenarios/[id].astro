@@ -3,9 +3,15 @@ import Layout from "../../../layouts/AdminLayout.astro";
 import NavBar from "../../../components/AdminNavBar.astro";
 import Breadcrumb from "../../../components/Breadcrumb.astro";
 import { AdminBenchmarksChart } from "../../../components/react/AdminBenchmarksChart";
+import { canAccessBenchmarkData } from "@/lib/api-validation";
+import { isFeatureEnabled } from "@/lib/featureflag";
 
 const title = "Algorithm Catalogue";
 const { id } = Astro.params;
+
+if (!isFeatureEnabled(Astro.url.href, "basicAuth") && !canAccessBenchmarkData(id as string, Astro.locals.user?.emailDomain as string)) {
+  return Astro.redirect("/403");
+}
 ---
 
 <Layout title={title}>

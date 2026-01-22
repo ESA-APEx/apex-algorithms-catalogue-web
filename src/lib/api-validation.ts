@@ -1,3 +1,5 @@
+import aclMapping from "@/acl-mapping.json";
+
 interface DateValidationResult {
   success: boolean;
   startDate?: Date;
@@ -5,10 +7,10 @@ interface DateValidationResult {
   errorResponse?: Response;
 }
 
-export function validateDateParameters(
+export const validateDateParameters = (
   startDateParam: string | undefined,
   endDateParam: string | undefined,
-): DateValidationResult {
+): DateValidationResult => {
   const errorResponseHeader = {
     status: 400,
     headers: { "Content-Type": "application/json" },
@@ -104,4 +106,9 @@ export function validateDateParameters(
     startDate,
     endDate,
   };
-}
+};
+
+export const canAccessBenchmarkData = (scenarioId: string, aclId: string) => {
+  // @ts-expect-error
+  return aclMapping.records[scenarioId]?.includes(aclId);
+};
