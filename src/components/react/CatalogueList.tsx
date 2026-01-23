@@ -115,7 +115,7 @@ const getValidatedQueryParamsFromUrl = (
 
 const updateUrlWithParams = (params: {
   query: string;
-  sortBy: SortOption;
+  sortBy: string;
   filterByLabels: string[];
   filterByLicenses: string[];
   filterByTypes: string[];
@@ -141,7 +141,7 @@ const updateUrlWithParams = (params: {
 
 interface SearchAndSortFilterParams {
   query: string;
-  sortBy: SortOption;
+  sortBy: string;
   filterBy: {
     labels: string[];
     licenses: string[];
@@ -286,7 +286,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
   );
 
   const [query, setQuery] = useState<string>(validatedParams.query);
-  const [sortBy, setSortBy] = useState<SortOption>(validatedParams.sortBy);
+  const [sortBy, setSortBy] = useState<string>(validatedParams.sortBy);
   const [filterByLabels, setFilterByLabels] = useState<string[]>(
     validatedParams.filterByLabels,
   );
@@ -523,10 +523,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         </div>
 
         <div className="flex-none">
-          <Select
-            value={sortBy}
-            onValueChange={(value) => setSortBy(value as SortOption)}
-          >
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

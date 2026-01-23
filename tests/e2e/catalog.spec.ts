@@ -1,12 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Catalog Tests", () => {
-  const getAlgorithmCount = async (page: any) => {
-    const resultsText = await page.getByText("Showing").textContent();
-    const totalMatch = resultsText?.match(/of (\d+) algorithms/);
-    return totalMatch ? parseInt(totalMatch[1]) : 0;
-  };
-
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
