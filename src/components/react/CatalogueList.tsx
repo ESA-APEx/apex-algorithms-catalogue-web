@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { FilterIcon, SearchIcon } from "lucide-react";
 import { Card } from "./Card";
 import { Input } from "./Input";
@@ -36,7 +36,12 @@ interface CatalogueListProps {
   catalogues: Omit<Catalogue, "applicationDetails">[];
 }
 
-const sortOptions = [
+interface Option {
+  value: string;
+  label: string;
+}
+
+const sortOptions: Option[] = [
   {
     value: "name",
     label: "Name",
@@ -49,11 +54,90 @@ const sortOptions = [
     value: "benchmark status",
     label: "Benchmark status",
   },
-] as const;
-
-type SortOption = (typeof sortOptions)[number]["value"];
+];
 
 const ITEMS_PER_PAGE = 15;
+
+const getValidatedQueryParamsFromUrl = (
+  availableOptions: {
+    labels: Option[];
+    licenses: Option[];
+    types: Option[];
+    benchmarkStatus: Option[];
+  },
+  isBenchmarkStatusEnabled: boolean,
+) => {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const rawParams = {
+    query: urlParams.get("q") || "",
+    sortBy: urlParams.get("sort") || "",
+    filterByLabels: urlParams.get("labels")?.split(",").filter(Boolean) || [],
+    filterByLicenses:
+      urlParams.get("licenses")?.split(",").filter(Boolean) || [],
+    filterByTypes: urlParams.get("types")?.split(",").filter(Boolean) || [],
+    filterByBenchmarkStatus:
+      urlParams.get("benchmarkStatus")?.split(",").filter(Boolean) || [],
+  };
+
+  const validSortOptions = isBenchmarkStatusEnabled
+    ? sortOptions.map((opt) => opt.value)
+    : sortOptions
+        .filter((opt) => opt.value !== "benchmark status")
+        .map((opt) => opt.value);
+
+  const availableLabels = availableOptions.labels.map((opt) => opt.value);
+  const availableLicenses = availableOptions.licenses.map((opt) => opt.value);
+  const availableTypes = availableOptions.types.map((opt) => opt.value);
+  const availableBenchmarkStatuses = availableOptions.benchmarkStatus.map(
+    (opt) => opt.value,
+  );
+
+  return {
+    query: rawParams.query,
+    sortBy: validSortOptions.includes(rawParams.sortBy)
+      ? rawParams.sortBy
+      : "name",
+    filterByLabels: rawParams.filterByLabels.filter((label) =>
+      availableLabels.includes(label),
+    ),
+    filterByLicenses: rawParams.filterByLicenses.filter((license) =>
+      availableLicenses.includes(license),
+    ),
+    filterByTypes: rawParams.filterByTypes.filter((type) =>
+      availableTypes.includes(type),
+    ),
+    filterByBenchmarkStatus: rawParams.filterByBenchmarkStatus.filter(
+      (status) => availableBenchmarkStatuses.includes(status),
+    ),
+  };
+};
+
+const updateUrlWithParams = (params: {
+  query: string;
+  sortBy: SortOption;
+  filterByLabels: string[];
+  filterByLicenses: string[];
+  filterByTypes: string[];
+  filterByBenchmarkStatus: string[];
+}) => {
+  const urlParams = new URLSearchParams();
+
+  if (params.query) urlParams.set("q", params.query);
+  if (params.sortBy && params.sortBy !== "name")
+    urlParams.set("sort", params.sortBy);
+  if (params.filterByLabels.length > 0)
+    urlParams.set("labels", params.filterByLabels.join(","));
+  if (params.filterByLicenses.length > 0)
+    urlParams.set("licenses", params.filterByLicenses.join(","));
+  if (params.filterByTypes.length > 0)
+    urlParams.set("types", params.filterByTypes.join(","));
+  if (params.filterByBenchmarkStatus.length > 0)
+    urlParams.set("benchmarkStatus", params.filterByBenchmarkStatus.join(","));
+
+  const newUrl = `${window.location.pathname}${urlParams.toString() ? "?" + urlParams.toString() : ""}`;
+  window.history.replaceState(null, "", newUrl);
+};
 
 interface SearchAndSortFilterParams {
   query: string;
@@ -187,18 +271,55 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     window.location.href,
     "benchmarkStatus",
   );
-  const [query, setQuery] = useState<string>("");
-  const [sortBy, setSortBy] = useState<SortOption>("name");
-  const [filterByLabels, setFilterByLabels] = useState<string[]>([]);
-  const [filterByLicenses, setFilterByLicenses] = useState<string[]>([]);
-  const [filterByTypes, setFilterByTypes] = useState<string[]>([]);
-  const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<
-    string[]
-  >([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>();
+
   const { labels, licenses, types, benchmarkStatus } =
     getCataloguesFilterList(catalogues);
+
+  // Parse and validate URL params against available options
+  const validatedParams = useMemo(
+    () =>
+      getValidatedQueryParamsFromUrl(
+        { labels, licenses, types, benchmarkStatus },
+        isBenchmarkStatusEnabled,
+      ),
+    [labels, licenses, types, benchmarkStatus, isBenchmarkStatusEnabled],
+  );
+
+  const [query, setQuery] = useState<string>(validatedParams.query);
+  const [sortBy, setSortBy] = useState<SortOption>(validatedParams.sortBy);
+  const [filterByLabels, setFilterByLabels] = useState<string[]>(
+    validatedParams.filterByLabels,
+  );
+  const [filterByLicenses, setFilterByLicenses] = useState<string[]>(
+    validatedParams.filterByLicenses,
+  );
+  const [filterByTypes, setFilterByTypes] = useState<string[]>(
+    validatedParams.filterByTypes,
+  );
+  const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<
+    string[]
+  >(validatedParams.filterByBenchmarkStatus);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [benchmarkData, setBenchmarkData] = useState<BenchmarkSummary[]>();
+
+  // Update URL when filters change
+  const updateUrl = useCallback(() => {
+    updateUrlWithParams({
+      query,
+      sortBy,
+      filterByLabels,
+      filterByLicenses,
+      filterByTypes,
+      filterByBenchmarkStatus,
+    });
+  }, [
+    query,
+    sortBy,
+    filterByLabels,
+    filterByLicenses,
+    filterByTypes,
+    filterByBenchmarkStatus,
+  ]);
   const toggledSortOptions = isBenchmarkStatusEnabled
     ? sortOptions
     : sortOptions.filter((option) => option.value != "benchmark status");
@@ -236,6 +357,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
 
   useEffect(() => {
     setCurrentPage(1);
+    updateUrl();
   }, [
     query,
     sortBy,
@@ -243,6 +365,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    updateUrl,
   ]);
 
   const clearFilters = () => {

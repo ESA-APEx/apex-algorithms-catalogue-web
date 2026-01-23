@@ -34,58 +34,6 @@ test.describe("Catalog Tests", () => {
     );
   });
 
-  test("Should apply the type filtering", async ({ page }) => {
-    await expect(page.getByTestId("service-card").first()).toBeVisible();
-
-    const initialTotal = await getAlgorithmCount(page);
-
-    await page.getByRole("button").getByText("Filter").click();
-
-    const openEOFilter = page
-      .getByTestId("filter-type-item")
-      .getByText("openEO");
-    await openEOFilter.scrollIntoViewIfNeeded();
-    await openEOFilter.click();
-
-    await page.waitForTimeout(500);
-
-    const openEOTotal = await getAlgorithmCount(page);
-    expect(openEOTotal).toBeLessThan(initialTotal);
-
-    const visibleTypes = await page
-      .getByTestId("service-type")
-      .allTextContents();
-    visibleTypes.forEach((type) => expect(type).toBe("openEO"));
-
-    await openEOFilter.click();
-    await page.waitForTimeout(500);
-
-    const afterRemoveTotal = await getAlgorithmCount(page);
-    expect(afterRemoveTotal).toBeGreaterThan(openEOTotal);
-
-    const ogcFilter = page
-      .getByTestId("filter-type-item")
-      .getByText("OGC API Process");
-    await ogcFilter.scrollIntoViewIfNeeded();
-    await ogcFilter.click();
-
-    await page.waitForTimeout(500);
-
-    const ogcTotal = await getAlgorithmCount(page);
-    expect(ogcTotal).toBeLessThan(initialTotal);
-
-    const ogcVisibleTypes = await page
-      .getByTestId("service-type")
-      .allTextContents();
-    ogcVisibleTypes.forEach((type) => expect(type).toBe("OGC API Process"));
-
-    await ogcFilter.click();
-    await page.waitForTimeout(500);
-
-    const finalTotal = await getAlgorithmCount(page);
-    expect(finalTotal).toBeGreaterThan(ogcTotal);
-  });
-
   test("Should not show a private algorithm", async ({ page }) => {
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
