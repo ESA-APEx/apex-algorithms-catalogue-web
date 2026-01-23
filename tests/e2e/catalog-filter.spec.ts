@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("URL Filter Persistence Tests", () => {
+test.describe("Catalog Filter Tests", () => {
   const getAlgorithmCount = async (page: any) => {
     const resultsText = await page.getByText("Showing").textContent();
     const totalMatch = resultsText?.match(/of (\d+) algorithms/);
@@ -15,7 +15,7 @@ test.describe("URL Filter Persistence Tests", () => {
     page,
   }) => {
     await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
     expect(page.url()).toContain("q=ESA");
 
@@ -31,9 +31,7 @@ test.describe("URL Filter Persistence Tests", () => {
   test("Should persist multiple filters to URL and load from URL", async ({
     page,
   }) => {
-    await page
-      .getByRole("textbox", { name: /Search algorithms/i })
-      .fill("test");
+    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
 
     await page.getByRole("combobox").click();
     await page.getByRole("option", { name: "Last updated" }).click();
@@ -47,18 +45,18 @@ test.describe("URL Filter Persistence Tests", () => {
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
 
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
     const url = page.url();
-    expect(url).toContain("q=test");
-    expect(url).toContain("sort=last%20updated");
+    expect(url).toContain("q=ESA");
+    expect(url).toContain("sort=last+updated");
     expect(url).toMatch(/types=[^&]+/);
     expect(url).toMatch(/licenses=[^&]+/);
 
     await page.reload();
     await expect(
       page.getByRole("textbox", { name: /Search algorithms/i }),
-    ).toHaveValue("test");
+    ).toHaveValue("ESA");
     await expect(page.getByRole("combobox")).toHaveText("Last updated");
     await expect(
       page.getByRole("button").getByText("Filter").locator("..").getByText("2"),
@@ -66,28 +64,28 @@ test.describe("URL Filter Persistence Tests", () => {
   });
 
   test("Should clear URL params when filters are reset", async ({ page }) => {
-    await page
-      .getByRole("textbox", { name: /Search algorithms/i })
-      .fill("test");
+    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
     const typeFilter = page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
-    expect(page.url()).toContain("q=test");
+    expect(page.url()).toContain("q=ESA");
     expect(page.url()).toMatch(/types=[^&]+/);
 
     await page.getByRole("button", { name: "Reset" }).click();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=ESA");
 
-    expect(page.url()).toContain("q=test");
+    expect(page.url()).toContain("q=ESA");
     expect(page.url()).not.toMatch(/types=[^&]+/);
   });
 
   test("Should handle invalid URL parameters gracefully", async ({ page }) => {
     await page.goto("/?sort=invalid&types=nonexistent");
-    await page.waitForTimeout(500);
+    await page.waitForURL(
+      "http://localhost:4321/?sort=invalid&types=nonexistent",
+    );
 
     await expect(page.getByTestId("apps")).toBeVisible();
 
@@ -101,19 +99,17 @@ test.describe("URL Filter Persistence Tests", () => {
   test("Should preserve URL params when navigating with filters", async ({
     page,
   }) => {
-    await page
-      .getByRole("textbox", { name: /Search algorithms/i })
-      .fill("search");
+    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
     const typeFilter = page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
     const urlWithFilters = page.url();
-    expect(urlWithFilters).toContain("q=search");
+    expect(urlWithFilters).toContain("q=ESA");
     expect(urlWithFilters).toMatch(/types=[^&]+/);
 
     const firstCard = page.getByTestId("service-card").first();
@@ -123,7 +119,7 @@ test.describe("URL Filter Persistence Tests", () => {
 
     await expect(
       page.getByRole("textbox", { name: /Search algorithms/i }),
-    ).toHaveValue("search");
+    ).toHaveValue("ESA");
     await expect(
       page.getByRole("button").getByText("Filter").locator("..").getByText("1"),
     ).toBeVisible();
@@ -135,9 +131,9 @@ test.describe("URL Filter Persistence Tests", () => {
     await page
       .getByRole("textbox", { name: /Search algorithms/i })
       .fill("test & encode");
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
-    expect(page.url()).toContain("q=test%20%26%20encode");
+    expect(page.url()).toContain("q=test+%26+encode");
 
     await page.reload();
     await expect(
@@ -146,27 +142,25 @@ test.describe("URL Filter Persistence Tests", () => {
   });
 
   test("Should remove empty filters from URL", async ({ page }) => {
-    await page
-      .getByRole("textbox", { name: /Search algorithms/i })
-      .fill("test");
+    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
     const typeFilter = page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?q=**");
 
-    expect(page.url()).toContain("q=test");
+    expect(page.url()).toContain("q=ESA");
     expect(page.url()).toMatch(/types=[^&]+/);
 
     await page.getByRole("textbox", { name: /Search algorithms/i }).clear();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?types=**");
 
     expect(page.url()).not.toContain("q=");
     expect(page.url()).toMatch(/types=[^&]+/); // Type filter should remain
 
     await page.getByRole("button").getByText("Filter").click();
     await typeFilter.click(); // Uncheck
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/");
 
     expect(page.url()).not.toMatch(/types=[^&]+/);
     expect(page.url()).not.toContain("q=");
@@ -185,7 +179,7 @@ test.describe("URL Filter Persistence Tests", () => {
     await openEOFilter.scrollIntoViewIfNeeded();
     await openEOFilter.click();
 
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?types=**");
 
     const openEOTotal = await getAlgorithmCount(page);
     expect(openEOTotal).toBeLessThan(initialTotal);
@@ -196,7 +190,7 @@ test.describe("URL Filter Persistence Tests", () => {
     visibleTypes.forEach((type) => expect(type).toBe("openEO"));
 
     await openEOFilter.click();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/");
 
     const afterRemoveTotal = await getAlgorithmCount(page);
     expect(afterRemoveTotal).toBeGreaterThan(openEOTotal);
@@ -207,7 +201,7 @@ test.describe("URL Filter Persistence Tests", () => {
     await ogcFilter.scrollIntoViewIfNeeded();
     await ogcFilter.click();
 
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/?types=**");
 
     const ogcTotal = await getAlgorithmCount(page);
     expect(ogcTotal).toBeLessThan(initialTotal);
@@ -218,7 +212,7 @@ test.describe("URL Filter Persistence Tests", () => {
     ogcVisibleTypes.forEach((type) => expect(type).toBe("OGC API Process"));
 
     await ogcFilter.click();
-    await page.waitForTimeout(500);
+    await page.waitForURL("http://localhost:4321/");
 
     const finalTotal = await getAlgorithmCount(page);
     expect(finalTotal).toBeGreaterThan(ogcTotal);
