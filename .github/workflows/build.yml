@@ -136,7 +136,11 @@ jobs:
           docker build . --tag $IMAGE_NAME
       - name: Log image size
         run: |
-          docker image inspect $IMAGE_NAME --format='{{printf "%.2f MB" (div .Size 1024 1024)}}'
+          SIZE_BYTES=$(docker image inspect "$IMAGE_NAME" --format='{{.Size}}')
+          SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $SIZE_BYTES/1024/1024}")
+          echo "size_bytes=$SIZE_BYTES" >> "$GITHUB_OUTPUT"
+          echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
+          echo "::notice title=Docker image size::$IMAGE_NAME is ${SIZE_MB} MB"
       - name: Tag the image
         run: |
           docker tag $IMAGE_NAME $IMAGE_TAG_RELEASE
