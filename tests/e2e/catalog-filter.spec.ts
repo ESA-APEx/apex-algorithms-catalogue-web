@@ -217,4 +217,60 @@ test.describe("Catalog Filter Tests", () => {
     const finalTotal = await getAlgorithmCount(page);
     expect(finalTotal).toBeGreaterThan(ogcTotal);
   });
+
+  test("Should persist pagination to URL and load from URL", async ({
+    page,
+  }) => {
+    await expect(page.getByTestId("pagination")).toBeVisible();
+
+    await page.getByTestId("pagination-next").click();
+    await page.waitForURL("http://localhost:4321/?page=2");
+
+    expect(page.url()).toContain("page=2");
+
+    await expect(page.getByTestId("pagination-page-2")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
+    await page.reload();
+    await expect(page.getByTestId("pagination-page-2")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  test("Should reset page to 1 when filters change but preserve pagination in URL", async ({
+    page,
+  }) => {
+    const pagination = page.getByTestId("pagination");
+    if (await pagination.isVisible()) {
+      await page.getByTestId("pagination-next").click();
+      await page.waitForURL("http://localhost:4321/?page=2");
+
+      await page
+        .getByRole("textbox", { name: /Search algorithms/i })
+        .fill("test");
+      await page.waitForURL("http://localhost:4321/?q=test");
+
+      expect(page.url()).not.toContain("page=");
+    }
+  });
+
+  test("Should handle invalid page numbers gracefully", async ({ page }) => {
+    await page.goto("/?page=9999");
+    await page.waitForURL("http://localhost:4321/?page=9999");
+
+    await page.waitForFunction(
+      () => !window.location.search.includes("page=9999"),
+    );
+
+    const pagination = page.getByTestId("pagination");
+    if (await pagination.isVisible()) {
+      await expect(page.getByTestId("pagination-page-1")).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    }
+  });
 });
