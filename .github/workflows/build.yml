@@ -134,6 +134,9 @@ jobs:
       - name: Build docker image
         run: |
           docker build . --tag $IMAGE_NAME
+      - name: Log image size
+        run: |
+          docker image inspect $IMAGE_NAME --format='{{printf "%.2f MB" (div .Size 1024 1024)}}'
       - name: Tag the image
         run: |
           docker tag $IMAGE_NAME $IMAGE_TAG_RELEASE
