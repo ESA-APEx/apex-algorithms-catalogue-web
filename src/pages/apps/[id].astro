@@ -274,7 +274,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
                       </p>
                     )}
                     <div class="flex gap-2">
-                      {contact.links.map((link) => (
+                      {(contact.links || []).map((link) => (
                         <a
                           href={link.href}
                           target="__blank"
