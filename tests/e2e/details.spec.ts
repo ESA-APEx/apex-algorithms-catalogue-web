@@ -73,6 +73,21 @@ test.describe("Service Details Test", () => {
   });
 
   test("Should show benchmark status", async ({ page }) => {
+
+    await page.route('/api/services/benchmarks.json', async route => {
+      const json = [
+        {
+          runs: 4,
+          scenario_id: "max_ndvi_composite",
+          success_count: 4,
+          failed_count: 0,
+          last_test_datetime: "2026-01-19T13:28:23.000Z"
+        }
+      ]
+
+      await route.fulfill({ json });
+    });
+
     await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await expect(page.getByText("Benchmark status")).toBeVisible();
