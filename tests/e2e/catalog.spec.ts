@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./utils.ts";
 
 test.describe("Catalog Tests", () => {
   test.beforeEach(async ({ page }) => {

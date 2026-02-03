@@ -1,4 +1,5 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page  } from "@playwright/test";
+import { test } from "./utils.ts";
 
 const setupBasicAuth = async (page: Page) => {
   const username = process.env.BASIC_AUTH_USERNAME;
