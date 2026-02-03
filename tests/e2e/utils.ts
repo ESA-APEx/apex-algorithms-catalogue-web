@@ -29,7 +29,7 @@ export const test = base.extend<{
     ],
 
     page: async ({ page, benchmarkMock }, use) => {
-        await page.route('**/api/benchmarks.json', route =>
+        await page.route('**/api/services/benchmarks.json', route =>
             route.fulfill({
                 status: 200,
                 contentType: 'application/json',
