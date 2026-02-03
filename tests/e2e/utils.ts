@@ -20,25 +20,16 @@ const readFixture = (filename: string) => {
 
 const defaultBenchmark = readFixture('benchmarks.json');
 
-
-export const test = base.extend<{
-    benchmarkMock: any;
-}>({
-    benchmarkMock: [
-        ...defaultBenchmark,
-    ],
-
-    page: async ({ page, benchmarkMock }, use) => {
-        await page.route('**/api/services/benchmarks.json', route =>
-            route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify(benchmarkMock),
+export const test = base.extend<{ forEachTest: void }>({
+    forEachTest: [async ({ page }, use) => {
+        await page.route('api/services/benchmarks.json', route => {
+            return route.fulfill({
+                json: defaultBenchmark
             })
-        );
+        });
 
-        await use(page);
-    },
+        await use();
+    }, { auto: true }],  // automatically starts for every test.
 });
 
 export { expect } from '@playwright/test';
