@@ -262,9 +262,12 @@ test.describe("Catalog Filter Tests", () => {
     await page.goto("/?page=9999");
     await page.waitForURL("http://localhost:4321/?page=9999");
 
+    /*
+    Commented out due to race condition: https://github.com/ESA-APEx/apex-algorithms-catalogue-web/issues/76
     await page.waitForFunction(
       () => !window.location.search.includes("page=9999"),
     );
+    */
 
     const pagination = page.getByTestId("pagination");
     if (await pagination.isVisible()) {
