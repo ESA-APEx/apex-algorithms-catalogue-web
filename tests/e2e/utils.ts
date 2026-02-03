@@ -1,5 +1,11 @@
 import base from '@playwright/test';
-import defaultBenchmark from '../fixtures/benchmarks.json';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+
+const defaultBenchmark = JSON.parse(
+    readFileSync(join(__dirname, '../fixtures/benchmarks.json'), 'utf-8')
+);
 
 export const test = base.extend<{
     benchmarkMock: any;
