@@ -1,11 +1,25 @@
 import base from '@playwright/test';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { read, readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 
-const defaultBenchmark = JSON.parse(
-    readFileSync(join(__dirname, '../fixtures/benchmarks.json'), 'utf-8')
-);
+
+const getFixturesDir = () => {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    return join(__dirname, '../fixtures');
+}
+const readFixture = (filename: string) => {
+    return JSON.parse(
+        readFileSync(join(getFixturesDir(), filename), 'utf-8')
+    );
+
+}
+
+
+const defaultBenchmark = readFixture('benchmarks.json');
+
 
 export const test = base.extend<{
     benchmarkMock: any;
