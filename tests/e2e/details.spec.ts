@@ -1,4 +1,5 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
+import { test } from "./utils.ts";
 
 const openService = async (page: Page, name: string) => {
   await page.getByTestId("service-card").getByText(name).first().click();
@@ -72,22 +73,18 @@ test.describe("Service Details Test", () => {
     await expect(page.getByTestId("service-access-warning")).not.toBeVisible();
   });
 
+  test.use({
+    benchmarkMock: [
+      {
+        runs: 4,
+        scenario_id: 'max_ndvi_composite',
+        success_count: 4,
+        failed_count: 0,
+        last_test_datetime: '2026-01-19T13:28:23.000Z',
+      },
+    ],
+  });
   test("Should show benchmark status", async ({ page }) => {
-
-    await page.route('/api/services/benchmarks.json', async route => {
-      const json = [
-        {
-          runs: 4,
-          scenario_id: "max_ndvi_composite",
-          success_count: 4,
-          failed_count: 0,
-          last_test_datetime: "2026-01-19T13:28:23.000Z"
-        }
-      ]
-
-      await route.fulfill({ json });
-    });
-
     await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await expect(page.getByText("Benchmark status")).toBeVisible();

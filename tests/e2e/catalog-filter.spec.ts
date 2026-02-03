@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./utils.ts";
 
 test.describe("Catalog Filter Tests", () => {
   const getAlgorithmCount = async (page: any) => {
