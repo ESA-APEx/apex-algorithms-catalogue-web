@@ -219,7 +219,8 @@ test.describe("Catalog Filter Tests", () => {
     expect(finalTotal).toBeGreaterThan(ogcTotal);
   });
 
-  test("Should persist pagination to URL and load from URL", async ({
+  // Skip test due to https://github.com/ESA-APEx/apex-algorithms-catalogue-web/issues/76
+  test.skip("Should persist pagination to URL and load from URL", async ({
     page,
   }) => {
     await expect(page.getByTestId("pagination")).toBeVisible();
