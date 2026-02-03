@@ -1,0 +1,163 @@
+[
+    {
+        "runs": 4,
+        "scenario_id": "WorldAgriCommodities",
+        "success_count": 0,
+        "failed_count": 4,
+        "last_test_datetime": "2026-01-04T02:58:16.000Z"
+    },
+    {
+        "runs": 4,
+        "scenario_id": "bap_composite",
+        "success_count": 3,
+        "failed_count": 1,
+        "last_test_datetime": "2026-01-08T02:33:27.000Z"
+    },
+    {
+        "runs": 2,
+        "scenario_id": "bap_composite_stac308",
+        "success_count": 0,
+        "failed_count": 2,
+        "last_test_datetime": "2026-01-19T13:04:23.000Z"
+    },
+    {
+        "runs": 5,
+        "scenario_id": "biopar",
+        "success_count": 5,
+        "failed_count": 0,
+        "last_test_datetime": "2025-12-31T13:11:03.000Z"
+    },
+    {
+        "runs": 5,
+        "scenario_id": "eurac_pv_farm_detection",
+        "success_count": 5,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-17T02:27:23.000Z"
+    },
+    {
+        "runs": 5,
+        "scenario_id": "forest_fire_mapping",
+        "success_count": 0,
+        "failed_count": 5,
+        "last_test_datetime": "2026-01-15T02:33:21.000Z"
+    },
+    {
+        "runs": 4,
+        "scenario_id": "fusets_mogpr",
+        "success_count": 0,
+        "failed_count": 4,
+        "last_test_datetime": "2025-12-09T13:20:30.000Z"
+    },
+    {
+        "runs": 6,
+        "scenario_id": "max_ndvi",
+        "success_count": 6,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-20T02:35:29.000Z"
+    },
+    {
+        "runs": 4,
+        "scenario_id": "max_ndvi_composite",
+        "success_count": 4,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-19T13:28:23.000Z"
+    },
+    {
+        "runs": 9,
+        "scenario_id": "max_ndvi_large",
+        "success_count": 9,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-16T13:21:58.000Z"
+    },
+    {
+        "runs": 1,
+        "scenario_id": "max_ndvi_large_stac308",
+        "success_count": 0,
+        "failed_count": 1,
+        "last_test_datetime": "2026-01-19T15:02:20.000Z"
+    },
+    {
+        "runs": 1,
+        "scenario_id": "max_ndvi_stac308",
+        "success_count": 0,
+        "failed_count": 1,
+        "last_test_datetime": "2026-01-19T12:50:54.000Z"
+    },
+    {
+        "runs": 1,
+        "scenario_id": "mogpr_s1s2",
+        "success_count": 0,
+        "failed_count": 1,
+        "last_test_datetime": "2025-12-24T13:10:24.000Z"
+    },
+    {
+        "runs": 4,
+        "scenario_id": "parcel_delineation",
+        "success_count": 0,
+        "failed_count": 4,
+        "last_test_datetime": "2026-01-08T13:24:02.000Z"
+    },
+    {
+        "runs": 8,
+        "scenario_id": "peakvalley",
+        "success_count": 5,
+        "failed_count": 3,
+        "last_test_datetime": "2026-01-17T13:07:53.000Z"
+    },
+    {
+        "runs": 3,
+        "scenario_id": "phenology",
+        "success_count": 0,
+        "failed_count": 3,
+        "last_test_datetime": "2026-01-19T02:40:24.000Z"
+    },
+    {
+        "runs": 4,
+        "scenario_id": "ramona_benin",
+        "success_count": 0,
+        "failed_count": 4,
+        "last_test_datetime": "2025-12-31T02:31:20.000Z"
+    },
+    {
+        "runs": 1,
+        "scenario_id": "sen2like",
+        "success_count": 0,
+        "failed_count": 1,
+        "last_test_datetime": "2026-01-01T02:56:22.000Z"
+    },
+    {
+        "runs": 7,
+        "scenario_id": "sentinel1_stats",
+        "success_count": 7,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-13T02:31:48.000Z"
+    },
+    {
+        "runs": 5,
+        "scenario_id": "wind_turbine-terrascope",
+        "success_count": 0,
+        "failed_count": 5,
+        "last_test_datetime": "2026-01-13T13:24:59.000Z"
+    },
+    {
+        "runs": 5,
+        "scenario_id": "worldcereal_crop_extent",
+        "success_count": 1,
+        "failed_count": 4,
+        "last_test_datetime": "2025-12-19T02:28:49.000Z"
+    },
+    {
+        "runs": 7,
+        "scenario_id": "worldcereal_crop_type",
+        "success_count": 4,
+        "failed_count": 3,
+        "last_test_datetime": "2025-12-27T02:27:22.000Z"
+    },
+    {
+        "runs": 8,
+        "scenario_id": "worldcover_statistics",
+        "success_count": 8,
+        "failed_count": 0,
+        "last_test_datetime": "2026-01-16T02:34:42.000Z"
+    }
+]

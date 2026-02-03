@@ -1,19 +1,20 @@
 import * as dotenv from "dotenv";
 import type { FullConfig } from "@playwright/test";
+import { test } from '@playwright/test';
+import benchmarkData from './tests/fixtures/benchmark.json';
 
 dotenv.config();
 
 const globalSetup = async (_config: FullConfig): Promise<void> => {
-  console.log(
-    "Manually initialize cache by triggering API call, making the test faster...",
-  );
-  try {
-    await fetch("http://localhost:4321/api/services/benchmarks.json");
-    console.log("Initializing cache done ✅.");
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/benchmarks.json', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(benchmarkData),
+      });
+    });
+  });
 };
 
 export default globalSetup;
