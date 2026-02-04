@@ -9,7 +9,7 @@ export const featureflag: Record<any, any> = {
   production: {
     benchmarkStatus: true,
     cwlParameterDetail: false,
-    jupyterLiteIntegration: false,
+    jupyterLiteIntegration: true,
     basicAuth: false,
     providerPlatformLogo: true,
   },
