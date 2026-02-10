@@ -25,10 +25,30 @@ import { PlatformProviderLogos } from "../../components/react/PlatformProviderLo
 
 import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
-import { AlgorithmType } from "../../types/models/algorithm";
+import { type Algorithm, AlgorithmType } from "../../types/models/algorithm";
 import { isFeatureEnabled } from "@/lib/featureflag";
 
 export const prerender = true;
+
+
+export const isAlgorithmDefProtected = async (
+  algorithm: Algorithm
+): Promise<boolean> => {
+   const applicationLink = algorithm.links.find((link) => link.rel === "application");
+
+   if (!applicationLink) {
+     return false; // No application link, so we consider it not protected
+   } else {
+      try {
+        const response = await fetch(applicationLink.href, { method: "HEAD" });
+        return response.status === 401 || response.status === 403; // Protected if unauthorized or forbidden
+      } catch (error) {
+        console.error("Error checking algorithm definition protection:", error);
+        return true; // If there's an error, assume it's protected to be safe
+      }
+   }
+
+};
 
 export const getExecutionInfo = (type: AlgorithmType) => {
   switch (type) {
@@ -64,6 +84,9 @@ export const getStaticPaths = (async () => {
       description,
       algorithm.links,
     )) as ToCElement[];
+
+    const isDefinitionProtected = await isAlgorithmDefProtected(algorithm);
+
     result.push({
       params: { id: item.algorithm.id },
       props: {
@@ -73,6 +96,7 @@ export const getStaticPaths = (async () => {
           platform,
           provider,
         },
+        isDefinitionProtected,
         description,
         toc,
       },
@@ -84,7 +108,7 @@ export const getStaticPaths = (async () => {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data, toc, description } = Astro.props;
+const { data, toc, description, isDefinitionProtected } = Astro.props;
 const { applicationDetails, algorithm, platform, provider } = data;
 
 const UDP_DOCS_URL =
@@ -121,6 +145,7 @@ const serviceRequestWarning =
 const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.cost_unit
   ? `${algorithm.properties.cost_estimate} ${algorithm.properties.cost_unit}`
   : "N/A";
+
 ---
 
 <Layout title={`${algorithm.properties.title} | APEx Algorithm Catalogue`} description={algorithm.properties.description}>
@@ -218,7 +243,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
                       <p class="text-white">
                         {executionInfoLabels[link.rel] || link.title}
                       </p>
-                      {link.rel === "application" && orderUrl ? (
+                      {link.rel === "application" && isDefinitionProtected ? (
                         <Badge className="font-normal text-sm rounded-sm">
                           protected
                         </Badge>
