@@ -5,6 +5,14 @@ import { isFeatureEnabled } from "@/lib/featureflag";
 import { CatalogueDetailParametersTable } from "./CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "./CatalogueCwlDetailParametersTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./Table";
 import type { Algorithm } from "../../types/models/algorithm";
 import { AlgorithmType } from "../../types/models/algorithm";
 
@@ -78,6 +86,80 @@ const ExecutionInfoContent = ({
         </>
       )}
     </>
+  );
+};
+
+interface ParametersTableProps {
+  parameters: Array<{ name: string; value: string }>;
+}
+
+export const ParametersTable = ({ parameters }: ParametersTableProps) => {
+  return (
+    <Table
+      className="bg-white bg-opacity-5 rounded-lg"
+      data-testid="parameters-table"
+    >
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-2/3">Parameter</TableHead>
+          <TableHead>Value</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {parameters.map((parameter) => (
+          <TableRow key={parameter.name}>
+            <TableCell>{parameter.name}</TableCell>
+            <TableCell className="break-all">{parameter.value}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+const CostAnalysisContent = () => {
+  return (
+    <article className="text-gray-300">
+      <aside className="mb-4">
+        <p className="text-sm">
+          Based on 17 benchmark runs (Nov 2025 - Jan 2026)
+        </p>
+      </aside>
+      <h3 className="text-white mb-2">Overview</h3>
+      <ul className="mb-5">
+        <li className="mb-1">Average cost: 0.3 platform credits / km2</li>
+        <li className="mb-1">
+          90% cost range: 0.2 - 0.5 platform credits / km2
+        </li>
+      </ul>
+      <h3 className="text-white mb-2">Benchmarks (2)</h3>
+      <ul className="mb-5">
+        <li>
+          <article className="bg-white bg-opacity-5 rounded-md p-4">
+            <h4 className="text-white font-medium mb-2">max ndvi example</h4>
+            <div className="grid grid-cols-3 gap-5">
+              <div className="col-span-2">
+                <ul className="mb-4">
+                  <li>Area size: 22,...,....</li>
+                  <li>Average benchmark duration: 209 s</li>
+                  <li>Average cost: 0.2 platform credits</li>
+                  <li>90% cost range: 0.1-0.3 platform credits / km2</li>
+                </ul>
+                <ParametersTable
+                  parameters={[
+                    { name: "input_collection", value: "SENTINEL2_L2A" },
+                    { name: "output_format", value: "GTiff" },
+                  ]}
+                />
+              </div>
+              <div className="flex-1">
+                <div className="bg-brand-teal-50/50 w-full h-full"></div>
+              </div>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </article>
   );
 };
 
@@ -186,60 +268,24 @@ export const ExecutionInfoTabs = ({
           value="execution"
           className="p-6 bg-brand-teal-30/20 rounded-b-md"
         >
-          <ul className="flex flex-col gap-5 mb-6">
-            {hasProcessInfo && (
-              <li>
-                <div className="flex gap-2" data-testid="execution-info-label">
-                  <p className="text-white">Process ID</p>
-                </div>
-                <p>
-                  <span className="text-gray-400 break-words">
-                    {algorithm.id}
-                  </span>
-                  <ClipboardButton text={algorithm.id} />
-                </p>
-              </li>
-            )}
-            {executionLinks.map((link, index) => (
-              <li key={index}>
-                <div className="flex gap-2" data-testid="execution-info-label">
-                  <p className="text-white">
-                    {executionInfoLabels[link.rel] || link.title}
-                  </p>
-                  {link.rel === "application" && isDefinitionProtected && (
-                    <Badge className="font-normal text-sm rounded-sm">
-                      protected
-                    </Badge>
-                  )}
-                </div>
-                <p>
-                  <a className="text-gray-400 break-all" href={link.href}>
-                    {link.href}
-                  </a>
-                  <ClipboardButton text={link.href} />
-                </p>
-              </li>
-            ))}
-          </ul>
-          {hasParameters && (
-            <>
-              {applicationDetails &&
-                algorithm.type === AlgorithmType.OPENEO && (
-                  <CatalogueDetailParametersTable
-                    details={applicationDetails}
-                  />
-                )}
-              {!orderUrl && cwlUrl && (
-                <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} />
-              )}
-            </>
-          )}
+          <ExecutionInfoContent
+            algorithm={algorithm}
+            applicationDetails={applicationDetails}
+            isDefinitionProtected={isDefinitionProtected}
+            executionLinks={executionLinks}
+            executionInfoLabels={executionInfoLabels}
+            orderUrl={orderUrl}
+            cwlUrl={cwlUrl}
+            hasProcessInfo={hasProcessInfo}
+            hasServiceLinks={hasServiceLinks}
+            hasParameters={hasParameters}
+          />
         </TabsContent>
         <TabsContent
           value="cost-analysis"
           className="p-6 bg-brand-teal-30/20 rounded-b-md"
         >
-          <p>Cost analysis content goes here.</p>
+          <CostAnalysisContent />
         </TabsContent>
       </Tabs>
     </section>
