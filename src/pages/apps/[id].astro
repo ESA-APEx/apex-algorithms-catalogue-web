@@ -9,15 +9,12 @@ import {
 } from "lucide-react";
 import { Badge } from "../../components/react/Badge";
 import { CatalogueDetailActions } from "../../components/react/CatalogueDetailActions";
-import { ClipboardButton } from "../../components/react/ClipboardButton";
 import Layout from "../../layouts/Layout.astro";
 import Prose from "../../components/Prose.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import { loadCatalogueDetailData } from "../../lib/load-catalogue";
 import { getDate, getLogoRel } from "../../lib/utils";
 import { generateToC } from "../../lib/toc-generator";
-import { CatalogueDetailParametersTable } from "../../components/react/CatalogueDetailParametersTable";
-import { CatalogueCwlDetailParametersTable } from "../../components/react/CatalogueCwlDetailParametersTable";
 import { CollapsibleText } from "../../components/react/CollapsibleText";
 import { ExecutionInfoTabs } from "../../components/react/ExecutionInfoTabs";
 import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStatusSideNavItem";
@@ -76,7 +73,7 @@ export const getStaticPaths = (async () => {
   const result = [];
 
   for (const item of data) {
-    const { algorithm, applicationDetails, platform, provider } = item;
+    const { algorithm, applicationDetails, platform, provider, benchmarkScenarios } = item;
 
     const description =
       applicationDetails?.description || algorithm.properties.description;
@@ -96,6 +93,7 @@ export const getStaticPaths = (async () => {
           applicationDetails,
           platform,
           provider,
+          benchmarkScenarios,
         },
         isDefinitionProtected,
         description,
@@ -110,7 +108,7 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { data, toc, description, isDefinitionProtected } = Astro.props;
-const { applicationDetails, algorithm, platform, provider } = data;
+const { applicationDetails, algorithm, platform, provider, benchmarkScenarios } = data;
 
 const UDP_DOCS_URL =
   "https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube";
@@ -206,6 +204,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
           orderUrl={orderUrl}
           cwlUrl={cwlUrl}
           udpDocsUrl={UDP_DOCS_URL}
+          benchmarkScenarios={benchmarkScenarios}
           client:only="react"
         />
         <section>

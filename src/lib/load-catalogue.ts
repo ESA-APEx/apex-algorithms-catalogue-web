@@ -7,6 +7,7 @@ import type { Catalogue } from "../types/models/catalogue";
 import type { UDP } from "../types/models/udp";
 import type { ApplicationDetails } from "@/types/models/application.ts";
 import type { Provider } from "@/types/models/provider";
+import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms/algorithm_catalog`;
 
@@ -59,6 +60,49 @@ const getServiceRecords = (): string[] =>
         (file.includes("/records/") || file.includes("\\records\\")), // support linux and windows based path
     );
 
+const loadBenchmarkScenarios = (recordPath: string): BenchmarkScenario[] => {
+  const recordDir = path.dirname(path.join(CATALOGUE_JSON_DIR, recordPath));
+  const benchmarkScenariosDir = path.join(recordDir, "../benchmark_scenarios");
+
+  try {
+    if (
+      !fs.existsSync(benchmarkScenariosDir) ||
+      !fs.statSync(benchmarkScenariosDir).isDirectory()
+    ) {
+      return [];
+    }
+
+    const benchmarkFiles = fs
+      .readdirSync(benchmarkScenariosDir)
+      .filter((file) => file.endsWith(".json"));
+
+    const allScenarios: BenchmarkScenario[] = [];
+
+    for (const filename of benchmarkFiles) {
+      try {
+        const filePath = path.join(benchmarkScenariosDir, filename);
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const scenarios: BenchmarkScenario[] = JSON.parse(fileContent);
+
+        allScenarios.push(...scenarios);
+      } catch (error) {
+        console.error(
+          `Error reading benchmark scenario file ${filename}:`,
+          error,
+        );
+      }
+    }
+
+    return allScenarios;
+  } catch (error) {
+    console.error(
+      `Error loading benchmark scenarios from ${benchmarkScenariosDir}:`,
+      error,
+    );
+    return [];
+  }
+};
+
 export const loadCatalogueData = () => {
   const jsonsInDir = getServiceRecords();
 
@@ -89,10 +133,12 @@ export const loadCatalogueData = () => {
     )) as Provider;
 
     if (visible) {
+      const benchmarkScenarios = loadBenchmarkScenarios(file);
       data.push({
         algorithm,
         platform,
         provider,
+        benchmarkScenarios,
       });
     }
   });
@@ -222,11 +268,14 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
         )) as Provider;
       }
 
+      const benchmarkScenarios = loadBenchmarkScenarios(file);
+
       data.push({
         algorithm,
         applicationDetails,
         platform: platformDetails,
         provider: providerDetails,
+        benchmarkScenarios,
       });
     } catch (_err) {
       console.error(`Could not load data for ${file}`, _err);

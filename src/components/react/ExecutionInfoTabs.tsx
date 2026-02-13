@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
 import { Info } from "lucide-react";
 import { Badge } from "./Badge";
 import { ClipboardButton } from "./ClipboardButton";
 import { isFeatureEnabled } from "@/lib/featureflag";
+import { getBenchmarkDetails } from "@/lib/api";
+import { PARQUET_MONTH_COVERAGE } from "@/lib/parquet-datasource";
+import { format, add as addDate } from "date-fns";
 import { CatalogueDetailParametersTable } from "./CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "./CatalogueCwlDetailParametersTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
@@ -15,6 +19,8 @@ import {
 } from "./Table";
 import type { Algorithm } from "../../types/models/algorithm";
 import { AlgorithmType } from "../../types/models/algorithm";
+import type { BenchmarkData } from "@/types/models/benchmark";
+import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
 
 const ExecutionInfoContent = ({
   algorithm,
@@ -101,8 +107,8 @@ export const ParametersTable = ({ parameters }: ParametersTableProps) => {
     >
       <TableHeader>
         <TableRow>
-          <TableHead className="w-2/3">Parameter</TableHead>
-          <TableHead>Value</TableHead>
+          <TableHead>Parameter</TableHead>
+          <TableHead className="w-2/3">Value</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -117,47 +123,117 @@ export const ParametersTable = ({ parameters }: ParametersTableProps) => {
   );
 };
 
-const CostAnalysisContent = () => {
+interface CostAnalysisContentProps {
+  scenarioId: string;
+  scenarios: BenchmarkScenario[];
+}
+
+const getParametersFromScenario = (scenario: BenchmarkScenario) => {
+  const parameters: Array<{ name: string; value: string }> = [];
+  const processGraphKey = Object.keys(scenario.process_graph)[0];
+
+  for (const [key, value] of Object.entries(
+    scenario.process_graph[processGraphKey].arguments,
+  )) {
+    parameters.push({ name: key, value: JSON.stringify(value) });
+  }
+
+  return parameters;
+};
+
+const CostAnalysisContent = ({
+  scenarioId,
+  scenarios,
+}: CostAnalysisContentProps) => {
+  const [data, setData] = useState<BenchmarkData[]>();
+  const [status, setStatus] = useState<string>("loading");
+
+  const now = new Date();
+  const startDate = addDate(now, { months: -Number(PARQUET_MONTH_COVERAGE) });
+  const dateRange = `${format(startDate, "MMM yyyy")} - ${format(now, "MMM yyyy")}`;
+
+  const fetchData = async () => {
+    setStatus("loading");
+    try {
+      const result = await getBenchmarkDetails(scenarioId);
+      if (result) {
+        setData(result.data);
+        setStatus("success");
+      }
+    } catch (error) {
+      setStatus("error");
+      console.error("Failed to fetch benchmark status", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [scenarioId]);
+
+  if (status === "loading") {
+    return <p className="text-gray-400">Loading benchmark data...</p>;
+  }
+
+  if (status === "error") {
+    return <p className="text-red-400">Failed to load benchmark data.</p>;
+  }
+
+  if (!data?.length)
+    return <p className="text-gray-400">No benchmark data available.</p>;
+
+  const averageCost = (
+    data.reduce((sum, item) => sum + item.costs, 0) / data.length
+  ).toFixed(2);
+  const sortedCosts = [...data].sort((a, b) => a.costs - b.costs);
+  const costRange90 = [
+    sortedCosts[Math.floor(data.length * 0.05)].costs.toFixed(2),
+    sortedCosts[Math.ceil(data.length * 0.95) - 1].costs.toFixed(2),
+  ];
+
   return (
     <article className="text-gray-300">
       <aside className="mb-4">
         <p className="text-sm">
-          Based on 17 benchmark runs (Nov 2025 - Jan 2026)
+          Based on {data.length} benchmark runs ({dateRange})
         </p>
       </aside>
       <h3 className="text-white mb-2">Overview</h3>
       <ul className="mb-5">
-        <li className="mb-1">Average cost: 0.3 platform credits / km2</li>
         <li className="mb-1">
-          90% cost range: 0.2 - 0.5 platform credits / km2
+          Average cost: {averageCost} platform credits / km²
+        </li>
+        <li className="mb-1">
+          90% cost range: {costRange90[0]} - {costRange90[1]} platform credits /
+          km²
         </li>
       </ul>
-      <h3 className="text-white mb-2">Benchmarks (2)</h3>
+      <h3 className="text-white mb-2">
+        Benchmark scenarios ({scenarios.length})
+      </h3>
       <ul className="mb-5">
-        <li>
-          <article className="bg-white bg-opacity-5 rounded-md p-4">
-            <h4 className="text-white font-medium mb-2">max ndvi example</h4>
-            <div className="grid grid-cols-3 gap-5">
-              <div className="col-span-2">
-                <ul className="mb-4">
-                  <li>Area size: 22,...,....</li>
-                  <li>Average benchmark duration: 209 s</li>
-                  <li>Average cost: 0.2 platform credits</li>
-                  <li>90% cost range: 0.1-0.3 platform credits / km2</li>
-                </ul>
-                <ParametersTable
-                  parameters={[
-                    { name: "input_collection", value: "SENTINEL2_L2A" },
-                    { name: "output_format", value: "GTiff" },
-                  ]}
-                />
+        {scenarios.map((scenario) => (
+          <li key={scenario.id}>
+            <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
+              <h4 className="text-white font-medium mb-2">{scenario.id}</h4>
+              <div className="grid grid-cols-3 gap-5">
+                <div className="col-span-2">
+                  <ul className="mb-4">
+                    <li>Area size: 22,...,....</li>
+                    <li>Average benchmark duration: 209 s</li>
+                    <li>Average cost: 0.2 platform credits</li>
+                    <li>90% cost range: 0.1-0.3 platform credits / km2</li>
+                  </ul>
+                  <ParametersTable
+                    parameters={getParametersFromScenario(scenario)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="bg-brand-teal-50/50 w-full h-full"></div>
+                </div>
               </div>
-              <div className="flex-1">
-                <div className="bg-brand-teal-50/50 w-full h-full"></div>
-              </div>
-            </div>
-          </article>
-        </li>
+            </article>
+          </li>
+        ))}
       </ul>
     </article>
   );
@@ -171,6 +247,7 @@ interface ExecutionInfoTabsProps {
   executionInfoLabels: Record<string, string>;
   orderUrl?: string;
   cwlUrl?: string;
+  benchmarkScenarios: BenchmarkScenario[];
   udpDocsUrl: string;
 }
 
@@ -182,6 +259,7 @@ export const ExecutionInfoTabs = ({
   executionInfoLabels,
   orderUrl,
   cwlUrl,
+  benchmarkScenarios,
   udpDocsUrl,
 }: ExecutionInfoTabsProps) => {
   const executionLinks = algorithm.links.filter((link) =>
@@ -196,6 +274,8 @@ export const ExecutionInfoTabs = ({
     (!orderUrl && cwlUrl);
 
   const shouldUseTabs = isFeatureEnabled(window.location.href, "costAnalysis");
+
+  console.log(benchmarkScenarios);
 
   if (!shouldUseTabs) {
     return (
@@ -255,13 +335,15 @@ export const ExecutionInfoTabs = ({
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger
-            value="cost-analysis"
-            className="bg-black/10 data-[state=active]:text-white data-[state=active]:bg-brand-teal-30/20"
-            id="cost-analysis"
-          >
-            Cost analysis
-          </TabsTrigger>
+          {benchmarkScenarios.length > 0 ? (
+            <TabsTrigger
+              value="cost-analysis"
+              className="bg-black/10 data-[state=active]:text-white data-[state=active]:bg-brand-teal-30/20"
+              id="cost-analysis"
+            >
+              Cost analysis
+            </TabsTrigger>
+          ) : null}
         </TabsList>
 
         <TabsContent
@@ -281,12 +363,17 @@ export const ExecutionInfoTabs = ({
             hasParameters={hasParameters}
           />
         </TabsContent>
-        <TabsContent
-          value="cost-analysis"
-          className="p-6 bg-brand-teal-30/20 rounded-b-md"
-        >
-          <CostAnalysisContent />
-        </TabsContent>
+        {benchmarkScenarios.length > 0 ? (
+          <TabsContent
+            value="cost-analysis"
+            className="p-6 bg-brand-teal-30/20 rounded-b-md"
+          >
+            <CostAnalysisContent
+              scenarioId="bap_composite"
+              scenarios={benchmarkScenarios}
+            />
+          </TabsContent>
+        ) : null}
       </Tabs>
     </section>
   );
