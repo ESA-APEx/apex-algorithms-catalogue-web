@@ -17,7 +17,8 @@
     "test-e2e-ui": "npm run build-test && playwright test --ui",
     "download-source": "node ./scripts/download-source.mjs",
     "download-navbar-footer": "node ./scripts/download-navbar-footer.mjs",
-    "generate-acl": "node ./scripts/generate-acl.mjs"
+    "generate-acl": "node ./scripts/generate-acl.mjs",
+    "generate-benchmark-mapping": "node ./scripts/generate-benchmark-mapping.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.3",
@@ -35,6 +36,8 @@
     "duckdb-async": "^1.1.3",
     "lucide-react": "^0.453.0",
     "node-fetch": "^3.3.2",
+    "ol": "^10.8.0",
+    "proj4": "^2.20.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sonner": "^2.0.7",

@@ -1,9 +1,10 @@
 export interface BenchmarkDetails {
-  scenario_id: string;
+  service_id: string;
   data: BenchmarkData[];
 }
 
 export interface BenchmarkData {
+  scenario_id: string;
   cpu: number;
   costs: number;
   memory: number;

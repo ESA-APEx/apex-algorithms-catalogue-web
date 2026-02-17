@@ -8,6 +8,7 @@ import { PARQUET_MONTH_COVERAGE } from "@/lib/parquet-datasource";
 import { format, add as addDate } from "date-fns";
 import { CatalogueDetailParametersTable } from "./CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "./CatalogueCwlDetailParametersTable";
+import { MapViewer } from "./MapViewer";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
 import {
   Table,
@@ -141,6 +142,17 @@ const getParametersFromScenario = (scenario: BenchmarkScenario) => {
   return parameters;
 };
 
+const getGeometryFromScenario = (scenario: BenchmarkScenario) => {
+  try {
+    const processGraphKey = Object.keys(scenario.process_graph)[0];
+    const args = scenario.process_graph[processGraphKey]?.arguments;
+    return args?.geometry || args?.bbox || args?.spatial_extent || null;
+  } catch (error) {
+    console.error("Failed to extract geometry from scenario:", error);
+    return null;
+  }
+};
+
 const CostAnalysisContent = ({
   scenarioId,
   scenarios,
@@ -186,8 +198,8 @@ const CostAnalysisContent = ({
   ).toFixed(2);
   const sortedCosts = [...data].sort((a, b) => a.costs - b.costs);
   const costRange90 = [
-    sortedCosts[Math.floor(data.length * 0.05)].costs.toFixed(2),
-    sortedCosts[Math.ceil(data.length * 0.95) - 1].costs.toFixed(2),
+    sortedCosts[Math.floor(data.length * 0.05)].costs,
+    sortedCosts[Math.ceil(data.length * 0.95) - 1].costs,
   ];
 
   return (
@@ -211,29 +223,36 @@ const CostAnalysisContent = ({
         Benchmark scenarios ({scenarios.length})
       </h3>
       <ul className="mb-5">
-        {scenarios.map((scenario) => (
-          <li key={scenario.id}>
-            <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
-              <h4 className="text-white font-medium mb-2">{scenario.id}</h4>
-              <div className="grid grid-cols-3 gap-5">
-                <div className="col-span-2">
-                  <ul className="mb-4">
-                    <li>Area size: 22,...,....</li>
-                    <li>Average benchmark duration: 209 s</li>
-                    <li>Average cost: 0.2 platform credits</li>
-                    <li>90% cost range: 0.1-0.3 platform credits / km2</li>
-                  </ul>
-                  <ParametersTable
-                    parameters={getParametersFromScenario(scenario)}
-                  />
+        {scenarios.map((scenario) => {
+          const geometry = getGeometryFromScenario(scenario);
+
+          return (
+            <li key={scenario.id}>
+              <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
+                <h4 className="text-white font-medium mb-2">{scenario.id}</h4>
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+                  <div className="xl:col-span-2">
+                    <ul className="mb-4">
+                      <li>Average benchmark duration: 209 s</li>
+                      <li>Average cost: 0.2 platform credits</li>
+                      <li>90% cost range: 0.1-0.3 platform credits / km2</li>
+                    </ul>
+                    <ParametersTable
+                      parameters={getParametersFromScenario(scenario)}
+                    />
+                  </div>
+                  {geometry ? (
+                    <div className="flex-1">
+                      <div className="bg-brand-teal-50/50 w-full h-full min-h-[200px]">
+                        <MapViewer geometry={JSON.stringify(geometry)} />
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-                <div className="flex-1">
-                  <div className="bg-brand-teal-50/50 w-full h-full"></div>
-                </div>
-              </div>
-            </article>
-          </li>
-        ))}
+              </article>
+            </li>
+          );
+        })}
       </ul>
     </article>
   );
@@ -274,8 +293,6 @@ export const ExecutionInfoTabs = ({
     (!orderUrl && cwlUrl);
 
   const shouldUseTabs = isFeatureEnabled(window.location.href, "costAnalysis");
-
-  console.log(benchmarkScenarios);
 
   if (!shouldUseTabs) {
     return (
@@ -348,7 +365,7 @@ export const ExecutionInfoTabs = ({
 
         <TabsContent
           value="execution"
-          className="p-6 bg-brand-teal-30/20 rounded-b-md"
+          className="p-6 bg-brand-teal-30/20 rounded-b-md rounded-tr-md"
         >
           <ExecutionInfoContent
             algorithm={algorithm}
@@ -366,8 +383,9 @@ export const ExecutionInfoTabs = ({
         {benchmarkScenarios.length > 0 ? (
           <TabsContent
             value="cost-analysis"
-            className="p-6 bg-brand-teal-30/20 rounded-b-md"
+            className="p-6 bg-brand-teal-30/20 rounded-b-md rounded-tr-md"
           >
+            {/* TODO: scenario can have multiple ids */}
             <CostAnalysisContent
               scenarioId="bap_composite"
               scenarios={benchmarkScenarios}
