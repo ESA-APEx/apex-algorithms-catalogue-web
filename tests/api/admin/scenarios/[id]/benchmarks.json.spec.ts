@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/pages/api/admin/services/[id]/benchmarks.json";
 import { getUrlsFromRequest } from "@/lib/parquet-datasource";
 import { executeQuery } from "@/lib/db";
-import type { BenchmarkData } from "@/types/models/benchmark";
+import type { AdminBenchmarkData } from "@/types/models/benchmark";
 
 vi.mock("@/lib/parquet-datasource", () => ({
   getUrlsFromRequest: vi.fn(),
@@ -54,8 +54,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
 
   describe("Basic functionality", () => {
     it("should return success for a scenario", async () => {
-      const mockData: BenchmarkData[] = [
+      const mockData: AdminBenchmarkData[] = [
         {
+          scenario_id: "scenario-123",
           cpu: 100,
           memory: 200,
           costs: 300,
@@ -64,6 +65,7 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           max_executor_memory: 600,
           network_received: 700,
           start_time: "2024-02-27T12:00:00Z",
+          area_size: 400,
           status: "passed",
         },
       ];
@@ -109,8 +111,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
 
   describe("Date parameter validation and filtering", () => {
     beforeEach(() => {
-      const mockData: BenchmarkData[] = [
+      const mockData: AdminBenchmarkData[] = [
         {
+          scenario_id: "scenario-123",
           cpu: 150,
           memory: 250,
           costs: 350,
@@ -119,6 +122,7 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           max_executor_memory: 650,
           network_received: 750,
           start_time: "2025-01-15T10:30:00Z",
+          area_size: 400,
           status: "passed",
         },
       ];
@@ -283,8 +287,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
 
   describe("URL parameter handling", () => {
     beforeEach(() => {
-      const mockData: BenchmarkData[] = [
+      const mockData: AdminBenchmarkData[] = [
         {
+          scenario_id: "scenario-123",
           cpu: 100,
           memory: 200,
           costs: 300,
@@ -293,6 +298,7 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           max_executor_memory: 600,
           network_received: 700,
           start_time: "2024-02-27T12:00:00Z",
+          area_size: 400,
           status: "passed",
         },
       ];
