@@ -125,7 +125,7 @@ export const ParametersTable = ({ parameters }: ParametersTableProps) => {
 };
 
 interface CostAnalysisContentProps {
-  scenarioId: string;
+  serviceId: string;
   scenarios: BenchmarkScenario[];
 }
 
@@ -146,28 +146,56 @@ const getGeometryFromScenario = (scenario: BenchmarkScenario) => {
   try {
     const processGraphKey = Object.keys(scenario.process_graph)[0];
     const args = scenario.process_graph[processGraphKey]?.arguments;
-    return args?.geometry || args?.bbox || args?.spatial_extent || null;
+    return (
+      args?.geometry ||
+      args?.bbox ||
+      args?.spatial_extent ||
+      args?.geometries ||
+      null
+    );
   } catch (error) {
     console.error("Failed to extract geometry from scenario:", error);
     return null;
   }
 };
 
+const getDateRange = (data: BenchmarkData[] | undefined) => {
+  if (data?.length) {
+    const startDate = new Date(data[data.length - 1].start_time);
+    const endDate = new Date(data[0].start_time);
+    return `${format(startDate, "MMM yyyy")} - ${format(endDate, "MMM yyyy")}`;
+  }
+  return "-";
+};
+
+const getAverageCostPerKm = (data: BenchmarkData[]) => {
+  if (!data.length) return "-";
+  const totalCost = data.reduce(
+    (sum, item) => sum + item.costs / item.area_size,
+    0,
+  );
+  return `${(totalCost / data.length).toFixed(2)} platform credits / km²`;
+};
+
+const getAverageBenchmarkDuration = (data: BenchmarkData[]) => {
+  if (!data.length) return "-";
+  const totalDuration = data.reduce((sum, item) => sum + item.duration, 0);
+  return `${(totalDuration / data.length).toFixed(2)} s`;
+};
+
 const CostAnalysisContent = ({
-  scenarioId,
+  serviceId,
   scenarios,
 }: CostAnalysisContentProps) => {
   const [data, setData] = useState<BenchmarkData[]>();
   const [status, setStatus] = useState<string>("loading");
 
-  const now = new Date();
-  const startDate = addDate(now, { months: -Number(PARQUET_MONTH_COVERAGE) });
-  const dateRange = `${format(startDate, "MMM yyyy")} - ${format(now, "MMM yyyy")}`;
+  const dateRange = getDateRange(data);
 
   const fetchData = async () => {
     setStatus("loading");
     try {
-      const result = await getBenchmarkDetails(scenarioId);
+      const result = await getBenchmarkDetails(serviceId);
       if (result) {
         setData(result.data);
         setStatus("success");
@@ -180,7 +208,7 @@ const CostAnalysisContent = ({
 
   useEffect(() => {
     fetchData();
-  }, [scenarioId]);
+  }, [serviceId]);
 
   if (status === "loading") {
     return <p className="text-gray-400">Loading benchmark data...</p>;
@@ -193,10 +221,10 @@ const CostAnalysisContent = ({
   if (!data?.length)
     return <p className="text-gray-400">No benchmark data available.</p>;
 
-  const averageCost = (
-    data.reduce((sum, item) => sum + item.costs, 0) / data.length
-  ).toFixed(2);
-  const sortedCosts = [...data].sort((a, b) => a.costs - b.costs);
+  const averageCost = getAverageCostPerKm(data);
+  const sortedCosts = [...data].sort(
+    (a, b) => a.costs / a.area_size - b.costs / b.area_size,
+  );
   const costRange90 = [
     sortedCosts[Math.floor(data.length * 0.05)].costs,
     sortedCosts[Math.ceil(data.length * 0.95) - 1].costs,
@@ -211,9 +239,7 @@ const CostAnalysisContent = ({
       </aside>
       <h3 className="text-white mb-2">Overview</h3>
       <ul className="mb-5">
-        <li className="mb-1">
-          Average cost: {averageCost} platform credits / km²
-        </li>
+        <li className="mb-1">Average cost: {averageCost}</li>
         <li className="mb-1">
           90% cost range: {costRange90[0]} - {costRange90[1]} platform credits /
           km²
@@ -233,8 +259,22 @@ const CostAnalysisContent = ({
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                   <div className="xl:col-span-2">
                     <ul className="mb-4">
-                      <li>Average benchmark duration: 209 s</li>
-                      <li>Average cost: 0.2 platform credits</li>
+                      <li>
+                        Average benchmark duration:{" "}
+                        {getAverageBenchmarkDuration(
+                          data.filter(
+                            (item) => item.scenario_id === scenario.id,
+                          ),
+                        )}
+                      </li>
+                      <li>
+                        Average cost:{" "}
+                        {getAverageCostPerKm(
+                          data.filter(
+                            (item) => item.scenario_id === scenario.id,
+                          ),
+                        )}
+                      </li>
                       <li>90% cost range: 0.1-0.3 platform credits / km2</li>
                     </ul>
                     <ParametersTable
@@ -385,9 +425,8 @@ export const ExecutionInfoTabs = ({
             value="cost-analysis"
             className="p-6 bg-brand-teal-30/20 rounded-b-md rounded-tr-md"
           >
-            {/* TODO: scenario can have multiple ids */}
             <CostAnalysisContent
-              scenarioId="bap_composite"
+              serviceId={algorithm.id}
               scenarios={benchmarkScenarios}
             />
           </TabsContent>
