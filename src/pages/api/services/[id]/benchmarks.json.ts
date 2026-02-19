@@ -75,9 +75,9 @@ import {
  *                       network_received:
  *                         type: number
  *                         description: Amount of data received over the network in bytes.
- *                       status:
- *                         type: string
- *                         description: Status of the benchmark ('passed' or 'failed').
+ *                       area_size:
+ *                         type: number
+ *                         description: Area size in square kilometers.
  *       500:
  *         description: An error occurred while fetching the scenario data.
  */
@@ -107,11 +107,11 @@ export const GET: APIRoute = async ({ params }) => {
                 round("usage:network_received:b", 2)                           as network_received,
                 round("results:proj:bbox:area:utm:km2", 2)                     as area_size,
                 strptime("test:start:datetime", '%Y-%m-%dT%H:%M:%SZ')          as start_time,
-                "test:outcome"                                                 as status,
                 "scenario_id"                                                  as scenario_id
             FROM benchmarks
             WHERE "scenario_id" IN (${scenarioIds.map((id: string) => `'${id}'`).join(", ")})
                 ${dateFilter}
+                AND "test:outcome" = 'passed'
             ORDER BY "test:start:datetime" DESC
         `;
     const data = (await executeQuery(query)) as BenchmarkData[];

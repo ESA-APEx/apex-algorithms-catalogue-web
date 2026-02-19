@@ -14,7 +14,6 @@ export interface BenchmarkData {
   max_executor_memory: number;
   network_received: number;
   area_size: number;
-  status: "passed" | "failed";
 }
 
 export interface BenchmarkSummary {
