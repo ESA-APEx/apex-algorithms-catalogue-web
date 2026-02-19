@@ -231,20 +231,24 @@ const CostAnalysisContent = ({
         </p>
       </aside>
       <h3 className="text-white mb-2">Overview</h3>
-      <div className="mb-5 flex flex-col xl:flex-row gap-5">
-        <ul className="flex-1">
+      <div className="mb-5 xl:flex gap-5">
+        <ul className="flex-1 xl:w-2/3">
           <li className="mb-1">Average cost: {averageCost}</li>
           <li>
             Average benchmark duration: {getAverageBenchmarkDuration(data)}
           </li>
+          {scenarios.length === 1 ? (
+            <li className="mt-4">
+              <ParametersTable
+                parameters={getParametersFromScenario(scenarios[0])}
+              />
+            </li>
+          ) : null}
         </ul>
         {scenarios.length === 1 && firstScenarioGeometry ? (
-          <div className="flex-1">
-            <div className="bg-brand-teal-50/50 w-full h-full">
-              <MapViewer
-                height="200px"
-                geometry={JSON.stringify(firstScenarioGeometry)}
-              />
+          <div className="flex-1 mt-5 xl:mt-0 xl:min-h[200px] h-[200px] xl:h-auto">
+            <div className="bg-brand-teal-50/50 w-full h-full min-h[200px]">
+              <MapViewer geometry={JSON.stringify(firstScenarioGeometry)} />
             </div>
           </div>
         ) : null}
