@@ -23,9 +23,15 @@ register(proj4);
 
 interface MapViewerProps {
   geometry: string;
+  width?: string;
+  height?: string;
 }
 
-export const MapViewer: React.FC<MapViewerProps> = ({ geometry }) => {
+export const MapViewer: React.FC<MapViewerProps> = ({
+  geometry,
+  width = "100%",
+  height = "100%",
+}) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
   const vectorLayer = useRef<VectorLayer<VectorSource> | null>(null);
@@ -170,7 +176,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({ geometry }) => {
 
   return (
     <>
-      <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
+      <div ref={mapRef} style={{ width, height }} />
       {error && (
         <div
           style={{

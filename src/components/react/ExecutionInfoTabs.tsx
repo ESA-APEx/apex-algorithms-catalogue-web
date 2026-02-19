@@ -4,8 +4,7 @@ import { Badge } from "./Badge";
 import { ClipboardButton } from "./ClipboardButton";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import { getBenchmarkDetails } from "@/lib/api";
-import { PARQUET_MONTH_COVERAGE } from "@/lib/parquet-datasource";
-import { format, add as addDate } from "date-fns";
+import { format } from "date-fns";
 import { CatalogueDetailParametersTable } from "./CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "./CatalogueCwlDetailParametersTable";
 import { MapViewer } from "./MapViewer";
@@ -222,13 +221,7 @@ const CostAnalysisContent = ({
     return <p className="text-gray-400">No benchmark data available.</p>;
 
   const averageCost = getAverageCostPerKm(data);
-  const sortedCosts = [...data].sort(
-    (a, b) => a.costs / a.area_size - b.costs / b.area_size,
-  );
-  const costRange90 = [
-    sortedCosts[Math.floor(data.length * 0.05)].costs,
-    sortedCosts[Math.ceil(data.length * 0.95) - 1].costs,
-  ];
+  const firstScenarioGeometry = getGeometryFromScenario(scenarios[0]);
 
   return (
     <article className="text-gray-300">
@@ -238,62 +231,78 @@ const CostAnalysisContent = ({
         </p>
       </aside>
       <h3 className="text-white mb-2">Overview</h3>
-      <ul className="mb-5">
-        <li className="mb-1">Average cost: {averageCost}</li>
-        <li className="mb-1">
-          90% cost range: {costRange90[0]} - {costRange90[1]} platform credits /
-          km²
-        </li>
-      </ul>
-      <h3 className="text-white mb-2">
-        Benchmark scenarios ({scenarios.length})
-      </h3>
-      <ul className="mb-5">
-        {scenarios.map((scenario) => {
-          const geometry = getGeometryFromScenario(scenario);
+      <div className="mb-5 flex flex-col xl:flex-row gap-5">
+        <ul className="flex-1">
+          <li className="mb-1">Average cost: {averageCost}</li>
+          <li>
+            Average benchmark duration: {getAverageBenchmarkDuration(data)}
+          </li>
+        </ul>
+        {scenarios.length === 1 && firstScenarioGeometry ? (
+          <div className="flex-1">
+            <div className="bg-brand-teal-50/50 w-full h-full">
+              <MapViewer
+                height="200px"
+                geometry={JSON.stringify(firstScenarioGeometry)}
+              />
+            </div>
+          </div>
+        ) : null}
+      </div>
+      {scenarios.length > 1 ? (
+        <>
+          <h3 className="text-white mb-2">
+            Benchmark scenarios ({scenarios.length})
+          </h3>
+          <ul className="mb-5">
+            {scenarios.map((scenario) => {
+              const geometry = getGeometryFromScenario(scenario);
 
-          return (
-            <li key={scenario.id}>
-              <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
-                <h4 className="text-white font-medium mb-2">{scenario.id}</h4>
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-                  <div className="xl:col-span-2">
-                    <ul className="mb-4">
-                      <li>
-                        Average benchmark duration:{" "}
-                        {getAverageBenchmarkDuration(
-                          data.filter(
-                            (item) => item.scenario_id === scenario.id,
-                          ),
-                        )}
-                      </li>
-                      <li>
-                        Average cost:{" "}
-                        {getAverageCostPerKm(
-                          data.filter(
-                            (item) => item.scenario_id === scenario.id,
-                          ),
-                        )}
-                      </li>
-                      <li>90% cost range: 0.1-0.3 platform credits / km2</li>
-                    </ul>
-                    <ParametersTable
-                      parameters={getParametersFromScenario(scenario)}
-                    />
-                  </div>
-                  {geometry ? (
-                    <div className="flex-1">
-                      <div className="bg-brand-teal-50/50 w-full h-full min-h-[200px]">
-                        <MapViewer geometry={JSON.stringify(geometry)} />
+              return (
+                <li key={scenario.id}>
+                  <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
+                    <h4 className="text-white font-medium mb-2">
+                      {scenario.id}
+                    </h4>
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+                      <div className="xl:col-span-2">
+                        <ul className="mb-4">
+                          <li>
+                            Average cost:{" "}
+                            {getAverageCostPerKm(
+                              data.filter(
+                                (item) => item.scenario_id === scenario.id,
+                              ),
+                            )}
+                          </li>
+                          <li>
+                            Average benchmark duration:{" "}
+                            {getAverageBenchmarkDuration(
+                              data.filter(
+                                (item) => item.scenario_id === scenario.id,
+                              ),
+                            )}
+                          </li>
+                        </ul>
+                        <ParametersTable
+                          parameters={getParametersFromScenario(scenario)}
+                        />
                       </div>
+                      {geometry ? (
+                        <div className="flex-1">
+                          <div className="bg-brand-teal-50/50 w-full h-full">
+                            <MapViewer geometry={JSON.stringify(geometry)} />
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-              </article>
-            </li>
-          );
-        })}
-      </ul>
+                  </article>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      ) : null}
     </article>
   );
 };
