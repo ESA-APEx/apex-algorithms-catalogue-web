@@ -16,6 +16,10 @@ export interface BenchmarkData {
   area_size: number;
 }
 
+export interface AdminBenchmarkData extends BenchmarkData {
+  status: "passed" | "failed";
+}
+
 export interface BenchmarkSummary {
   runs: number;
   scenario_id: string;

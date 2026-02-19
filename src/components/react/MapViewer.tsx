@@ -11,11 +11,10 @@ import { Feature } from "ol";
 import { Polygon } from "ol/geom";
 import { FullScreen, Zoom } from "ol/control";
 import GeoJSON from "ol/format/GeoJSON";
-import { fromLonLat, transformExtent } from "ol/proj";
+import { fromLonLat } from "ol/proj";
 import { Fill, Stroke, Style, Circle as CircleStyle } from "ol/style";
 import { isEmpty } from "ol/extent";
 import "ol/ol.css";
-import { fromExtent } from "ol/geom/Polygon";
 
 proj4.defs("EPSG:32631", "+proj=utm +zone=31 +datum=WGS84 +units=m +no_defs");
 
