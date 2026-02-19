@@ -149,7 +149,9 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         ]);
 
         polygon.transform(
-          parsedData.crs || parsedData.srs || "EPSG:4326",
+          typeof parsedData.crs === "number"
+            ? `EPSG:${parsedData.crs}`
+            : parsedData.crs || "EPSG:4326",
           "EPSG:3857",
         );
 
