@@ -262,11 +262,11 @@ const CostAnalysisContent = ({
             Benchmark scenarios ({scenarios.length})
           </h3>
           <ul className="mb-5">
-            {scenarios.map((scenario) => {
+            {scenarios.map((scenario, id) => {
               const geometry = getGeometryFromScenario(scenario);
 
               return (
-                <li key={scenario.id}>
+                <li key={scenario.id} data-testid={`benchmark-scenario-${id}`}>
                   <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
                     <h4 className="text-white font-medium mb-2">
                       {scenario.id}

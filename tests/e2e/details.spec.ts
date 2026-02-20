@@ -103,6 +103,105 @@ test.describe("Service Details Test", () => {
     await expect(readMoreButton).not.toBeVisible();
   });
 
+  test("Should display powered by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLogo = page.getByTestId("powered-by");
+    await expect(poweredByLogo).toBeVisible();
+
+    await expect(poweredByLogo.getByText("Powered by")).toBeVisible();
+
+    const logoImage = poweredByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should display provided by logo in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const providedByLogo = page.getByTestId("provided-by");
+    await expect(providedByLogo).toBeVisible();
+
+    await expect(providedByLogo.getByText("Provided by")).toBeVisible();
+
+    const logoImage = providedByLogo.locator("img");
+    await expect(logoImage).toBeVisible();
+    await expect(logoImage).toHaveAttribute("alt");
+    await expect(logoImage).toHaveAttribute("src");
+  });
+
+  test("Should have clickable logo links in detail page", async ({ page }) => {
+    await openService(page, "Multi output gaussian process regression");
+
+    const poweredByLink = page.getByTestId("powered-by").locator("a");
+    await expect(poweredByLink).toHaveAttribute("href");
+    await expect(poweredByLink).toHaveAttribute("target", "__blank");
+
+    const providedByLink = page.getByTestId("provided-by").locator("a");
+    await expect(providedByLink).toHaveAttribute("href");
+    await expect(providedByLink).toHaveAttribute("target", "__blank");
+  });
+});
+
+test.describe("Notebook Execution Test", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("http://localhost:4321/apps/parcel_delineation");
+  });
+
+  test("Should render execute notebook action", async ({ page }) => {
+    const notebookSelect = page.locator("#notebook-select");
+    await expect(notebookSelect).toBeVisible();
+
+    const options = notebookSelect.locator("option");
+    const defaultOption = options.first();
+    await expect(defaultOption).toHaveText("Execute notebook");
+
+    const count = await options.count();
+    expect(count).toBeGreaterThanOrEqual(2);
+  });
+
+  test("Should open notebook in new tab with correct URL when option is selected", async ({
+    page,
+    context,
+  }) => {
+    const notebookSelect = page.locator("#notebook-select");
+
+    const options = notebookSelect.locator("option");
+
+    const notebookOption = options.nth(1);
+    const notebookUrl = await notebookOption.getAttribute("value");
+
+    expect(notebookUrl).toBeTruthy();
+
+    const pagePromise = context.waitForEvent("page");
+
+    await notebookSelect.selectOption({ index: 1 });
+
+    const newPage = await pagePromise;
+    const newPageUrl = newPage.url();
+
+    expect(newPageUrl).toContain("?fromURL=");
+    expect(newPageUrl).toContain(encodeURIComponent(notebookUrl!));
+
+    await newPage.close();
+  });
+});
+
+test.describe("Detail page tabs", () => {
+  test("should display tabs", async ({ page }) => {
+    await openService(page, "Biophysical parameters calculation");
+
+    await expect(page.locator('[role="tablist"]')).toBeVisible();
+
+    await expect(
+      page.getByRole("tab", { name: /execution information/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("tab", { name: /cost analysis/i }),
+    ).toBeVisible();
+  });
+
   test("Should show parameters in the details page for OpenEO service", async ({
     page,
   }) => {
@@ -198,87 +297,39 @@ test.describe("Service Details Test", () => {
     );
   });
 
-  test("Should display powered by logo in detail page", async ({ page }) => {
-    await openService(page, "Multi output gaussian process regression");
-
-    const poweredByLogo = page.getByTestId("powered-by");
-    await expect(poweredByLogo).toBeVisible();
-
-    await expect(poweredByLogo.getByText("Powered by")).toBeVisible();
-
-    const logoImage = poweredByLogo.locator("img");
-    await expect(logoImage).toBeVisible();
-    await expect(logoImage).toHaveAttribute("alt");
-    await expect(logoImage).toHaveAttribute("src");
-  });
-
-  test("Should display provided by logo in detail page", async ({ page }) => {
-    await openService(page, "Multi output gaussian process regression");
-
-    const providedByLogo = page.getByTestId("provided-by");
-    await expect(providedByLogo).toBeVisible();
-
-    await expect(providedByLogo.getByText("Provided by")).toBeVisible();
-
-    const logoImage = providedByLogo.locator("img");
-    await expect(logoImage).toBeVisible();
-    await expect(logoImage).toHaveAttribute("alt");
-    await expect(logoImage).toHaveAttribute("src");
-  });
-
-  test("Should have clickable logo links in detail page", async ({ page }) => {
-    await openService(page, "Multi output gaussian process regression");
-
-    const poweredByLink = page.getByTestId("powered-by").locator("a");
-    await expect(poweredByLink).toHaveAttribute("href");
-    await expect(poweredByLink).toHaveAttribute("target", "__blank");
-
-    const providedByLink = page.getByTestId("provided-by").locator("a");
-    await expect(providedByLink).toHaveAttribute("href");
-    await expect(providedByLink).toHaveAttribute("target", "__blank");
-  });
-});
-
-test.describe("Notebook Execution Test", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:4321/apps/parcel_delineation");
-  });
-
-  test("Should render execute notebook action", async ({ page }) => {
-    const notebookSelect = page.locator("#notebook-select");
-    await expect(notebookSelect).toBeVisible();
-
-    const options = notebookSelect.locator("option");
-    const defaultOption = options.first();
-    await expect(defaultOption).toHaveText("Execute notebook");
-
-    const count = await options.count();
-    expect(count).toBeGreaterThanOrEqual(2);
-  });
-
-  test("Should open notebook in new tab with correct URL when option is selected", async ({
+  test("should switch to cost analysis tab and display benchmark data", async ({
     page,
-    context,
   }) => {
-    const notebookSelect = page.locator("#notebook-select");
+    await openService(page, "Biophysical parameters calculation");
 
-    const options = notebookSelect.locator("option");
+    await page.getByRole("tab", { name: /cost analysis/i }).click();
 
-    const notebookOption = options.nth(1);
-    const notebookUrl = await notebookOption.getAttribute("value");
+    await expect(page.getByRole("tabpanel")).toBeVisible();
 
-    expect(notebookUrl).toBeTruthy();
+    await expect(page.getByText("Loading benchmark data...")).toBeVisible();
 
-    const pagePromise = context.waitForEvent("page");
+    await expect(page.getByText("Based on 2 benchmark runs")).toBeVisible();
+    await expect(page.getByText("Overview")).toBeVisible();
 
-    await notebookSelect.selectOption({ index: 1 });
+    await expect(
+      page.getByText(/Average cost:.*platform credits \/ km²/),
+    ).toBeVisible();
 
-    const newPage = await pagePromise;
-    const newPageUrl = newPage.url();
+    await expect(
+      page.getByText(/Average benchmark duration:.*s/),
+    ).toBeVisible();
+  });
 
-    expect(newPageUrl).toContain("?fromURL=");
-    expect(newPageUrl).toContain(encodeURIComponent(notebookUrl!));
+  test("should display multiple scenarios section", async ({ page }) => {
+    await openService(page, "Biophysical parameters calculation");
 
-    await newPage.close();
+    await page.getByRole("tab", { name: /cost analysis/i }).click();
+
+    await expect(page.getByText("Overview")).toBeVisible();
+
+    await expect(page.getByText(/Benchmark scenarios \(2\)/)).toBeVisible();
+
+    await expect(page.getByTestId("benchmark-scenario-0")).toBeVisible();
+    await expect(page.getByTestId("benchmark-scenario-1")).toBeVisible();
   });
 });
