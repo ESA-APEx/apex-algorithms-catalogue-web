@@ -67,9 +67,12 @@ const ExecutionInfoContent = ({
                   {executionInfoLabels[link.rel] || link.title}
                 </p>
                 {link.rel === "application" && isDefinitionProtected && (
-                  <Badge className="font-normal text-sm rounded-sm">
-                    protected
-                  </Badge>
+                  <>
+                    {" "}
+                    <Badge className="font-normal text-sm rounded-sm">
+                      protected
+                    </Badge>
+                  </>
                 )}
               </div>
               <p>
