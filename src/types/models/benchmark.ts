@@ -1,9 +1,10 @@
 export interface BenchmarkDetails {
-  scenario_id: string;
+  service_id: string;
   data: BenchmarkData[];
 }
 
 export interface BenchmarkData {
+  scenario_id: string;
   cpu: number;
   costs: number;
   memory: number;
@@ -12,6 +13,10 @@ export interface BenchmarkData {
   input_pixel: number;
   max_executor_memory: number;
   network_received: number;
+  area_size: number;
+}
+
+export interface AdminBenchmarkData extends BenchmarkData {
   status: "passed" | "failed";
 }
 

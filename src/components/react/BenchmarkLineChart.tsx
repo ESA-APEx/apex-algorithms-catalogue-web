@@ -12,7 +12,7 @@ import {
   TimeScale,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import type { BenchmarkData } from "@/types/models/benchmark";
+import type { AdminBenchmarkData } from "@/types/models/benchmark";
 import { formatDate } from "date-fns";
 import { formatNumber } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ ChartJS.register(
 );
 
 interface BenchmarkLineChartProps {
-  data: BenchmarkData[];
+  data: AdminBenchmarkData[];
   metric: "cpu" | "memory" | "costs" | "duration";
   loading?: boolean;
   error?: string | null;

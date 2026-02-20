@@ -15,14 +15,14 @@ vi.mock("@/lib/db", () => ({
 }));
 
 describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", () => {
-  const mockScenarioId = "scenario-123";
+  const mockServiceId = "max_ndvi_composite";
   const mockUrls = ["https://example.com/data.parquet"];
 
   const createMockRequest = () =>
     ({
-      params: { id: mockScenarioId },
+      params: { id: mockServiceId },
       request: {
-        url: `https://example.com/api/services/${mockScenarioId}/benchmarks.json`,
+        url: `https://example.com/api/services/${mockServiceId}/benchmarks.json`,
       },
     }) as any;
 
@@ -53,7 +53,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
 
     expect(response.status).toBe(200);
     expect(jsonResponse).toEqual({
-      scenario_id: mockScenarioId,
+      service_id: mockServiceId,
       data: mockData,
     });
 
@@ -70,11 +70,13 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
 
     // Verify scenario ID filter is included
     expect(executeQuery).toHaveBeenCalledWith(
-      expect.stringContaining(`WHERE "scenario_id" = '${mockScenarioId}'`),
+      expect.stringContaining(
+        `WHERE "scenario_id" IN ('max_ndvi_composite', 'max_ndvi_composite_stac308')`,
+      ),
     );
   });
 
-  it("should return empty data array when no benchmarks exist for scenario", async () => {
+  it("should return empty data array when no benchmarks exist for service", async () => {
     (executeQuery as jest.Mock).mockResolvedValue([]);
 
     const response = await GET(createMockRequest());
@@ -82,7 +84,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
 
     expect(response.status).toBe(200);
     expect(jsonResponse).toEqual({
-      scenario_id: mockScenarioId,
+      service_id: mockServiceId,
       data: [],
     });
   });
@@ -98,7 +100,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
 
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
-      message: `Fetching benchmark data for service ${mockScenarioId} failed.`,
+      message: `Fetching benchmark data for ${mockServiceId} failed.`,
     });
 
     expect(getUrls).toHaveBeenCalledOnce();
@@ -116,7 +118,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
 
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
-      message: `Fetching benchmark data for service ${mockScenarioId} failed.`,
+      message: `Fetching benchmark data for ${mockServiceId} failed.`,
     });
 
     expect(getUrls).toHaveBeenCalledOnce();

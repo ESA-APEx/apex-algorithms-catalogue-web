@@ -5,6 +5,7 @@ export const featureflag: Record<any, any> = {
     jupyterLiteIntegration: true,
     basicAuth: false,
     providerPlatformLogo: true,
+    costAnalysis: true,
   },
   production: {
     benchmarkStatus: true,
@@ -12,6 +13,7 @@ export const featureflag: Record<any, any> = {
     jupyterLiteIntegration: true,
     basicAuth: false,
     providerPlatformLogo: true,
+    costAnalysis: false,
   },
   preview: {
     benchmarkStatus: false,
@@ -19,6 +21,7 @@ export const featureflag: Record<any, any> = {
     jupyterLiteIntegration: true,
     basicAuth: true,
     providerPlatformLogo: true,
+    costAnalysis: false,
   },
   default: {
     benchmarkStatus: true,
@@ -26,5 +29,6 @@ export const featureflag: Record<any, any> = {
     jupyterLiteIntegration: true,
     basicAuth: true,
     providerPlatformLogo: true,
+    costAnalysis: true,
   },
 };
