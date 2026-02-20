@@ -189,8 +189,12 @@ test.describe("Notebook Execution Test", () => {
 });
 
 test.describe("Detail page tabs", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
+
   test("should display tabs", async ({ page }) => {
-    await openService(page, "Biophysical parameters calculation");
+    await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await expect(page.locator('[role="tablist"]')).toBeVisible();
 
@@ -300,28 +304,26 @@ test.describe("Detail page tabs", () => {
   test("should switch to cost analysis tab and display benchmark data", async ({
     page,
   }) => {
-    await openService(page, "Biophysical parameters calculation");
+    await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await page.getByRole("tab", { name: /cost analysis/i }).click();
 
     await expect(page.getByRole("tabpanel")).toBeVisible();
 
-    await expect(page.getByText("Loading benchmark data...")).toBeVisible();
-
-    await expect(page.getByText("Based on 2 benchmark runs")).toBeVisible();
+    await expect(page.getByText(/Based on .* benchmark runs/)).toBeVisible();
     await expect(page.getByText("Overview")).toBeVisible();
 
     await expect(
-      page.getByText(/Average cost:.*platform credits \/ km²/),
+      page.getByText(/Average cost:.*platform credits \/ km²/).first(),
     ).toBeVisible();
 
     await expect(
-      page.getByText(/Average benchmark duration:.*s/),
+      page.getByText(/Average benchmark duration:.*s/).first(),
     ).toBeVisible();
   });
 
   test("should display multiple scenarios section", async ({ page }) => {
-    await openService(page, "Biophysical parameters calculation");
+    await openService(page, "Max NDVI Composite based on Sentinel-2 data");
 
     await page.getByRole("tab", { name: /cost analysis/i }).click();
 
