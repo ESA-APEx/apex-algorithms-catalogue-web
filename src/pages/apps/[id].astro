@@ -9,16 +9,14 @@ import {
 } from "lucide-react";
 import { Badge } from "../../components/react/Badge";
 import { CatalogueDetailActions } from "../../components/react/CatalogueDetailActions";
-import { ClipboardButton } from "../../components/react/ClipboardButton";
 import Layout from "../../layouts/Layout.astro";
 import Prose from "../../components/Prose.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import { loadCatalogueDetailData } from "../../lib/load-catalogue";
 import { getDate, getLogoRel } from "../../lib/utils";
 import { generateToC } from "../../lib/toc-generator";
-import { CatalogueDetailParametersTable } from "../../components/react/CatalogueDetailParametersTable";
-import { CatalogueCwlDetailParametersTable } from "../../components/react/CatalogueCwlDetailParametersTable";
 import { CollapsibleText } from "../../components/react/CollapsibleText";
+import { ExecutionInfoTabs } from "../../components/react/ExecutionInfoTabs";
 import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStatusSideNavItem";
 import { InfoPopover } from "../../components/react/InfoPopover";
 import { PlatformProviderLogos } from "../../components/react/PlatformProviderLogos";
@@ -75,7 +73,7 @@ export const getStaticPaths = (async () => {
   const result = [];
 
   for (const item of data) {
-    const { algorithm, applicationDetails, platform, provider } = item;
+    const { algorithm, applicationDetails, platform, provider, benchmarkScenarios } = item;
 
     const description =
       applicationDetails?.description || algorithm.properties.description;
@@ -95,6 +93,7 @@ export const getStaticPaths = (async () => {
           applicationDetails,
           platform,
           provider,
+          benchmarkScenarios,
         },
         isDefinitionProtected,
         description,
@@ -109,7 +108,7 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { data, toc, description, isDefinitionProtected } = Astro.props;
-const { applicationDetails, algorithm, platform, provider } = data;
+const { applicationDetails, algorithm, platform, provider, benchmarkScenarios } = data;
 
 const UDP_DOCS_URL =
   "https://open-eo.github.io/openeo-python-client/cookbook/udp_sharing.html#loading-a-published-user-defined-process-as-datacube";
@@ -196,83 +195,18 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
             </section>
           )
         }
-        <section
-          class="bg-brand-teal-30 bg-opacity-20 rounded-md p-6 text-white mb-8"
-        >
-          <h2
-            class="text-xl md:text-2xl mb-6 relative inline-flex"
-            id="execution-information"
-          >
-            Execution information
-            {
-              applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
-                <div class="absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6">
-                  <a
-                    href={UDP_DOCS_URL}
-                    target="__blank"
-                    class="text-white inline-block rounded-full hover:bg-brand-teal-50/20"
-                  >
-                    <Info className="w-4 h-4" />
-                  </a>
-                </div>
-              )
-            }
-          </h2>
-          <ul class="flex flex-col gap-5 mb-6">
-            {
-              applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
-                <li>
-                  <div class="flex gap-2" data-testid="execution-info-label">
-                    <p class="text-white">Process ID</p>
-                  </div>
-                  <p>
-                    <span class="text-gray-400 break-words">
-                      {algorithm.id}
-                    </span>
-                    <ClipboardButton text={algorithm.id} client:idle />
-                  </p>
-                </li>
-              )
-            }
-            {
-              algorithm.links
-                .filter((link) => executionInfoLinksRel.includes(link.rel))
-                .map((link) => (
-                  <li>
-                    <div class="flex gap-2" data-testid="execution-info-label">
-                      <p class="text-white">
-                        {executionInfoLabels[link.rel] || link.title}
-                      </p>
-                      {link.rel === "application" && isDefinitionProtected ? (
-                        <Badge className="font-normal text-sm rounded-sm">
-                          protected
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <p>
-                      <a class="text-gray-400 break-all" href={link.href}>
-                        {link.href}
-                      </a>
-                      <ClipboardButton text={link.href} client:idle />
-                    </p>
-                  </li>
-                ))
-            }
-          </ul>
-          {
-            applicationDetails && algorithm.type === AlgorithmType.OPENEO && (
-              <CatalogueDetailParametersTable details={applicationDetails} />
-            )
-          }
-          {
-            !orderUrl && cwlUrl ? (
-              <CatalogueCwlDetailParametersTable
-                cwlUrl={cwlUrl}
-                client:only="react"
-              />
-            ) : null
-          }
-        </section>
+        <ExecutionInfoTabs
+          algorithm={algorithm}
+          applicationDetails={applicationDetails}
+          isDefinitionProtected={isDefinitionProtected}
+          executionInfoLinksRel={executionInfoLinksRel}
+          executionInfoLabels={executionInfoLabels}
+          orderUrl={orderUrl}
+          cwlUrl={cwlUrl}
+          udpDocsUrl={UDP_DOCS_URL}
+          benchmarkScenarios={benchmarkScenarios}
+          client:only="react"
+        />
         <section>
           <h2
             class="text-white text-xl md:text-2xl mb-4 relative inline-flex"

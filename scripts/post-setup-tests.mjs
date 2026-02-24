@@ -1,34 +1,47 @@
 import fs from "fs";
 import path from "path";
 
-copyAclMapping();
-copyFixtures();
+copyFileSourceToDist(
+  "./src/acl-mapping.json",
+  "./dist/server/acl-mapping.json",
+  "ACL mapping",
+);
+copyFileSourceToDist(
+  "./src/benchmark-mapping.json",
+  "./dist/server/benchmark-mapping.json",
+  "Benchmark mapping",
+);
+copyDirSourceToDist(
+  "./tests/fixtures",
+  "./dist/client/fixtures",
+  "test fixtures",
+);
 
-function copyAclMapping() {
-  console.log("Copying ACL mapping for tests...");
+function copyFileSourceToDist(sourcePath, targetPath, description) {
+  console.log(`Copying ${description} for tests...`);
 
-  const sourcePath = path.resolve("./src/acl-mapping.json");
-  const targetPath = path.resolve("./dist/server/acl-mapping.json");
-  const distServerPath = path.dirname(targetPath);
+  const source = path.resolve(sourcePath);
+  const target = path.resolve(targetPath);
+  const distServerDir = path.dirname(targetPath);
 
-  if (!fs.existsSync(distServerPath)) {
-    fs.mkdirSync(distServerPath, { recursive: true });
+  if (!fs.existsSync(distServerDir)) {
+    fs.mkdirSync(distServerDir, { recursive: true });
   }
-  fs.copyFileSync(sourcePath, targetPath);
+  fs.copyFileSync(source, target);
 
-  console.log("Copying ACL mapping completed ✅.");
+  console.log(`Copying ${description} completed ✅.`);
 }
 
-function copyFixtures() {
-  console.log("Copying test fixtures...");
+function copyDirSourceToDist(sourceDir, targetDir, description) {
+  console.log(`Copying ${description} for tests...`);
 
-  const sourceDir = path.resolve("./tests/fixtures");
-  const targetDir = path.resolve("./dist/client/fixtures");
+  const source = path.resolve(sourceDir);
+  const target = path.resolve(targetDir);
 
-  if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
+  if (!fs.existsSync(target)) {
+    fs.mkdirSync(target, { recursive: true });
   }
-  fs.cpSync(sourceDir, targetDir, { recursive: true });
+  fs.cpSync(source, target, { recursive: true });
 
-  console.log("Copying test fixtures completed ✅.");
+  console.log(`Copying ${description} completed ✅.`);
 }

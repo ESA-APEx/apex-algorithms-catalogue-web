@@ -1,11 +1,27 @@
 import type { ApplicationDetails } from "@/types/models/application";
-import type { BenchmarkSummary } from "@/types/models/benchmark";
+import type {
+  BenchmarkSummary,
+  BenchmarkDetails,
+} from "@/types/models/benchmark";
 
 export const getBenchmarkSummary = async () => {
   try {
     const response = await fetch("/api/services/benchmarks.json");
     if (response.ok) {
       return (await response.json()) as BenchmarkSummary[];
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getBenchmarkDetails = async (scenarioId: string) => {
+  try {
+    // TODO: get multiple scenarios in one request
+    // This should have received service / algorithm id instead of scenario id
+    const response = await fetch(`/api/services/${scenarioId}/benchmarks.json`);
+    if (response.ok) {
+      return (await response.json()) as BenchmarkDetails;
     }
   } catch (error) {
     throw error;

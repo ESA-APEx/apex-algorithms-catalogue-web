@@ -1,5 +1,5 @@
 import { getAdminBenchmarksScenarioData } from "@/lib/api";
-import type { BenchmarkData } from "@/types/models/benchmark";
+import type { AdminBenchmarkData } from "@/types/models/benchmark";
 import { addMonths, formatDate } from "date-fns";
 import React, { useState, useEffect } from "react";
 import { Spinner } from "./Spinner";
@@ -45,7 +45,7 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   className,
   id,
 }) => {
-  const [data, setData] = useState<BenchmarkData[]>();
+  const [data, setData] = useState<AdminBenchmarkData[]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
