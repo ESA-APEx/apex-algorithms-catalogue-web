@@ -1,0 +1,53 @@
+{
+    "service_id": "max_ndvi_composite",
+    "data": [
+        {
+            "cpu": null,
+            "memory": null,
+            "costs": 4,
+            "duration": 130.75,
+            "input_pixel": 2.58,
+            "max_executor_memory": null,
+            "network_received": null,
+            "area_size": 3.34,
+            "start_time": "2026-01-19T13:28:23.000Z",
+            "scenario_id": "max_ndvi_composite"
+        },
+        {
+            "cpu": null,
+            "memory": null,
+            "costs": 4,
+            "duration": 164.27,
+            "input_pixel": 2.58,
+            "max_executor_memory": null,
+            "network_received": null,
+            "area_size": 3.34,
+            "start_time": "2026-01-18T02:56:03.000Z",
+            "scenario_id": "max_ndvi_composite"
+        },
+        {
+            "cpu": null,
+            "memory": null,
+            "costs": 4,
+            "duration": 134.88,
+            "input_pixel": 2.58,
+            "max_executor_memory": null,
+            "network_received": null,
+            "area_size": 3.34,
+            "start_time": "2026-01-03T13:08:15.000Z",
+            "scenario_id": "max_ndvi_composite"
+        },
+        {
+            "cpu": null,
+            "memory": null,
+            "costs": 4,
+            "duration": 197.56,
+            "input_pixel": 2.58,
+            "max_executor_memory": null,
+            "network_received": null,
+            "area_size": 3.34,
+            "start_time": "2025-12-12T02:29:17.000Z",
+            "scenario_id": "max_ndvi_composite"
+        }
+    ]
+}
