@@ -170,7 +170,7 @@ const getDateRange = (data: BenchmarkData[] | undefined) => {
   return "-";
 };
 
-const getAverageCostPerKm = (data: BenchmarkData[]) => {
+export const getAverageCostPerKm = (data: BenchmarkData[]) => {
   if (!data.length) return "-";
   const totalCost = data.reduce(
     (sum, item) => sum + item.costs / item.area_size,
@@ -179,7 +179,7 @@ const getAverageCostPerKm = (data: BenchmarkData[]) => {
   return `${(totalCost / data.length).toFixed(2)} platform credits / km²`;
 };
 
-const getAverageBenchmarkDuration = (data: BenchmarkData[]) => {
+export const getAverageBenchmarkDuration = (data: BenchmarkData[]) => {
   if (!data.length) return "-";
   const totalDuration = data.reduce((sum, item) => sum + item.duration, 0);
   return `${(totalDuration / data.length).toFixed(2)} s`;
@@ -221,7 +221,7 @@ const CostAnalysisContent = ({
   }
 
   if (!data?.length)
-    return <p className="text-gray-400">No benchmark data available.</p>;
+    return <p className="text-gray-400">No recent benchmark data found.</p>;
 
   const averageCost = getAverageCostPerKm(data);
   const firstScenarioGeometry = getGeometryFromScenario(scenarios[0]);

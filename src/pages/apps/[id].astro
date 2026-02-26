@@ -1,7 +1,6 @@
 ---
 import { Markdown } from "@astropub/md";
 import {
-  Info,
   Globe,
   Mail,
   SquareArrowOutUpRight,
@@ -18,6 +17,7 @@ import { generateToC } from "../../lib/toc-generator";
 import { CollapsibleText } from "../../components/react/CollapsibleText";
 import { ExecutionInfoTabs } from "../../components/react/ExecutionInfoTabs";
 import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStatusSideNavItem";
+import { CostEstimateSideNavItem } from "../../components/react/CostEstimateSideNavItem";
 import { InfoPopover } from "../../components/react/InfoPopover";
 import { PlatformProviderLogos } from "../../components/react/PlatformProviderLogos";
 
@@ -302,12 +302,11 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
             scenarioId={algorithm.id}
             client:only="react"
           />
-          <li>
-            <div class="text-white mb-1">Cost estimation</div>
-            <div>
-              {costEstimate}
-            </div>
-          </li>
+          <CostEstimateSideNavItem
+            serviceId={algorithm.id}
+            costEstimate={costEstimate}
+            client:only="react"
+          />
           <li>
             <div class="text-white mb-1">Format</div>
             <div>
