@@ -225,6 +225,19 @@ const CostAnalysisContent = ({
 
   const averageCost = getAverageCostPerKm(data);
   const firstScenarioGeometry = getGeometryFromScenario(scenarios[0]);
+  const scenarioBenchmarks = scenarios.map((scenario) => ({
+    averageCost: getAverageCostPerKm(
+      data.filter(
+        (item) => item.scenario_id === scenario.id,
+      ),
+    ),
+    averageDuration: getAverageBenchmarkDuration(
+      data.filter(
+        (item) => item.scenario_id === scenario.id,
+      ),
+    ),
+    scenario,
+  })).filter(benchmark => benchmark.averageCost !== '-');
 
   return (
     <article className="text-gray-300">
@@ -259,40 +272,32 @@ const CostAnalysisContent = ({
       {scenarios.length > 1 ? (
         <>
           <h3 className="text-white mb-2">
-            Benchmark scenarios ({scenarios.length})
+            Benchmark scenarios ({scenarioBenchmarks.length})
           </h3>
           <ul className="mb-5">
-            {scenarios.map((scenario, id) => {
-              const geometry = getGeometryFromScenario(scenario);
+            {scenarioBenchmarks.map((item, id) => {
+              const geometry = getGeometryFromScenario(item.scenario);
 
               return (
-                <li key={scenario.id} data-testid={`benchmark-scenario-${id}`}>
+                <li key={item.scenario.id} data-testid={`benchmark-scenario-${id}`}>
                   <article className="bg-white bg-opacity-5 rounded-md p-4 mb-5">
                     <h4 className="text-white font-medium mb-2">
-                      {scenario.id}
+                      {item.scenario.id}
                     </h4>
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                       <div className="xl:col-span-2">
                         <ul className="mb-4">
                           <li>
                             Average cost:{" "}
-                            {getAverageCostPerKm(
-                              data.filter(
-                                (item) => item.scenario_id === scenario.id,
-                              ),
-                            )}
+                            {item.averageCost}
                           </li>
                           <li>
                             Average benchmark duration:{" "}
-                            {getAverageBenchmarkDuration(
-                              data.filter(
-                                (item) => item.scenario_id === scenario.id,
-                              ),
-                            )}
+                            {item.averageDuration}
                           </li>
                         </ul>
                         <ParametersTable
-                          parameters={getParametersFromScenario(scenario)}
+                          parameters={getParametersFromScenario(item.scenario)}
                         />
                       </div>
                       {geometry ? (
