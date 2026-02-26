@@ -71,7 +71,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
     // Verify scenario ID filter is included
     expect(executeQuery).toHaveBeenCalledWith(
       expect.stringContaining(
-        `WHERE "scenario_id" IN ('max_ndvi_composite', 'max_ndvi_composite_stac308')`,
+        `WHERE "scenario_id" IN ('max_ndvi_composite')`,
       ),
     );
   });
