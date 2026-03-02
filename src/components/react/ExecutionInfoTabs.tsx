@@ -21,6 +21,7 @@ import type { Algorithm } from "../../types/models/algorithm";
 import { AlgorithmType } from "../../types/models/algorithm";
 import type { BenchmarkData } from "@/types/models/benchmark";
 import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
+import { start } from "node:repl";
 
 const ExecutionInfoContent = ({
   algorithm,
@@ -163,9 +164,12 @@ const getGeometryFromScenario = (scenario: BenchmarkScenario) => {
 
 const getDateRange = (data: BenchmarkData[] | undefined) => {
   if (data?.length) {
-    const startDate = new Date(data[data.length - 1].start_time);
-    const endDate = new Date(data[0].start_time);
-    return `${format(startDate, "MMM yyyy")} - ${format(endDate, "MMM yyyy")}`;
+    const start = format(new Date(data[data.length - 1].start_time), "MMM yyyy");
+    const end = format(new Date(data[0].start_time), "MMM yyyy");
+    if (start === end) {
+      return start;
+    }
+    return `${start} - ${end}`;
   }
   return "-";
 };
