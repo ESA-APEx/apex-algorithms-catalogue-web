@@ -5,7 +5,7 @@ import { getBenchmarkDetails } from "@/lib/api";
 import { getAverageCostPerKm } from "./ExecutionInfoTabs";
 
 interface CostEstimateSideNavItemProps {
-  costEstimate: string;
+  costEstimate?: string;
   serviceId: string;
 }
 
@@ -31,10 +31,12 @@ export const CostEstimateSideNavItem = ({
   };
 
   useEffect(() => {
-    fetchData();
+    if (!costEstimate) {
+      fetchData();
+    }
   }, [serviceId]);
 
-  let displayedCostEstimate = '-';
+  let displayedCostEstimate = costEstimate ?? "-";
 
   if (status === "loading") {
     displayedCostEstimate = "Loading cost estimate data...";
@@ -50,10 +52,8 @@ export const CostEstimateSideNavItem = ({
 
   return (
     <li data-testid="cost-estimate-sidenav">
-        <div className="text-white mb-1">Cost estimation</div>
-        <div>
-            {isEnabled ? displayedCostEstimate : costEstimate}
-        </div>
+      <div className="text-white mb-1">Cost estimation</div>
+      <div>{isEnabled ? displayedCostEstimate : costEstimate}</div>
     </li>
   );
 };
