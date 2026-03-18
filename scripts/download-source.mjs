@@ -5,7 +5,7 @@ import { Readable } from "stream";
 import { finished } from "stream/promises";
 import unzipper from "unzipper";
 
-const SOURCE_REF = process.env.ALGO_REF || "main";
+const SOURCE_REF = process.env.PUBLIC_ALGO_REF || "main";
 const REPO_URL = `https://github.com/ESA-APEx/apex_algorithms/archive/refs/heads/${SOURCE_REF}.zip`;
 const DOWNLOAD_DIR = "contents";
 const REPO_FILENAME = `apex_algorithms`;
