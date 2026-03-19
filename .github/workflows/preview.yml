@@ -8,7 +8,7 @@ env:
   NODE_VERSION: 20.17.0
   PREVIEW_BASE_URL: https://esa-apex.github.io/apex-algorithms-catalogue-web
   PR_NUMBER: ${{ github.event.client_payload.pr_number }}
-  ALGO_REF: ${{ github.event.client_payload.head_ref }}
+  PUBLIC_ALGO_REF: ${{ github.event.client_payload.head_ref }}
   ALGO_REPO: apex_algorithms
 
 permissions:
@@ -65,7 +65,7 @@ jobs:
       - name: Build new preview site
         run: BUILD_TARGET=preview npm run build
         env:
-          ALGO_REF: ${{ env.ALGO_REF }}
+          PUBLIC_ALGO_REF: ${{ env.PUBLIC_ALGO_REF }}
           PR_NUMBER: ${{ env.PR_NUMBER }}
       - name: Setup new preview site
         run: |
