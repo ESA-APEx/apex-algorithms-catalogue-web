@@ -13,7 +13,7 @@ export const featureflag: Record<any, any> = {
     jupyterLiteIntegration: true,
     basicAuth: false,
     providerPlatformLogo: true,
-    costAnalysis: false,
+    costAnalysis: true,
   },
   preview: {
     benchmarkStatus: false,
