@@ -81,6 +81,9 @@
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.21.3"
   },
+  "lint-staged": {
+    "*": "oxfmt --no-error-on-unmatched-pattern"
+  },
   "engines": {
     "node": "20.x"
   },
