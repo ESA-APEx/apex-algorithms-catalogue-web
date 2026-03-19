@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import https from "https";
+import { RECORD_LINK_BASE_URL } from "../config";
 import type { Platform } from "../types/models/platform";
 import { type Algorithm, AlgorithmType } from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
@@ -59,6 +60,23 @@ const getServiceRecords = (): string[] =>
         file.endsWith(".json") &&
         (file.includes("/records/") || file.includes("\\records\\")), // support linux and windows based path
     );
+
+export const resolveRelativeLinks = (
+  links: Algorithm["links"],
+  recordPath: string,
+): Algorithm["links"] => {
+  return links.map((link) => {
+    if (link.href.startsWith("./") || link.href.startsWith("../")) {
+      const filePath = path.join(path.dirname(recordPath), link.href);
+      const urlObject = new URL(filePath, RECORD_LINK_BASE_URL);
+      return {
+        ...link,
+        href: urlObject.href,
+      };
+    }
+    return link;
+  });
+};
 
 const loadBenchmarkScenarios = (recordPath: string): BenchmarkScenario[] => {
   const recordDir = path.dirname(path.join(CATALOGUE_JSON_DIR, recordPath));
@@ -134,6 +152,7 @@ export const loadCatalogueData = () => {
 
     if (visible) {
       const benchmarkScenarios = loadBenchmarkScenarios(file);
+      algorithm.links = resolveRelativeLinks(algorithm.links, file);
       data.push({
         algorithm,
         platform,
@@ -269,6 +288,8 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       }
 
       const benchmarkScenarios = loadBenchmarkScenarios(file);
+
+      algorithm.links = resolveRelativeLinks(algorithm.links, file);
 
       data.push({
         algorithm,
