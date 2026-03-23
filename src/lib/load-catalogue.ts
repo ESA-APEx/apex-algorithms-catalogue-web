@@ -252,11 +252,15 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       const algorithm = JSON.parse(
         fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file)).toString(),
       ) as Algorithm;
+
+      algorithm.links = resolveRelativeLinks(algorithm.links, file);
+
       const applicationUrl = algorithm.links.find(
         (link) => link.rel === "application",
       )?.href;
 
       algorithm.type = getAlgorithmType(algorithm);
+
       let applicationDetails: ApplicationDetails | undefined;
       if (applicationUrl) {
         applicationDetails = await fetchApplicationDetails(
@@ -289,7 +293,6 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
 
       const benchmarkScenarios = loadBenchmarkScenarios(file);
 
-      algorithm.links = resolveRelativeLinks(algorithm.links, file);
 
       data.push({
         algorithm,
