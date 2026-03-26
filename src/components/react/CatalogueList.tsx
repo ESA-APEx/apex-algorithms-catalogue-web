@@ -432,7 +432,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               <Button
                 variant="link"
                 onClick={clearFilters}
-                className="absolute right-0 top-2"
+                className="absolute right-1 bottom-2"
               >
                 Reset
               </Button>
