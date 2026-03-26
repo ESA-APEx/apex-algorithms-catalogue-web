@@ -278,4 +278,90 @@ test.describe("Catalog Filter Tests", () => {
       );
     }
   });
+
+  test("Should apply provider filtering", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
+    const initialTotal = await getAlgorithmCount(page);
+
+    await page.getByRole("button").getByText("Filter").click();
+
+    const providerInput = page.getByPlaceholder("Select providers");
+    await providerInput.scrollIntoViewIfNeeded();
+    await providerInput.click();
+
+    await page.getByRole("option").first().click();
+
+    await page.waitForURL("http://localhost:4321/?providers=**");
+
+    expect(page.url()).toMatch(/providers=[^&]+/);
+
+    const filteredTotal = await getAlgorithmCount(page);
+    expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
+
+    await page.reload();
+
+    await expect(
+      page.getByRole("button").getByText("Filter").locator("..").getByText("1"),
+    ).toBeVisible();
+    expect(page.url()).toMatch(/providers=[^&]+/);
+
+    const reloadedTotal = await getAlgorithmCount(page);
+    expect(reloadedTotal).toBe(filteredTotal);
+
+    await page.getByRole("button").getByText("Filter").click();
+    await page
+      .getByRole("button", { name: /Remove .* option/ })
+      .first()
+      .click();
+    await page.waitForURL("http://localhost:4321/");
+
+    expect(page.url()).not.toMatch(/providers=[^&]+/);
+
+    const resetTotal = await getAlgorithmCount(page);
+    expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
+  });
+
+  test("Should apply platform filtering", async ({ page }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+
+    const initialTotal = await getAlgorithmCount(page);
+
+    await page.getByRole("button").getByText("Filter").click();
+
+    const platformInput = page.getByPlaceholder("Select platforms");
+    await platformInput.scrollIntoViewIfNeeded();
+    await platformInput.click();
+
+    await page.getByRole("option").first().click();
+
+    await page.waitForURL("http://localhost:4321/?platforms=**");
+
+    expect(page.url()).toMatch(/platforms=[^&]+/);
+
+    const filteredTotal = await getAlgorithmCount(page);
+    expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
+
+    await page.reload();
+
+    await expect(
+      page.getByRole("button").getByText("Filter").locator("..").getByText("1"),
+    ).toBeVisible();
+    expect(page.url()).toMatch(/platforms=[^&]+/);
+
+    const reloadedTotal = await getAlgorithmCount(page);
+    expect(reloadedTotal).toBe(filteredTotal);
+
+    await page.getByRole("button").getByText("Filter").click();
+    await page
+      .getByRole("button", { name: /Remove .* option/ })
+      .first()
+      .click();
+    await page.waitForURL("http://localhost:4321/");
+
+    expect(page.url()).not.toMatch(/platforms=[^&]+/);
+
+    const resetTotal = await getAlgorithmCount(page);
+    expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
+  });
 });

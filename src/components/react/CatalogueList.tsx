@@ -22,7 +22,7 @@ import {
   MultiSelectorList,
   MultiSelectorItem,
 } from "./MultiSelect";
-import { generateUniqueOptions, getLogoRel } from "../../lib/utils";
+import { generateUniqueOptions, getLogoRel, cn } from "../../lib/utils";
 import {
   getValidatedParamsFromUrl,
   updateUrlWithParams,
@@ -71,6 +71,8 @@ interface SearchAndSortFilterParams {
     licenses: string[];
     types: string[];
     benchmarkStatus: string[];
+    providers: string[];
+    platforms: string[];
   };
   catalogues: Catalogue[];
   benchmarkData?: BenchmarkSummary[];
@@ -96,7 +98,7 @@ const searchAndSortFilterCatalogues = ({
     });
 
     return catalogues
-      .filter(({ algorithm }) => {
+      .filter(({ algorithm, platform, provider }) => {
         const { type, properties, id } = algorithm;
         const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]
           ? getBenchmarkStatus(benchmarkStatusData[id])
@@ -130,13 +132,21 @@ const searchAndSortFilterCatalogues = ({
         const hitFilterByBenchmarkStatus = filterBy.benchmarkStatus.length
           ? filterBy.benchmarkStatus.includes(benchmarkStatus)
           : true;
+        const hitFilterByProviders = filterBy.providers.length && provider
+          ? filterBy.providers.includes(provider.properties.title || "")
+          : true;
+        const hitFilterByPlatforms = filterBy.platforms.length && platform
+          ? filterBy.platforms.includes(platform.properties.title || "")
+          : true;
 
         return (
           hitSearch &&
           hitFilterByLabels &&
           hitFilterByLicense &&
           hitFilterByTypes &&
-          hitFilterByBenchmarkStatus
+          hitFilterByBenchmarkStatus &&
+          hitFilterByProviders &&
+          hitFilterByPlatforms
         );
       })
       .sort((a, b) => {
@@ -171,15 +181,23 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
   let labels: string[] = [];
   const licenses: string[] = [];
   const types: string[] = [];
+  const providers: string[] = [];
+  const platforms: string[] = [];
 
   for (const catalogue of catalogues) {
-    const { algorithm } = catalogue;
+    const { algorithm, provider, platform } = catalogue;
     labels = [
       ...labels,
       ...algorithm.properties.keywords.map((keyword) => keyword.toLowerCase()),
     ];
     licenses.push(algorithm.properties.license);
     types.push(algorithm.type);
+    if (provider) {
+      providers.push(provider.properties.title);
+    }
+    if (platform) {
+      platforms.push(platform.properties.title);
+    }
   }
 
   return {
@@ -187,6 +205,8 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
     licenses: generateUniqueOptions(licenses),
     types: generateUniqueOptions(types),
     benchmarkStatus: generateUniqueOptions(Object.keys(STATUS_THRESHOLD)),
+    providers: generateUniqueOptions(providers),
+    platforms: generateUniqueOptions(platforms),
   };
 };
 
@@ -195,8 +215,12 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     window.location.href,
     "benchmarkStatus",
   );
+  const isPlatformProviderFilterEnabled = isFeatureEnabled(
+    window.location.href,
+    "platformProviderFilter",
+  );
 
-  const { labels, licenses, types, benchmarkStatus } =
+  const { labels, licenses, types, benchmarkStatus, providers, platforms } =
     getCataloguesFilterList(catalogues);
 
   const toggledSortOptions = isBenchmarkStatusEnabled
@@ -211,8 +235,10 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       availableLicenses: licenses.map((opt) => opt.value),
       availableTypes: types.map((opt) => opt.value),
       availableBenchmarkStatuses: benchmarkStatus.map((opt) => opt.value),
+      availableProviders: providers.map((opt) => opt.value),
+      availablePlatforms: platforms.map((opt) => opt.value),
     }),
-    [labels, licenses, types, benchmarkStatus, toggledSortOptions],
+    [labels, licenses, types, benchmarkStatus, providers, platforms, toggledSortOptions],
   );
 
   // Parse and validate URL params against available options
@@ -226,6 +252,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         licenses: [],
         types: [],
         benchmarkStatus: [],
+        providers: [],
+        platforms: [],
       },
     }).length;
     const maxPage = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -250,6 +278,12 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
   const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<
     string[]
   >(validatedParams.filterByBenchmarkStatus);
+  const [filterByProviders, setFilterByProviders] = useState<string[]>(
+    validatedParams.filterByProviders,
+  );
+  const [filterByPlatforms, setFilterByPlatforms] = useState<string[]>(
+    validatedParams.filterByPlatforms,
+  );
   const [currentPage, setCurrentPage] = useState<number>(
     validatedParams.currentPage,
   );
@@ -265,6 +299,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       filterByLicenses,
       filterByTypes,
       filterByBenchmarkStatus,
+      filterByProviders,
+      filterByPlatforms,
       currentPage,
     });
   }, [
@@ -274,6 +310,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    filterByProviders,
+    filterByPlatforms,
     currentPage,
   ]);
 
@@ -287,13 +325,17 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       licenses: filterByLicenses,
       types: filterByTypes,
       benchmarkStatus: filterByBenchmarkStatus,
+      providers: filterByProviders,
+      platforms: filterByPlatforms,
     },
   });
   const filterCounts =
     filterByLabels.length +
     filterByLicenses.length +
     filterByTypes.length +
-    filterByBenchmarkStatus.length;
+    filterByBenchmarkStatus.length +
+    filterByProviders.length +
+    filterByPlatforms.length;
 
   const totalItems = data.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -335,6 +377,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    filterByProviders,
+    filterByPlatforms,
   ]);
 
   const clearFilters = () => {
@@ -342,6 +386,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     setFilterByLicenses([]);
     setFilterByTypes([]);
     setFilterByBenchmarkStatus([]);
+    setFilterByProviders([]);
+    setFilterByPlatforms([]);
   };
   const fetchBenchmarkData = async () => {
     try {
@@ -382,7 +428,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                 ) : null}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="relative">
+            <PopoverContent align="end" className={cn("relative", isPlatformProviderFilterEnabled && "w-[700px]")}>
               <Button
                 variant="link"
                 onClick={clearFilters}
@@ -390,75 +436,24 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               >
                 Reset
               </Button>
-              <p className="mb-1">Type</p>
-              <div className="flex flex-col mb-4">
-                {types.map(({ label, value }) => (
-                  <label
-                    key={value}
-                    className="flex items-center gap-1"
-                    data-testid="filter-type-item"
-                  >
-                    <Checkbox
-                      key={value}
-                      checked={filterByTypes.includes(value)}
-                      onCheckedChange={(checked) => {
-                        return checked
-                          ? setFilterByTypes([...filterByTypes, value])
-                          : setFilterByTypes(
-                              filterByTypes.filter((item) => item != value),
-                            );
-                      }}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </div>
-              <p className="mb-1">Licenses</p>
-              <div className="flex flex-col mb-4">
-                {licenses.map(({ label, value }) => (
-                  <label
-                    key={value}
-                    className="flex items-center gap-1"
-                    data-testid="filter-license-item"
-                  >
-                    <Checkbox
-                      key={value}
-                      checked={filterByLicenses.includes(value)}
-                      onCheckedChange={(checked) => {
-                        return checked
-                          ? setFilterByLicenses([...filterByLicenses, value])
-                          : setFilterByLicenses(
-                              filterByLicenses.filter((item) => item != value),
-                            );
-                      }}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </div>
-              {isBenchmarkStatusEnabled ? (
-                <>
-                  <p className="mb-1">Benchmark status</p>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <p className="mb-1">Type</p>
                   <div className="flex flex-col mb-4">
-                    {benchmarkStatus.map(({ label, value }) => (
+                    {types.map(({ label, value }) => (
                       <label
                         key={value}
                         className="flex items-center gap-1"
-                        data-testid="filter-benchmark-status"
+                        data-testid="filter-type-item"
                       >
                         <Checkbox
                           key={value}
-                          checked={filterByBenchmarkStatus.includes(value)}
+                          checked={filterByTypes.includes(value)}
                           onCheckedChange={(checked) => {
                             return checked
-                              ? setFilterByBenchmarkStatus([
-                                  ...filterByBenchmarkStatus,
-                                  value,
-                                ])
-                              : setFilterByBenchmarkStatus(
-                                  filterByBenchmarkStatus.filter(
-                                    (item) => item != value,
-                                  ),
+                              ? setFilterByTypes([...filterByTypes, value])
+                              : setFilterByTypes(
+                                  filterByTypes.filter((item) => item != value),
                                 );
                           }}
                         />
@@ -466,27 +461,128 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                       </label>
                     ))}
                   </div>
-                </>
-              ) : null}
-              <p>Labels</p>
-              <MultiSelector
-                values={filterByLabels}
-                onValuesChange={setFilterByLabels}
-                loop={false}
-              >
-                <MultiSelectorTrigger>
-                  <MultiSelectorInput placeholder="Select labels" />
-                </MultiSelectorTrigger>
-                <MultiSelectorContent>
-                  <MultiSelectorList>
-                    {labels.map((option, i) => (
-                      <MultiSelectorItem key={i} value={option.value}>
-                        {option.label}
-                      </MultiSelectorItem>
+                  <p className="mb-1">Licenses</p>
+                  <div className="flex flex-col mb-4">
+                    {licenses.map(({ label, value }) => (
+                      <label
+                        key={value}
+                        className="flex items-center gap-1"
+                        data-testid="filter-license-item"
+                      >
+                        <Checkbox
+                          key={value}
+                          checked={filterByLicenses.includes(value)}
+                          onCheckedChange={(checked) => {
+                            return checked
+                              ? setFilterByLicenses([...filterByLicenses, value])
+                              : setFilterByLicenses(
+                                  filterByLicenses.filter((item) => item != value),
+                                );
+                          }}
+                        />
+                        <span>{label}</span>
+                      </label>
                     ))}
-                  </MultiSelectorList>
-                </MultiSelectorContent>
-              </MultiSelector>
+                  </div>
+                  {isBenchmarkStatusEnabled ? (
+                    <>
+                      <p className="mb-1">Benchmark status</p>
+                      <div className="flex flex-col mb-4">
+                        {benchmarkStatus.map(({ label, value }) => (
+                          <label
+                            key={value}
+                            className="flex items-center gap-1"
+                            data-testid="filter-benchmark-status"
+                          >
+                            <Checkbox
+                              key={value}
+                              checked={filterByBenchmarkStatus.includes(value)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? setFilterByBenchmarkStatus([
+                                      ...filterByBenchmarkStatus,
+                                      value,
+                                    ])
+                                  : setFilterByBenchmarkStatus(
+                                      filterByBenchmarkStatus.filter(
+                                        (item) => item != value,
+                                      ),
+                                    );
+                              }}
+                            />
+                            <span>{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </>
+                  ) : null}
+                  <p>Labels</p>
+                  <MultiSelector
+                    values={filterByLabels}
+                    onValuesChange={setFilterByLabels}
+                    loop={false}
+                  >
+                    <MultiSelectorTrigger>
+                      <MultiSelectorInput placeholder="Select labels" />
+                    </MultiSelectorTrigger>
+                    <MultiSelectorContent>
+                      <MultiSelectorList>
+                        {labels.map((option, i) => (
+                          <MultiSelectorItem key={i} value={option.value}>
+                            {option.label}
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </div>
+                {isPlatformProviderFilterEnabled ? (
+                  <div className="flex-1">
+                    <div className="mb-4">
+                      <p className="mb-1">Provided by</p>
+                      <MultiSelector
+                        values={filterByProviders}
+                        onValuesChange={setFilterByProviders}
+                        loop={false}
+                      >
+                        <MultiSelectorTrigger>
+                          <MultiSelectorInput placeholder="Select providers" />
+                        </MultiSelectorTrigger>
+                        <MultiSelectorContent>
+                          <MultiSelectorList>
+                            {providers.map((option, i) => (
+                              <MultiSelectorItem key={i} value={option.value}>
+                                {option.label}
+                              </MultiSelectorItem>
+                            ))}
+                          </MultiSelectorList>
+                        </MultiSelectorContent>
+                      </MultiSelector>
+                    </div>
+                    <div>
+                      <p className="mb-1">Powered by</p>
+                      <MultiSelector
+                        values={filterByPlatforms}
+                        onValuesChange={setFilterByPlatforms}
+                        loop={false}
+                      >
+                        <MultiSelectorTrigger>
+                          <MultiSelectorInput placeholder="Select platforms" />
+                        </MultiSelectorTrigger>
+                        <MultiSelectorContent>
+                          <MultiSelectorList>
+                            {platforms.map((option, i) => (
+                              <MultiSelectorItem key={i} value={option.value}>
+                                {option.label}
+                              </MultiSelectorItem>
+                            ))}
+                          </MultiSelectorList>
+                        </MultiSelectorContent>
+                      </MultiSelector>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </PopoverContent>
           </Popover>
         </div>

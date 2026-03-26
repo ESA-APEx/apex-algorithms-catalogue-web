@@ -6,6 +6,7 @@ export const featureflag: Record<any, any> = {
     basicAuth: false,
     providerPlatformLogo: true,
     costAnalysis: true,
+    platformProviderFilter: true,
   },
   production: {
     benchmarkStatus: true,
@@ -14,6 +15,7 @@ export const featureflag: Record<any, any> = {
     basicAuth: false,
     providerPlatformLogo: true,
     costAnalysis: true,
+    platformProviderFilter: false,
   },
   preview: {
     benchmarkStatus: false,
@@ -22,6 +24,7 @@ export const featureflag: Record<any, any> = {
     basicAuth: true,
     providerPlatformLogo: true,
     costAnalysis: false,
+    platformProviderFilter: true,
   },
   default: {
     benchmarkStatus: true,
@@ -30,5 +33,6 @@ export const featureflag: Record<any, any> = {
     basicAuth: true,
     providerPlatformLogo: true,
     costAnalysis: true,
+    platformProviderFilter: true,
   },
 };
