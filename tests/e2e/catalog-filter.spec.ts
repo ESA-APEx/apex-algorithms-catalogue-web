@@ -15,8 +15,8 @@ test.describe("Catalog Filter Tests", () => {
   test("Should persist search query to URL and load from URL", async ({
     page,
   }) => {
-    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
-    await page.waitForURL("http://localhost:4321/?q=**");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("ESA");
 
     expect(page.url()).toContain("q=ESA");
 
@@ -32,7 +32,8 @@ test.describe("Catalog Filter Tests", () => {
   test("Should persist multiple filters to URL and load from URL", async ({
     page,
   }) => {
-    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("ESA");
 
     await page.getByRole("combobox").click();
     await page.getByRole("option", { name: "Last updated" }).click();
@@ -45,8 +46,6 @@ test.describe("Catalog Filter Tests", () => {
     const licenseFilter = page.getByTestId("filter-license-item").first();
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
-
-    await page.waitForURL("http://localhost:4321/?q=**");
 
     const url = page.url();
     expect(url).toContain("q=ESA");
@@ -65,18 +64,18 @@ test.describe("Catalog Filter Tests", () => {
   });
 
   test("Should clear URL params when filters are reset", async ({ page }) => {
-    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
-    const typeFilter = page.getByTestId("filter-type-item").first();
+
+    const typeFilter = await page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
-    await page.waitForURL("http://localhost:4321/?q=**");
 
     expect(page.url()).toContain("q=ESA");
     expect(page.url()).toMatch(/types=[^&]+/);
 
     await page.getByRole("button", { name: "Reset" }).click();
-    await page.waitForURL("http://localhost:4321/?q=ESA");
 
     expect(page.url()).toContain("q=ESA");
     expect(page.url()).not.toMatch(/types=[^&]+/);
@@ -84,9 +83,6 @@ test.describe("Catalog Filter Tests", () => {
 
   test("Should handle invalid URL parameters gracefully", async ({ page }) => {
     await page.goto("/?sort=invalid&types=nonexistent");
-    await page.waitForURL(
-      "http://localhost:4321/?sort=invalid&types=nonexistent",
-    );
 
     await expect(page.getByTestId("apps")).toBeVisible();
 
@@ -100,20 +96,21 @@ test.describe("Catalog Filter Tests", () => {
   test("Should preserve URL params when navigating with filters", async ({
     page,
   }) => {
-    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
-    const typeFilter = page.getByTestId("filter-type-item").first();
+
+    const typeFilter = await page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
     await page.keyboard.press("Escape");
-    await page.waitForURL("http://localhost:4321/?q=**");
 
     const urlWithFilters = page.url();
     expect(urlWithFilters).toContain("q=ESA");
     expect(urlWithFilters).toMatch(/types=[^&]+/);
 
-    const firstCard = page.getByTestId("service-card").first();
+    const firstCard = await page.getByTestId("service-card").first();
     await firstCard.click();
 
     await page.goBack();
@@ -129,10 +126,8 @@ test.describe("Catalog Filter Tests", () => {
   test("Should handle URL encoding of special characters in filters", async ({
     page,
   }) => {
-    await page
-      .getByRole("textbox", { name: /Search algorithms/i })
-      .fill("test & encode");
-    await page.waitForURL("http://localhost:4321/?q=**");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("test & encode");
 
     expect(page.url()).toContain("q=test+%26+encode");
 
@@ -143,25 +138,24 @@ test.describe("Catalog Filter Tests", () => {
   });
 
   test("Should remove empty filters from URL", async ({ page }) => {
-    await page.getByRole("textbox", { name: /Search algorithms/i }).fill("ESA");
+    const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
+    await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
-    const typeFilter = page.getByTestId("filter-type-item").first();
+
+    const typeFilter = await page.getByTestId("filter-type-item").first();
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
-    await page.waitForURL("http://localhost:4321/?q=**");
 
     expect(page.url()).toContain("q=ESA");
     expect(page.url()).toMatch(/types=[^&]+/);
 
-    await page.getByRole("textbox", { name: /Search algorithms/i }).clear();
-    await page.waitForURL("http://localhost:4321/?types=**");
+    await textbox.clear();
 
     expect(page.url()).not.toContain("q=");
     expect(page.url()).toMatch(/types=[^&]+/); // Type filter should remain
 
     await page.getByRole("button").getByText("Filter").click();
     await typeFilter.click(); // Uncheck
-    await page.waitForURL("http://localhost:4321/");
 
     expect(page.url()).not.toMatch(/types=[^&]+/);
     expect(page.url()).not.toContain("q=");
@@ -174,13 +168,11 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.getByRole("button").getByText("Filter").click();
 
-    const openEOFilter = page
+    const openEOFilter = await page
       .getByTestId("filter-type-item")
       .getByText("openEO");
     await openEOFilter.scrollIntoViewIfNeeded();
     await openEOFilter.click();
-
-    await page.waitForURL("http://localhost:4321/?types=**");
 
     const openEOTotal = await getAlgorithmCount(page);
     expect(openEOTotal).toBeLessThan(initialTotal);
@@ -191,18 +183,15 @@ test.describe("Catalog Filter Tests", () => {
     visibleTypes.forEach((type) => expect(type).toBe("openEO"));
 
     await openEOFilter.click();
-    await page.waitForURL("http://localhost:4321/");
 
     const afterRemoveTotal = await getAlgorithmCount(page);
     expect(afterRemoveTotal).toBeGreaterThan(openEOTotal);
 
-    const ogcFilter = page
+    const ogcFilter = await page
       .getByTestId("filter-type-item")
       .getByText("OGC API Process");
     await ogcFilter.scrollIntoViewIfNeeded();
     await ogcFilter.click();
-
-    await page.waitForURL("http://localhost:4321/?types=**");
 
     const ogcTotal = await getAlgorithmCount(page);
     expect(ogcTotal).toBeLessThan(initialTotal);
@@ -213,20 +202,17 @@ test.describe("Catalog Filter Tests", () => {
     ogcVisibleTypes.forEach((type) => expect(type).toBe("OGC API Process"));
 
     await ogcFilter.click();
-    await page.waitForURL("http://localhost:4321/");
 
     const finalTotal = await getAlgorithmCount(page);
     expect(finalTotal).toBeGreaterThan(ogcTotal);
   });
 
-  // Skip test due to https://github.com/ESA-APEx/apex-algorithms-catalogue-web/issues/76
-  test.skip("Should persist pagination to URL and load from URL", async ({
+  test("Should persist pagination to URL and load from URL", async ({
     page,
   }) => {
     await expect(page.getByTestId("pagination")).toBeVisible();
 
     await page.getByTestId("pagination-next").click();
-    await page.waitForURL("http://localhost:4321/?page=2");
 
     expect(page.url()).toContain("page=2");
 
@@ -248,12 +234,10 @@ test.describe("Catalog Filter Tests", () => {
     const pagination = page.getByTestId("pagination");
     if (await pagination.isVisible()) {
       await page.getByTestId("pagination-next").click();
-      await page.waitForURL("http://localhost:4321/?page=2");
 
       await page
         .getByRole("textbox", { name: /Search algorithms/i })
         .fill("test");
-      await page.waitForURL("http://localhost:4321/?q=test");
 
       expect(page.url()).not.toContain("page=");
     }
@@ -261,7 +245,6 @@ test.describe("Catalog Filter Tests", () => {
 
   test("Should handle invalid page numbers gracefully", async ({ page }) => {
     await page.goto("/?page=9999");
-    await page.waitForURL("http://localhost:4321/?page=9999");
 
     /*
     Commented out due to race condition: https://github.com/ESA-APEx/apex-algorithms-catalogue-web/issues/76
@@ -292,8 +275,6 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.getByRole("option").first().click();
 
-    await page.waitForURL("http://localhost:4321/?providers=**");
-
     expect(page.url()).toMatch(/providers=[^&]+/);
 
     const filteredTotal = await getAlgorithmCount(page);
@@ -314,7 +295,6 @@ test.describe("Catalog Filter Tests", () => {
       .getByRole("button", { name: /Remove .* option/ })
       .first()
       .click();
-    await page.waitForURL("http://localhost:4321/");
 
     expect(page.url()).not.toMatch(/providers=[^&]+/);
 
@@ -335,8 +315,6 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.getByRole("option").first().click();
 
-    await page.waitForURL("http://localhost:4321/?platforms=**");
-
     expect(page.url()).toMatch(/platforms=[^&]+/);
 
     const filteredTotal = await getAlgorithmCount(page);
@@ -357,7 +335,6 @@ test.describe("Catalog Filter Tests", () => {
       .getByRole("button", { name: /Remove .* option/ })
       .first()
       .click();
-    await page.waitForURL("http://localhost:4321/");
 
     expect(page.url()).not.toMatch(/platforms=[^&]+/);
 
