@@ -9,8 +9,6 @@
     "build-test": "npm run setup && node ./scripts/setup-tests.mjs && astro build && node ./scripts/post-setup-tests.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
     "test": "npm run test-unit && npm run test-e2e",
     "test-unit": "vitest run",
     "test-e2e": "npm run build-test && playwright test",
