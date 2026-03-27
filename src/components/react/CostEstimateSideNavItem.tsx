@@ -38,14 +38,16 @@ export const CostEstimateSideNavItem = ({
 
   let displayedCostEstimate = costEstimate ?? "-";
 
-  if (status === "loading") {
-    displayedCostEstimate = "Loading cost estimate data...";
-  } else if (status === "error") {
-    displayedCostEstimate = "Failed to load cost estimate data.";
-  } else if (status === "success" && !data?.length) {
-    displayedCostEstimate = "No recent cost estimate data found.";
-  } else if (status === "success" && data?.length) {
-    displayedCostEstimate = getAverageCostPerKm(data);
+  if (!costEstimate) {
+    if (status === "loading") {
+      displayedCostEstimate = "Loading cost estimate data...";
+    } else if (status === "error") {
+      displayedCostEstimate = "Failed to load cost estimate data.";
+    } else if (status === "success" && !data?.length) {
+      displayedCostEstimate = "No recent cost estimate data found.";
+    } else if (status === "success" && data?.length) {
+      displayedCostEstimate = getAverageCostPerKm(data);
+    }
   }
 
   const isEnabled = isFeatureEnabled(window.location.href, "costAnalysis");

@@ -21,7 +21,6 @@ import type { Algorithm } from "../../types/models/algorithm";
 import { AlgorithmType } from "../../types/models/algorithm";
 import type { BenchmarkData } from "@/types/models/benchmark";
 import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
-import { start } from "node:repl";
 
 const ExecutionInfoContent = ({
   algorithm,

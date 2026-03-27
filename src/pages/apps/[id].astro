@@ -41,7 +41,9 @@ export const isAlgorithmDefProtected = async (
         const response = await fetch(applicationLink.href, { method: "HEAD" });
         return response.status === 401 || response.status === 403; // Protected if unauthorized or forbidden
       } catch (error) {
-        console.error("Error checking algorithm definition protection:", error);
+        // NOTE: the fetch might fail due to 'SELF_SIGNED_CERT_IN_CHAIN'
+        console.log(`Failed to fetch algorithm definition at ${applicationLink.href}`);
+        // console.error("Error checking algorithm definition protection:", error);
         return true; // If there's an error, assume it's protected to be safe
       }
    }
