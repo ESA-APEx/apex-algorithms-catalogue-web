@@ -5,6 +5,8 @@ interface UrlFilterParams {
   filterByLicenses: string[];
   filterByTypes: string[];
   filterByBenchmarkStatus: string[];
+  filterByProviders: string[];
+  filterByPlatforms: string[];
   currentPage: number;
 }
 
@@ -15,6 +17,8 @@ interface UrlParamConfig {
   filterByLicenses: { key: string; defaultValue: string[] };
   filterByTypes: { key: string; defaultValue: string[] };
   filterByBenchmarkStatus: { key: string; defaultValue: string[] };
+  filterByProviders: { key: string; defaultValue: string[] };
+  filterByPlatforms: { key: string; defaultValue: string[] };
   currentPage: { key: string; defaultValue: number };
 }
 
@@ -25,6 +29,8 @@ const DEFAULT_URL_CONFIG: UrlParamConfig = {
   filterByLicenses: { key: "licenses", defaultValue: [] },
   filterByTypes: { key: "types", defaultValue: [] },
   filterByBenchmarkStatus: { key: "benchmarkStatus", defaultValue: [] },
+  filterByProviders: { key: "providers", defaultValue: [] },
+  filterByPlatforms: { key: "platforms", defaultValue: [] },
   currentPage: { key: "page", defaultValue: 1 },
 };
 
@@ -34,6 +40,8 @@ interface ValidationOptions {
   availableLicenses: string[];
   availableTypes: string[];
   availableBenchmarkStatuses: string[];
+  availableProviders: string[];
+  availablePlatforms: string[];
   maxPage?: number;
 }
 
@@ -61,6 +69,12 @@ export const getValidatedParamsFromUrl = (
         .get(config.filterByBenchmarkStatus.key)
         ?.split(",")
         .filter(Boolean) || config.filterByBenchmarkStatus.defaultValue,
+    filterByProviders:
+      urlParams.get(config.filterByProviders.key)?.split(",").filter(Boolean) ||
+      config.filterByProviders.defaultValue,
+    filterByPlatforms:
+      urlParams.get(config.filterByPlatforms.key)?.split(",").filter(Boolean) ||
+      config.filterByPlatforms.defaultValue,
     currentPage:
       parseInt(
         urlParams.get(config.currentPage.key) ||
@@ -85,6 +99,12 @@ export const getValidatedParamsFromUrl = (
     ),
     filterByBenchmarkStatus: rawParams.filterByBenchmarkStatus.filter(
       (status) => validationOptions.availableBenchmarkStatuses.includes(status),
+    ),
+    filterByProviders: rawParams.filterByProviders.filter((provider) =>
+      validationOptions.availableProviders.includes(provider),
+    ),
+    filterByPlatforms: rawParams.filterByPlatforms.filter((platform) =>
+      validationOptions.availablePlatforms.includes(platform),
     ),
     currentPage:
       validationOptions.maxPage &&
@@ -130,6 +150,20 @@ export const updateUrlWithParams = (
     urlParams.set(
       config.filterByBenchmarkStatus.key,
       params.filterByBenchmarkStatus.join(","),
+    );
+  }
+
+  if (params.filterByProviders.length > 0) {
+    urlParams.set(
+      config.filterByProviders.key,
+      params.filterByProviders.join(","),
+    );
+  }
+
+  if (params.filterByPlatforms.length > 0) {
+    urlParams.set(
+      config.filterByPlatforms.key,
+      params.filterByPlatforms.join(","),
     );
   }
 
