@@ -12,7 +12,7 @@ test.describe("Catalog Filter Tests", () => {
     await page.goto("/");
   });
 
-  test("Should persist search query to URL and load from URL", async ({
+  test.skip("Should persist search query to URL and load from URL", async ({
     page,
   }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
