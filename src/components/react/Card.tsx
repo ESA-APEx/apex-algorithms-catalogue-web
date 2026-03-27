@@ -117,7 +117,7 @@ export const Card = ({
                   <img
                     src={platform.logoUrl}
                     alt={platform.name}
-                    className="h-6"
+                    className="h-8 object-contain"
                   />
                 </div>
               </div>
@@ -135,7 +135,7 @@ export const Card = ({
                   <img
                     src={provider.logoUrl}
                     alt={provider.name}
-                    className="h-6"
+                    className="h-8 object-contain"
                   />
                 </div>
               </div>
