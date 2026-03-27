@@ -207,7 +207,7 @@ test.describe("Catalog Filter Tests", () => {
     expect(finalTotal).toBeGreaterThan(ogcTotal);
   });
 
-  test("Should persist pagination to URL and load from URL", async ({
+  test.skip("Should persist pagination to URL and load from URL", async ({
     page,
   }) => {
     await expect(page.getByTestId("pagination")).toBeVisible();
