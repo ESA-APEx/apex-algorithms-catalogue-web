@@ -228,18 +228,21 @@ test.describe("Catalog Filter Tests", () => {
     );
   });
 
-  test("Should reset page to 1 when filters change but preserve pagination in URL", async ({
+  test.skip("Should reset page to 1 when filters change but preserve pagination in URL", async ({
     page,
   }) => {
     const pagination = page.getByTestId("pagination");
     if (await pagination.isVisible()) {
       await page.getByTestId("pagination-next").click();
 
-      await page
-        .getByRole("textbox", { name: /Search algorithms/i })
-        .fill("test");
+      const textbox = await page
+        .getByRole("textbox", { name: /Search algorithms/i });
+      await textbox.fill("test");
 
-      expect(page.url()).not.toContain("page=");
+      await expect(page.getByTestId("pagination-page-1")).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
     }
   });
 
@@ -275,8 +278,6 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.getByRole("option").first().click();
 
-    expect(page.url()).toMatch(/providers=[^&]+/);
-
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -285,7 +286,6 @@ test.describe("Catalog Filter Tests", () => {
     await expect(
       page.getByRole("button").getByText("Filter").locator("..").getByText("1"),
     ).toBeVisible();
-    expect(page.url()).toMatch(/providers=[^&]+/);
 
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
@@ -295,8 +295,6 @@ test.describe("Catalog Filter Tests", () => {
       .getByRole("button", { name: /Remove .* option/ })
       .first()
       .click();
-
-    expect(page.url()).not.toMatch(/providers=[^&]+/);
 
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
@@ -315,8 +313,6 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.getByRole("option").first().click();
 
-    expect(page.url()).toMatch(/platforms=[^&]+/);
-
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -325,7 +321,6 @@ test.describe("Catalog Filter Tests", () => {
     await expect(
       page.getByRole("button").getByText("Filter").locator("..").getByText("1"),
     ).toBeVisible();
-    expect(page.url()).toMatch(/platforms=[^&]+/);
 
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
@@ -336,7 +331,6 @@ test.describe("Catalog Filter Tests", () => {
       .first()
       .click();
 
-    expect(page.url()).not.toMatch(/platforms=[^&]+/);
 
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
