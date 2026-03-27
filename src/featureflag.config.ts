@@ -15,7 +15,7 @@ export const featureflag: Record<any, any> = {
     basicAuth: false,
     providerPlatformLogo: true,
     costAnalysis: true,
-    platformProviderFilter: false,
+    platformProviderFilter: true,
   },
   preview: {
     benchmarkStatus: false,
