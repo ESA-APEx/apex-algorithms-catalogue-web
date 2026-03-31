@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "./Table";
+import { ParameterDescriptionMarkdown } from "./ParameterDescriptionMarkdown";
 import { getCwlProcessDefinition } from "@/lib/api";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import type { ApplicationDetails } from "@/types/models/application";
@@ -72,9 +73,9 @@ export const CatalogueCwlDetailParametersTable = ({
                     {parameter.name}{" "}
                     {!parameter?.optional && <span>(required)</span>}
                   </p>
-                  <p className="text-sm text-gray-300">
-                    {parameter.description}
-                  </p>
+                  <ParameterDescriptionMarkdown
+                    description={parameter.description}
+                  />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">

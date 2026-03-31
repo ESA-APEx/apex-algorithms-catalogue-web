@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "./Table";
+import { ParameterDescriptionMarkdown } from "./ParameterDescriptionMarkdown";
 
 import type { ApplicationDetails } from "@/types/models/application.ts";
 
@@ -36,10 +37,9 @@ export const CatalogueDetailParametersTable = ({
                 {parameter.name}{" "}
                 {!parameter?.optional && <span>(required)</span>}
               </p>
-              <p
-                className="text-sm text-gray-300"
-                dangerouslySetInnerHTML={{ __html: parameter.description }}
-              ></p>
+              <ParameterDescriptionMarkdown
+                description={parameter.description}
+              />
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-1">
