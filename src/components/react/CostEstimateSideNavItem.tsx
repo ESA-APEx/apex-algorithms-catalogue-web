@@ -21,7 +21,10 @@ export const CostEstimateSideNavItem = ({
     try {
       const result = await getBenchmarkDetails(serviceId);
       if (result) {
-        setData(result.data);
+        setData(result.data.filter(item => item.costs > 0 && item.area_size > 0));
+        setStatus("success");
+      } else {
+        setData([]);
         setStatus("success");
       }
     } catch (error) {
@@ -31,25 +34,26 @@ export const CostEstimateSideNavItem = ({
   };
 
   useEffect(() => {
-    if (!costEstimate) {
-      fetchData();
-    }
+    fetchData();
   }, [serviceId]);
 
   let displayedCostEstimate = costEstimate ?? "-";
 
-  if (!costEstimate) {
-    if (status === "loading") {
-      displayedCostEstimate = "Loading cost estimate data...";
-    } else if (status === "error") {
-      displayedCostEstimate = "Failed to load cost estimate data.";
-    } else if (status === "success" && !data?.length) {
-      displayedCostEstimate = "No recent cost estimate data found.";
-    } else if (status === "success" && data?.length) {
-      displayedCostEstimate = getAverageCostPerKm(data);
-    }
+  if (status === "loading") {
+    displayedCostEstimate = "Loading cost estimate data...";
+  } else if (status === "error") {
+    displayedCostEstimate = "Failed to load cost estimate data.";
+  } else if (status === "success" && !data?.length) {
+    displayedCostEstimate =
+      costEstimate ?? "No recent cost estimate data found.";
+  } else if (status === "success" && data?.length) {
+    displayedCostEstimate = getAverageCostPerKm(data);
   }
-
+  console.log(
+    "CostEstimateSideNavItem - displayedCostEstimate:",
+    data,
+    displayedCostEstimate,
+  );
   const isEnabled = isFeatureEnabled(window.location.href, "costAnalysis");
 
   return (
