@@ -175,7 +175,7 @@ const getDateRange = (data: BenchmarkData[] | undefined) => {
 
 export const getAverageCostPerKm = (data: BenchmarkData[]) => {
   if (!data.length) return "-";
-  const totalCost = data.reduce(
+  const totalCost = data.filter(item => item.area_size > 0).reduce(
     (sum, item) => sum + item.costs / item.area_size,
     0,
   );
@@ -202,7 +202,7 @@ const CostAnalysisContent = ({
     try {
       const result = await getBenchmarkDetails(serviceId);
       if (result) {
-        setData(result.data);
+        setData(result.data.filter(item => item.costs > 0 && item.area_size > 0));
         setStatus("success");
       }
     } catch (error) {

@@ -15,14 +15,14 @@ export const getBenchmarkSummary = async () => {
   }
 };
 
-export const getBenchmarkDetails = async (scenarioId: string) => {
+export const getBenchmarkDetails = async (scenarioId: string): Promise<BenchmarkDetails | undefined> => {
   try {
     // TODO: get multiple scenarios in one request
     // This should have received service / algorithm id instead of scenario id
     const response = await fetch(`/api/services/${scenarioId}/benchmarks.json`);
     if (response.ok) {
       return (await response.json()) as BenchmarkDetails;
-    }
+    } 
   } catch (error) {
     throw error;
   }
