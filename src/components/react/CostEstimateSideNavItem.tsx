@@ -49,11 +49,7 @@ export const CostEstimateSideNavItem = ({
   } else if (status === "success" && data?.length) {
     displayedCostEstimate = getAverageCostPerKm(data);
   }
-  console.log(
-    "CostEstimateSideNavItem - displayedCostEstimate:",
-    data,
-    displayedCostEstimate,
-  );
+
   const isEnabled = isFeatureEnabled(window.location.href, "costAnalysis");
 
   return (
