@@ -66,7 +66,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           network_received: 700,
           start_time: "2024-02-27T12:00:00Z",
           area_size: 400,
-          status: "passed",
+          status: "stable",
+          test_outcome: "passed",
+          test_phase_end: "compare",
         },
       ];
 
@@ -123,7 +125,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           network_received: 750,
           start_time: "2025-01-15T10:30:00Z",
           area_size: 400,
-          status: "passed",
+          status: "stable",
+          test_outcome: "passed",
+          test_phase_end: "compare",
         },
       ];
 
@@ -299,7 +303,9 @@ describe("Admin API Route: GET /api/admin/services/{id}/benchmarks.json", () => 
           network_received: 700,
           start_time: "2024-02-27T12:00:00Z",
           area_size: 400,
-          status: "passed",
+          status: "stable",
+          test_outcome: "passed",
+          test_phase_end: "compare",
         },
       ];
 

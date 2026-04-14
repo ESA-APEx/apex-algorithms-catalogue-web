@@ -1,5 +1,5 @@
 import type {
-  BenchmarkSummary,
+  AdminBenchmarkSummary,
   BenchmarkStatusKey,
 } from "@/types/models/benchmark";
 
@@ -10,7 +10,7 @@ export const STATUS_THRESHOLD = {
 };
 
 export const getBenchmarkStatus = (
-  data?: BenchmarkSummary,
+  data?: AdminBenchmarkSummary,
 ): BenchmarkStatusKey => {
   if (data) {
     const successRate = data.success_count / data.runs;

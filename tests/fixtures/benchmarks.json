@@ -1,163 +1,142 @@
 [
-    {
-        "runs": 4,
-        "scenario_id": "WorldAgriCommodities",
-        "success_count": 0,
-        "failed_count": 4,
-        "last_test_datetime": "2026-01-04T02:58:16.000Z"
-    },
-    {
-        "runs": 4,
-        "scenario_id": "bap_composite",
-        "success_count": 3,
-        "failed_count": 1,
-        "last_test_datetime": "2026-01-08T02:33:27.000Z"
-    },
-    {
-        "runs": 2,
-        "scenario_id": "bap_composite_stac308",
-        "success_count": 0,
-        "failed_count": 2,
-        "last_test_datetime": "2026-01-19T13:04:23.000Z"
-    },
-    {
-        "runs": 5,
-        "scenario_id": "biopar",
-        "success_count": 5,
-        "failed_count": 0,
-        "last_test_datetime": "2025-12-31T13:11:03.000Z"
-    },
-    {
-        "runs": 5,
-        "scenario_id": "eurac_pv_farm_detection",
-        "success_count": 5,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-17T02:27:23.000Z"
-    },
-    {
-        "runs": 5,
-        "scenario_id": "forest_fire_mapping",
-        "success_count": 0,
-        "failed_count": 5,
-        "last_test_datetime": "2026-01-15T02:33:21.000Z"
-    },
-    {
-        "runs": 4,
-        "scenario_id": "fusets_mogpr",
-        "success_count": 0,
-        "failed_count": 4,
-        "last_test_datetime": "2025-12-09T13:20:30.000Z"
-    },
-    {
-        "runs": 6,
-        "scenario_id": "max_ndvi",
-        "success_count": 6,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-20T02:35:29.000Z"
-    },
-    {
-        "runs": 4,
-        "scenario_id": "max_ndvi_composite",
-        "success_count": 4,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-19T13:28:23.000Z"
-    },
-    {
-        "runs": 9,
-        "scenario_id": "max_ndvi_large",
-        "success_count": 9,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-16T13:21:58.000Z"
-    },
-    {
-        "runs": 1,
-        "scenario_id": "max_ndvi_large_stac308",
-        "success_count": 0,
-        "failed_count": 1,
-        "last_test_datetime": "2026-01-19T15:02:20.000Z"
-    },
-    {
-        "runs": 1,
-        "scenario_id": "max_ndvi_stac308",
-        "success_count": 0,
-        "failed_count": 1,
-        "last_test_datetime": "2026-01-19T12:50:54.000Z"
-    },
-    {
-        "runs": 1,
-        "scenario_id": "mogpr_s1s2",
-        "success_count": 0,
-        "failed_count": 1,
-        "last_test_datetime": "2025-12-24T13:10:24.000Z"
-    },
-    {
-        "runs": 4,
-        "scenario_id": "parcel_delineation",
-        "success_count": 0,
-        "failed_count": 4,
-        "last_test_datetime": "2026-01-08T13:24:02.000Z"
-    },
-    {
-        "runs": 8,
-        "scenario_id": "peakvalley",
-        "success_count": 5,
-        "failed_count": 3,
-        "last_test_datetime": "2026-01-17T13:07:53.000Z"
-    },
-    {
-        "runs": 3,
-        "scenario_id": "phenology",
-        "success_count": 0,
-        "failed_count": 3,
-        "last_test_datetime": "2026-01-19T02:40:24.000Z"
-    },
-    {
-        "runs": 4,
-        "scenario_id": "ramona_benin",
-        "success_count": 0,
-        "failed_count": 4,
-        "last_test_datetime": "2025-12-31T02:31:20.000Z"
-    },
-    {
-        "runs": 1,
-        "scenario_id": "sen2like",
-        "success_count": 0,
-        "failed_count": 1,
-        "last_test_datetime": "2026-01-01T02:56:22.000Z"
-    },
-    {
-        "runs": 7,
-        "scenario_id": "sentinel1_stats",
-        "success_count": 7,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-13T02:31:48.000Z"
-    },
-    {
-        "runs": 5,
-        "scenario_id": "wind_turbine-terrascope",
-        "success_count": 0,
-        "failed_count": 5,
-        "last_test_datetime": "2026-01-13T13:24:59.000Z"
-    },
-    {
-        "runs": 5,
-        "scenario_id": "worldcereal_crop_extent",
-        "success_count": 1,
-        "failed_count": 4,
-        "last_test_datetime": "2025-12-19T02:28:49.000Z"
-    },
-    {
-        "runs": 7,
-        "scenario_id": "worldcereal_crop_type",
-        "success_count": 4,
-        "failed_count": 3,
-        "last_test_datetime": "2025-12-27T02:27:22.000Z"
-    },
-    {
-        "runs": 8,
-        "scenario_id": "worldcover_statistics",
-        "success_count": 8,
-        "failed_count": 0,
-        "last_test_datetime": "2026-01-16T02:34:42.000Z"
-    }
+  {
+    "scenario_id": "WorldAgriCommodities",
+    "status": "critical",
+    "last_test_datetime": "2026-02-05T03:18:05.000Z"
+  },
+  {
+    "scenario_id": "WorldAgriCommodities_stac308",
+    "status": "unstable",
+    "last_test_datetime": "2026-02-10T03:40:44.000Z"
+  },
+  {
+    "scenario_id": "bap_composite",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-29T13:35:52.000Z"
+  },
+  {
+    "scenario_id": "bap_composite_stac308",
+    "status": "unstable",
+    "last_test_datetime": "2026-02-03T13:44:41.000Z"
+  },
+  {
+    "scenario_id": "biopar",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-30T08:01:55.000Z"
+  },
+  {
+    "scenario_id": "eurac_pv_farm_detection",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-16T03:44:01.000Z"
+  },
+  {
+    "scenario_id": "forest_fire_mapping",
+    "status": "critical",
+    "last_test_datetime": "2026-03-27T13:52:34.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-02T03:17:00.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi_composite",
+    "status": "stable",
+    "last_test_datetime": "2026-03-29T03:45:13.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi_composite_stac308",
+    "status": "stable",
+    "last_test_datetime": "2026-02-20T13:42:00.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi_large",
+    "status": "stable",
+    "last_test_datetime": "2026-03-19T03:27:10.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi_large_stac308",
+    "status": "stable",
+    "last_test_datetime": "2026-02-14T03:14:45.000Z"
+  },
+  {
+    "scenario_id": "max_ndvi_stac308",
+    "status": "stable",
+    "last_test_datetime": "2026-02-23T13:50:38.000Z"
+  },
+  {
+    "scenario_id": "mogpr_s1s2",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-25T03:24:42.000Z"
+  },
+  {
+    "scenario_id": "parcel_delineation",
+    "status": "stable",
+    "last_test_datetime": "2026-03-30T14:07:21.000Z"
+  },
+  {
+    "scenario_id": "parcel_delineation_stac308",
+    "status": "stable",
+    "last_test_datetime": "2026-02-22T13:27:32.000Z"
+  },
+  {
+    "scenario_id": "peakvalley",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-12T03:18:16.000Z"
+  },
+  {
+    "scenario_id": "phenology",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-13T13:41:40.000Z"
+  },
+  {
+    "scenario_id": "ppi",
+    "status": "critical",
+    "last_test_datetime": "2026-03-18T03:26:44.000Z"
+  },
+  {
+    "scenario_id": "sen2like",
+    "status": "critical",
+    "last_test_datetime": "2026-03-26T03:37:44.000Z"
+  },
+  {
+    "scenario_id": "sentinel1_soil_moisture",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-30T03:48:48.000Z"
+  },
+  {
+    "scenario_id": "sentinel1_stats",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-26T14:06:38.000Z"
+  },
+  {
+    "scenario_id": "whittaker",
+    "status": "stable",
+    "last_test_datetime": "2026-03-27T03:39:42.000Z"
+  },
+  {
+    "scenario_id": "wind_turbine-terrascope",
+    "status": "critical",
+    "last_test_datetime": "2026-03-25T13:57:02.000Z"
+  },
+  {
+    "scenario_id": "world_agrocommodities",
+    "status": "critical",
+    "last_test_datetime": "2026-03-24T03:20:36.000Z"
+  },
+  {
+    "scenario_id": "worldcereal_crop_extent",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-16T14:00:49.000Z"
+  },
+  {
+    "scenario_id": "worldcereal_crop_type",
+    "status": "unstable",
+    "last_test_datetime": "2026-03-12T13:44:27.000Z"
+  },
+  {
+    "scenario_id": "worldcover_statistics",
+    "status": "stable",
+    "last_test_datetime": "2026-03-21T13:26:27.000Z"
+  }
 ]

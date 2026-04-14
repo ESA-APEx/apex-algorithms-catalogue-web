@@ -88,7 +88,8 @@ const searchAndSortFilterCatalogues = ({
   const statusOrder = {
     stable: 0,
     unstable: 1,
-    "no benchmark": 2,
+    critical: 2,
+    "no benchmark": 3,
   };
   if (!!query || !!sortBy) {
     const normalizedQuery = query.toLowerCase();
@@ -100,9 +101,7 @@ const searchAndSortFilterCatalogues = ({
     return catalogues
       .filter(({ algorithm, platform, provider }) => {
         const { type, properties, id } = algorithm;
-        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]
-          ? getBenchmarkStatus(benchmarkStatusData[id])
-          : "no benchmark";
+        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]?.status || "no benchmark";
         const hitSearch =
           type.toLowerCase().includes(normalizedQuery) ||
           properties.keywords.find((k) =>
@@ -162,12 +161,8 @@ const searchAndSortFilterCatalogues = ({
             : -1;
         }
 
-        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id]
-          ? getBenchmarkStatus(benchmarkStatusData[a.algorithm.id])
-          : "no benchmark";
-        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id]
-          ? getBenchmarkStatus(benchmarkStatusData[b.algorithm.id])
-          : "no benchmark";
+        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id]?.status || "no benchmark";
+        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id]?.status || "no benchmark";
 
         return (
           statusOrder[benchmarkStatusDataA] - statusOrder[benchmarkStatusDataB]
@@ -183,6 +178,12 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
   const types: string[] = [];
   const providers: string[] = [];
   const platforms: string[] = [];
+  const status = [
+    { label: "stable", value: "stable" },
+    { label: "unstable", value: "unstable" },
+    { label: "critical", value: "critical" },
+    { label: "no benchmark", value: "no benchmark" },
+  ];
 
   for (const catalogue of catalogues) {
     const { algorithm, provider, platform } = catalogue;
@@ -204,7 +205,7 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
     labels: generateUniqueOptions(labels),
     licenses: generateUniqueOptions(licenses),
     types: generateUniqueOptions(types),
-    benchmarkStatus: generateUniqueOptions(Object.keys(STATUS_THRESHOLD)),
+    benchmarkStatus: status,
     providers: generateUniqueOptions(providers),
     platforms: generateUniqueOptions(platforms),
   };

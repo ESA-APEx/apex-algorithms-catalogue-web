@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import type { BenchmarkSummary } from "@/types/models/benchmark";
+import type { AdminBenchmarkSummary } from "@/types/models/benchmark";
 import { executeQuery } from "@/lib/db";
 import {
   PARQUET_MONTH_COVERAGE,
@@ -53,10 +53,12 @@ import { isFeatureEnabled } from "@/lib/featureflag";
  *                     type: string
  *                     format: date-time
  *                     description: The datetime of the most recent test run for this scenario.
- *                   success_rate:
- *                     type: number
- *                     format: float
- *                     description: Success rate as a percentage (0-100).
+ *                   last_test_phase:
+ *                     type: string
+ *                     description: The phase of the most recent test run.
+ *                   status:
+ *                     type: string
+ *                     description: The status of the most recent test run ('stable', 'unstable', 'critical', or 'no benchmark').
  *       400:
  *         description: Bad request
  *         content:
@@ -91,20 +93,50 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const query = `
+      WITH aggregated AS (
+        SELECT
+          count()::INTEGER as "runs",
+          "scenario_id",
+          SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER as "success_count",
+          SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER as "failed_count",
+          MAX(CAST("test:start:datetime" AS TIMESTAMP)) as "last_test_datetime"
+        FROM parquet_scan([${urls.map((url) => `"${url}"`)}])
+        WHERE "scenario_id" IS NOT NULL
+          ${dateFilter}
+        GROUP BY "scenario_id"
+      ),
+      last_runs AS (
+        SELECT
+          "scenario_id",
+          "test:outcome",
+          "test:phase:end",
+          ROW_NUMBER() OVER (
+            PARTITION BY "scenario_id"
+            ORDER BY CAST("test:start:datetime" AS TIMESTAMP) DESC
+          ) AS rn
+        FROM parquet_scan([${urls.map((url) => `"${url}"`)}])
+        WHERE "scenario_id" IS NOT NULL
+          ${dateFilter}
+      )
       SELECT
-        count()::INTEGER as "runs",
-        "scenario_id",
-        SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER as "success_count",
-        SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER as "failed_count",
-        MAX(CAST("test:start:datetime" AS TIMESTAMP)) as "last_test_datetime"
-      FROM parquet_scan([${urls.map((url) => `"${url}"`)}])
-      WHERE "scenario_id" IS NOT NULL
-        ${dateFilter}
-      GROUP BY "scenario_id"
-      ORDER BY "scenario_id";
+        a."runs",
+        a."scenario_id",
+        a."success_count",
+        a."failed_count",
+        a."last_test_datetime",
+        lr."test:phase:end" as last_test_phase,
+        CASE
+          WHEN lr."test:outcome" = 'failed' AND lr."test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
+          WHEN lr."test:outcome" = 'failed'                                                       THEN 'unstable'
+          WHEN lr."test:outcome" = 'passed'                                                       THEN 'stable'
+          ELSE 'no benchmark'
+        END AS status
+      FROM aggregated a
+      JOIN last_runs lr ON a."scenario_id" = lr."scenario_id" AND lr.rn = 1
+      ORDER BY a."scenario_id";
     `;
 
-    let data = (await executeQuery(query)) as BenchmarkSummary[];
+    let data = (await executeQuery(query)) as AdminBenchmarkSummary[];
 
     if (!isFeatureEnabled(request.url, "basicAuth")) {
       data = data.filter((benchmark) => {

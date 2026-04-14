@@ -6,7 +6,6 @@ import type {
 import { isFeatureEnabled } from "@/lib/featureflag";
 import { getBenchmarkSummary } from "@/lib/api";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
-import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { Spinner } from "./Spinner";
 
 interface BenchmarkStatusProps {
@@ -26,7 +25,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
         const summaryData = result.find(
           (item) => item.scenario_id === scenarioId,
         );
-        setStatus(getBenchmarkStatus(summaryData));
+        setStatus(summaryData?.status || "no benchmark");
       } else {
         setStatus("no benchmark");
         console.error(
@@ -43,15 +42,13 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
     if (isEnabled) {
       if (data) {
         setStatus(
-          getBenchmarkStatus(
-            data.find((item) => item.scenario_id === scenarioId),
-          ),
+          data.find((item) => item.scenario_id === scenarioId)?.status || "no benchmark"
         );
       } else {
         fetchData();
       }
     }
-  }, [data, scenarioId]);
+  }, [data, scenarioId, isEnabled]);
 
   return (
     isEnabled && (

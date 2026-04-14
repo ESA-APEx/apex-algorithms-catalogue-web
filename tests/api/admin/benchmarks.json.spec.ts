@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/pages/api/admin/services/benchmarks.json";
 import { getUrlsFromRequest } from "@/lib/parquet-datasource";
 import { executeQuery } from "@/lib/db";
-import type { BenchmarkSummary } from "@/types/models/benchmark";
+import type { AdminBenchmarkSummary } from "@/types/models/benchmark";
 
 vi.mock("@/lib/parquet-datasource", () => ({
   getUrlsFromRequest: vi.fn(),
@@ -52,12 +52,14 @@ describe("Admin API Route: GET /api/admin/services/benchmarks.json", () => {
 
   describe("Basic functionality", () => {
     it("should return benchmark data with metadata", async () => {
-      const mockData: BenchmarkSummary[] = [
+      const mockData: AdminBenchmarkSummary[] = [
         {
           scenario_id: "A",
           runs: 5,
           success_count: 5,
           failed_count: 0,
+          status: "stable",
+          last_test_phase: "compare",
           last_test_datetime: "2024-11-01T10:00:00Z",
         },
         {
@@ -65,6 +67,8 @@ describe("Admin API Route: GET /api/admin/services/benchmarks.json", () => {
           runs: 10,
           success_count: 8,
           failed_count: 2,
+          status: "unstable",
+          last_test_phase: "run-job",
           last_test_datetime: "2024-11-02T15:30:00Z",
         },
       ];
@@ -103,9 +107,11 @@ describe("Admin API Route: GET /api/admin/services/benchmarks.json", () => {
         {
           scenario_id: "A",
           runs: 5,
-          success_count: 4,
-          failed_count: 1,
-          success_rate: 80.0,
+          success_count: 5,
+          failed_count: 0,
+          status: "stable",
+          last_test_phase: "compare",
+          last_test_datetime: "2024-11-01T10:00:00Z",
         },
       ];
       (executeQuery as jest.Mock)
@@ -272,9 +278,11 @@ describe("Admin API Route: GET /api/admin/services/benchmarks.json", () => {
         {
           scenario_id: "A",
           runs: 5,
-          success_count: 4,
-          failed_count: 1,
-          success_rate: 80.0,
+          success_count: 5,
+          failed_count: 0,
+          status: "stable",
+          last_test_phase: "compare",
+          last_test_datetime: "2024-11-01T10:00:00Z",
         },
       ];
       (executeQuery as jest.Mock)

@@ -76,7 +76,7 @@ test.describe("Dashboard Page Tests", () => {
         const firstRow = tableRows.first();
         const cells = firstRow.locator("td");
         const cellCount = await cells.count();
-        expect(cellCount).toBe(6); // scenario_id, runs, success, failed, last_test, status
+        expect(cellCount).toBe(7); // scenario_id, runs, success, failed, last_test, last_phase, last_status
 
         const scenarioId = await cells.first().textContent();
         expect(scenarioId).toBeTruthy();
@@ -181,9 +181,6 @@ test.describe("Dashboard Page Tests", () => {
 
         await expect(
           firstStatusCell.locator('[data-testid="benchmark-status-badge"]'),
-        ).toBeVisible();
-        await expect(
-          firstStatusCell.locator("text=/\\(\\d+\\.?\\d*%\\)/"),
         ).toBeVisible();
       }
     });
