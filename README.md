@@ -89,11 +89,11 @@ All commands are run from the root of the project, from a terminal:
 
 ##### Description
 
-Retrieves aggregated benchmark statistics from all services, grouped by service ID or scenario ID.
+Retrieves the latest benchmark status for each scenario.
 
 ##### Response
 
-- **200 OK**: Returns a JSON array of benchmark statistics.
+- **200 OK**: Returns a JSON array of benchmark status per scenario.
 - **500 Internal Server Error**: Error fetching benchmark data.
 
 ##### Example Response
@@ -101,41 +101,39 @@ Retrieves aggregated benchmark statistics from all services, grouped by service 
 ```json
 [
   {
-    "runs": 100,
     "scenario_id": "service_1",
-    "success_count": 90,
-    "failed_count": 10
+    "status": "stable",
+    "last_test_datetime": "2024-11-24T16:47:28.000Z"
   }
 ]
 ```
 
 ##### Response Fields
 
-- `runs` (number): The total number of test runs.
-- `scenario_id` (string): The unique identifier of the service or scenario.
-- `success_count` (number): The total count of successful runs.
-- `failed_count` (number): The total count of failed runs.
+- `scenario_id` (string): The unique identifier of the scenario.
+- `status` (string): The status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
+- `last_test_datetime` (string): The datetime of the most recent test run in ISO 8601 format.
 
 #### `GET /api/services/{id}/benchmarks.json`
 
 ##### Description
 
-Retrieves aggregated benchmark statistics from a specified service.
+Retrieves benchmark data for a specified service or scenario, limited to successful runs within the default time period.
 
-#### Parameters
+##### Parameters
 
 - `id` (path parameter): The unique identifier of the service or scenario.
 
 ##### Response
 
-- **200 OK**: Returns a JSON object of benchmark statistics.
+- **200 OK**: Returns a JSON object of benchmark data.
 - **500 Internal Server Error**: Error fetching benchmark data.
 
 ##### Example Response
 
 ```json
 {
-  "scenario": "service_1",
+  "service_id": "service_1",
   "data": [
     {
       "cpu": 107,
@@ -145,19 +143,9 @@ Retrieves aggregated benchmark statistics from a specified service.
       "input_pixel": 2.95,
       "max_executor_memory": 1.54,
       "network_received": 7047668,
+      "area_size": 100.5,
       "start_time": "2024-11-24T16:47:28.000Z",
-      "status": "success"
-    },
-    {
-      "cpu": 174,
-      "memory": 602696,
-      "costs": 4,
-      "duration": 155.36,
-      "input_pixel": 2.95,
-      "max_executor_memory": 1.57,
-      "network_received": 1414923468,
-      "start_time": "2024-11-19T20:44:02.000Z",
-      "status": "success"
+      "scenario_id": "service_1"
     }
   ]
 }
@@ -165,7 +153,7 @@ Retrieves aggregated benchmark statistics from a specified service.
 
 ##### Response Fields
 
-- `scenario_id` (string): The ID of the scenario for which data is retrieved.
+- `service_id` (string): The ID of the service for which data is retrieved.
 - `data` (array): An array of benchmarking data objects, each containing:
   - `cpu` (number): CPU usage in seconds.
   - `costs` (number): Costs associated with the benchmark.
@@ -175,7 +163,8 @@ Retrieves aggregated benchmark statistics from a specified service.
   - `input_pixel` (number): Input pixel usage in mega-pixels.
   - `max_executor_memory` (number): Maximum executor memory used in GB.
   - `network_received` (number): Amount of data received over the network in bytes.
-  - `status` (string): Status of the benchmark ('success' or 'failed').
+  - `area_size` (number): Area size in square kilometers.
+  - `scenario_id` (string): The scenario ID for this benchmark entry.
 
 ### Admin API Endpoints
 
@@ -201,20 +190,30 @@ Retrieves comprehensive benchmark statistics from all services with date filteri
 ##### Example Response
 
 ```json
-{
-  "data": [
-    {
-      "scenario_id": "service_1",
-      "runs": 100,
-      "success_count": 90,
-      "failed_count": 10,
-      "success_rate": 90.0
-    }
-  ]
-}
+[
+  {
+    "runs": 100,
+    "scenario_id": "service_1",
+    "success_count": 90,
+    "failed_count": 10,
+    "last_test_datetime": "2024-11-24T16:47:28.000Z",
+    "last_test_phase": "run-job",
+    "status": "stable"
+  }
+]
 ```
 
-#### `GET /api/admin/scenarios/{id}/benchmarks.json`
+##### Response Fields
+
+- `runs` (number): The total number of test runs.
+- `scenario_id` (string): The unique identifier of the scenario.
+- `success_count` (number): The total count of successful runs.
+- `failed_count` (number): The total count of failed runs.
+- `last_test_datetime` (string): The datetime of the most recent test run in ISO 8601 format.
+- `last_test_phase` (string): The phase of the most recent test run.
+- `status` (string): The status of the most recent test run ('stable', 'unstable', 'critical', or 'no benchmark').
+
+#### `GET /api/admin/services/{id}/benchmarks.json`
 
 ##### Description
 
@@ -227,17 +226,11 @@ Retrieves detailed benchmark data for a specific scenario with date filtering.
 ##### Query Parameters
 
 - `start` (string, optional): Start date for filtering in YYYY-MM-DD format.
-- `end` (string, optional): End date for filtering in YYYY-MM-DD format. Required if `start` is provided.
-- `status` (string, optional): Filter by benchmark status. Valid values: `passed`, `failed`, `all`. Default: `all`.
-- `limit` (number, optional): Number of results per page. Range: 1-1000. Default: 100.
-- `offset` (number, optional): Number of results to skip for pagination. Default: 0.
-- `sort` (string, optional): Field to sort by. Valid values: `start_time`, `duration`, `cpu`, `memory`, `costs`, `status`. Default: `start_time`.
-- `order` (string, optional): Sort order. Valid values: `asc`, `desc`. Default: `desc`.
-- `include_aggregates` (boolean, optional): Include aggregate statistics in response. Default: false.
+- `end` (string, optional): End date for filtering in YYYY-MM-DD format.
 
 ##### Response
 
-- **200 OK**: Returns a JSON object with detailed benchmark data and metadata.
+- **200 OK**: Returns a JSON array with detailed benchmark data.
 - **400 Bad Request**: Invalid query parameters or scenario ID.
 - **500 Internal Server Error**: Error fetching benchmark data.
 
@@ -254,14 +247,14 @@ Retrieves detailed benchmark data for a specific scenario with date filtering.
     "max_executor_memory": 1.54,
     "network_received": 7047668,
     "start_time": "2024-11-24T16:47:28.000Z",
-    "status": "passed"
+    "test_phase_end": "run-job",
+    "test_outcome": "passed",
+    "status": "stable"
   }
 ]
 ```
 
-##### Admin Response Fields
-
-**Data Fields**:
+##### Response Fields
 
 - `cpu` (number): CPU usage in seconds.
 - `memory` (number): Memory usage in MB-seconds.
@@ -271,4 +264,6 @@ Retrieves detailed benchmark data for a specific scenario with date filtering.
 - `max_executor_memory` (number): Maximum executor memory used in GB.
 - `network_received` (number): Amount of data received over the network in bytes.
 - `start_time` (string): The start time of the test in ISO 8601 format.
-- `status` (string): Status of the benchmark ('passed' or 'failed').
+- `test_phase_end` (string): The phase in which the test ended (e.g., 'create-job', 'run-job').
+- `test_outcome` (string): The outcome of the test (e.g., 'passed', 'failed').
+- `status` (string): Status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
