@@ -6,6 +6,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
 interface BenchmarkStatusBadgeProps {
   status: BenchmarkStatusKey;
   forcedEnabled?: boolean;
+  className?: string;
 }
 
 const statusVariant = cva("inline-flex w-2 h-2 rounded-full", {
@@ -25,13 +26,14 @@ const statusVariant = cva("inline-flex w-2 h-2 rounded-full", {
 export const BenchmarkStatusBadge = ({
   status,
   forcedEnabled = false,
+  className,
 }: BenchmarkStatusBadgeProps) => {
   const isEnabled =
     isFeatureEnabled(window.location.href, "benchmarkStatus") || forcedEnabled;
 
   return isEnabled ? (
     <div
-      className="flex items-center gap-2"
+      className={cn("flex items-center gap-2", className)}
       data-testid="benchmark-status-badge"
     >
       <span className={cn(statusVariant({ status }))}></span>
