@@ -9,6 +9,20 @@ export const STATUS_THRESHOLD = {
   "no benchmark": null,
 };
 
+export const statusDescriptions: Record<BenchmarkStatusKey, string> = {
+  "no benchmark": "No test benchmark found",
+  critical: "The service execution failed in the create-job or run-job phase",
+  unstable: "The service execution failed in one of the other phases",
+  stable: "Everything executed successfully",
+};
+
+export const statusOrder: BenchmarkStatusKey[] = [
+  "no benchmark",
+  "critical",
+  "unstable",
+  "stable",
+];
+
 export const getBenchmarkStatus = (
   data?: AdminBenchmarkSummary,
 ): BenchmarkStatusKey => {

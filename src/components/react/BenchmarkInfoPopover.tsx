@@ -1,6 +1,7 @@
 import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
 import { Info } from "lucide-react";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
+import { statusDescriptions, statusOrder } from "@/lib/benchmark-status";
 
 export const BenchmarkInfoPopover = () => {
   return (
@@ -14,26 +15,12 @@ export const BenchmarkInfoPopover = () => {
             The benchmark status is determined based on the algorithm's latest test run:
           </p>
           <ul className="text-sm space-y-1">
-            <li>
-              <BenchmarkStatusBadge className="inline-flex" status="no benchmark" />
-              <span className="ml-1">(no test benchmark found)</span>
-            </li>
-            <li>
-              <BenchmarkStatusBadge className="inline-flex" status="critical" />
-              <span className="ml-1">
-                (the service execution failed in the create-job or run-job phase)
-              </span>
-            </li>
-            <li>
-              <BenchmarkStatusBadge className="inline-flex" status="unstable" />
-              <span className="ml-1">
-                (the service execution failed in one of the other phases)
-              </span>
-            </li>
-            <li>
-              <BenchmarkStatusBadge className="inline-flex" status="stable" />
-              <span className="ml-1">(everything executed successfully)</span>
-            </li>
+            {statusOrder.map((s) => (
+              <li key={s}>
+                <BenchmarkStatusBadge className="inline-flex" status={s} forcedEnabled />
+                <span className="ml-1 lowercase">({statusDescriptions[s]})</span>
+              </li>
+            ))}
           </ul>
         </article>
       </PopoverContent>

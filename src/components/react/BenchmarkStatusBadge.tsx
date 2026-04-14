@@ -2,6 +2,9 @@ import type { BenchmarkStatusKey } from "@/types/models/benchmark";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { isFeatureEnabled } from "@/lib/featureflag";
+import { statusDescriptions } from "@/lib/benchmark-status";
+import { useState } from "react";
+import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
 
 interface BenchmarkStatusBadgeProps {
   status: BenchmarkStatusKey;
@@ -30,14 +33,30 @@ export const BenchmarkStatusBadge = ({
 }: BenchmarkStatusBadgeProps) => {
   const isEnabled =
     isFeatureEnabled(window.location.href, "benchmarkStatus") || forcedEnabled;
+  const [open, setOpen] = useState(false);
 
   return isEnabled ? (
-    <div
-      className={cn("flex items-center gap-2", className)}
-      data-testid="benchmark-status-badge"
-    >
-      <span className={cn(statusVariant({ status }))}></span>
-      <span className="capitalize">{status}</span>
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className={cn("flex items-center gap-2", className)}
+          data-testid="benchmark-status-badge"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <span className={cn(statusVariant({ status }))}></span>
+          <span className="capitalize">{status}</span>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-auto"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        <p className="text-sm">
+          {statusDescriptions[status]}
+        </p>
+      </PopoverContent>
+    </Popover>
   ) : null;
 };
