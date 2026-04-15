@@ -33,7 +33,6 @@ import type {
   BenchmarkSummary,
 } from "@/types/models/benchmark";
 import { getBenchmarkSummary } from "@/lib/api";
-import { getBenchmarkStatus, STATUS_THRESHOLD } from "@/lib/benchmark-status";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import type { Catalogue } from "@/types/models/catalogue";
 
@@ -86,8 +85,8 @@ const searchAndSortFilterCatalogues = ({
   filterBy,
 }: SearchAndSortFilterParams) => {
   const statusOrder = {
-    stable: 0,
-    unstable: 1,
+    healthy: 0,
+    warning: 1,
     critical: 2,
     "no benchmark": 3,
   };
@@ -179,8 +178,8 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
   const providers: string[] = [];
   const platforms: string[] = [];
   const status = [
-    { label: "stable", value: "stable" },
-    { label: "unstable", value: "unstable" },
+    { label: "healthy", value: "healthy" },
+    { label: "warning", value: "warning" },
     { label: "critical", value: "critical" },
     { label: "no benchmark", value: "no benchmark" },
   ];

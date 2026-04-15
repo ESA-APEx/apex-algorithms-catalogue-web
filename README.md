@@ -102,7 +102,7 @@ Retrieves the latest benchmark status for each scenario.
 [
   {
     "scenario_id": "service_1",
-    "status": "stable",
+    "status": "healthy",
     "last_test_datetime": "2024-11-24T16:47:28.000Z"
   }
 ]
@@ -111,7 +111,7 @@ Retrieves the latest benchmark status for each scenario.
 ##### Response Fields
 
 - `scenario_id` (string): The unique identifier of the scenario.
-- `status` (string): The status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
+- `status` (string): The status of the benchmark ('health', 'warning', 'critical', or 'no benchmark').
 - `last_test_datetime` (string): The datetime of the most recent test run in ISO 8601 format.
 
 #### `GET /api/services/{id}/benchmarks.json`
@@ -198,7 +198,7 @@ Retrieves comprehensive benchmark statistics from all services with date filteri
     "failed_count": 10,
     "last_test_datetime": "2024-11-24T16:47:28.000Z",
     "last_test_phase": "run-job",
-    "status": "stable"
+    "status": "healthy"
   }
 ]
 ```
@@ -211,7 +211,7 @@ Retrieves comprehensive benchmark statistics from all services with date filteri
 - `failed_count` (number): The total count of failed runs.
 - `last_test_datetime` (string): The datetime of the most recent test run in ISO 8601 format.
 - `last_test_phase` (string): The phase of the most recent test run.
-- `status` (string): The status of the most recent test run ('stable', 'unstable', 'critical', or 'no benchmark').
+- `status` (string): The status of the most recent test run ('healthy', 'warning', 'critical', or 'no benchmark').
 
 #### `GET /api/admin/services/{id}/benchmarks.json`
 
@@ -249,7 +249,7 @@ Retrieves detailed benchmark data for a specific scenario with date filtering.
     "start_time": "2024-11-24T16:47:28.000Z",
     "test_phase_end": "run-job",
     "test_outcome": "passed",
-    "status": "stable"
+    "status": "healthy"
   }
 ]
 ```
@@ -266,4 +266,4 @@ Retrieves detailed benchmark data for a specific scenario with date filtering.
 - `start_time` (string): The start time of the test in ISO 8601 format.
 - `test_phase_end` (string): The phase in which the test ended (e.g., 'create-job', 'run-job').
 - `test_outcome` (string): The outcome of the test (e.g., 'passed', 'failed').
-- `status` (string): Status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
+- `status` (string): Status of the benchmark ('health', 'warning', 'critical', or 'no benchmark').

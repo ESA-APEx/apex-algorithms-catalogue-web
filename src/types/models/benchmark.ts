@@ -38,4 +38,4 @@ export interface BenchmarkSummary {
   last_test_datetime: string;
 }
 
-export type BenchmarkStatusKey = "stable" | "unstable" | "critical" | "no benchmark";
+export type BenchmarkStatusKey = "healthy" | "warning" | "critical" | "no benchmark";

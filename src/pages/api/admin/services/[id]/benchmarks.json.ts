@@ -83,7 +83,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
  *                         description: The outcome of the test (e.g., 'passed', 'failed').
  *                       status:
  *                         type: string
- *                         description: Status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
+ *                         description: Status of the benchmark ('healthy', 'warning', 'critical', or 'no benchmark').
  *       400:
  *         description: Bad request
  *         content:
@@ -151,8 +151,8 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
         "test:outcome" as 'test_outcome',
         CASE
           WHEN "test:outcome" = 'failed' AND "test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
-          WHEN "test:outcome" = 'failed'                                                    THEN 'unstable'
-          WHEN "test:outcome" = 'passed'                                                    THEN 'stable'
+          WHEN "test:outcome" = 'failed'                                                    THEN 'warning'
+          WHEN "test:outcome" = 'passed'                                                    THEN 'healthy'
           ELSE 'no benchmark'
         END AS status
       FROM parquet_scan([${urls.map((url) => `"${url}"`)}])

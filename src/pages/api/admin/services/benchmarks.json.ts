@@ -58,7 +58,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
  *                     description: The phase of the most recent test run.
  *                   status:
  *                     type: string
- *                     description: The status of the most recent test run ('stable', 'unstable', 'critical', or 'no benchmark').
+ *                     description: The status of the most recent test run ('healthy', 'warning', 'critical', or 'no benchmark').
  *       400:
  *         description: Bad request
  *         content:
@@ -127,8 +127,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
         lr."test:phase:end" as last_test_phase,
         CASE
           WHEN lr."test:outcome" = 'failed' AND lr."test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
-          WHEN lr."test:outcome" = 'failed'                                                       THEN 'unstable'
-          WHEN lr."test:outcome" = 'passed'                                                       THEN 'stable'
+          WHEN lr."test:outcome" = 'failed'                                                       THEN 'warning'
+          WHEN lr."test:outcome" = 'passed'                                                       THEN 'healthy'
           ELSE 'no benchmark'
         END AS status
       FROM aggregated a

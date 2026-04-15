@@ -15,8 +15,8 @@ interface BenchmarkStatusBadgeProps {
 const statusVariant = cva("inline-flex w-2 h-2 rounded-full", {
   variants: {
     status: {
-      stable: "bg-green-600",
-      unstable: "bg-yellow-600",
+      healthy: "bg-green-600",
+      warning: "bg-yellow-600",
       critical: "bg-red-600",
       "no benchmark": "bg-gray-500",
     },

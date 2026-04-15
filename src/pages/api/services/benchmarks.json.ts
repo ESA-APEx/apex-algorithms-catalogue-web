@@ -29,7 +29,7 @@ import {
  *                     description: Unique identifier for the scenario.
  *                   status:
  *                     type: string
- *                     description: Status of the benchmark ('stable', 'unstable', 'critical', or 'no benchmark').
+ *                     description: Status of the benchmark ('healthy', 'warning', 'critical', or 'no benchmark').
  *                   last_test_datetime:
  *                     type: string
  *                     format: date-time
@@ -49,9 +49,6 @@ export const GET: APIRoute = async () => {
       updateCacheExpiration();
     }
 
-    // Use default date filter for the last N months
-    const dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
-
     const query = `
       WITH last_runs AS (
           SELECT *,
@@ -61,17 +58,17 @@ export const GET: APIRoute = async () => {
               ) AS rn
           FROM benchmarks
           WHERE "scenario_id" IS NOT NULL
-            ${dateFilter}
       )
       SELECT
           "scenario_id",
           CASE
               WHEN "test:outcome" = 'failed' AND "test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
-              WHEN "test:outcome" = 'failed'                                                    THEN 'unstable'
-              WHEN "test:outcome" = 'passed'                                                    THEN 'stable'
+              WHEN "test:outcome" = 'failed'                                                    THEN 'warning'
+              WHEN "test:outcome" = 'passed'                                                    THEN 'healthy'
               ELSE 'no benchmark'
           END AS status,
-          CAST("test:start:datetime" AS TIMESTAMP) AS "last_test_datetime"
+          CAST("test:start:datetime" AS TIMESTAMP) AS "last_test_datetime",
+          "test:phase:end" AS "last_test_phase"
       FROM last_runs
       WHERE rn = 1
       ORDER BY "scenario_id";
