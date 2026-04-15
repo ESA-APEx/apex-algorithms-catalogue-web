@@ -4,6 +4,7 @@ import type {
   BenchmarkStatusKey,
 } from "@/types/models/benchmark";
 import { isFeatureEnabled } from "@/lib/featureflag";
+import { calculateStatusFromSummary } from "@/lib/benchmark-status";
 import { getBenchmarkSummary } from "@/lib/api";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { Spinner } from "./Spinner";
@@ -22,10 +23,7 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
     try {
       const result = await getBenchmarkSummary();
       if (result) {
-        const summaryData = result.find(
-          (item) => item.scenario_id === scenarioId,
-        );
-        setStatus(summaryData?.status || "no benchmark");
+        setStatus(calculateStatusFromSummary(scenarioId, result));
       } else {
         setStatus("no benchmark");
         console.error(
@@ -41,15 +39,12 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
   useEffect(() => {
     if (isEnabled) {
       if (data) {
-        setStatus(
-          data.find((item) => item.scenario_id === scenarioId)?.status || "no benchmark"
-        );
+        setStatus(calculateStatusFromSummary(scenarioId,data));
       } else {
         fetchData();
       }
     }
   }, [data, scenarioId, isEnabled]);
-
   return (
     isEnabled && (
       <>{status ? <BenchmarkStatusBadge status={status} /> : <Spinner />}</>

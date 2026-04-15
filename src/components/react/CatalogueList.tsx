@@ -35,6 +35,8 @@ import type {
 import { getBenchmarkSummary } from "@/lib/api";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import type { Catalogue } from "@/types/models/catalogue";
+import { ca } from "date-fns/locale";
+import { calculateStatusFromSummary } from "@/lib/benchmark-status";
 
 interface CatalogueListProps {
   catalogues: Omit<Catalogue, "applicationDetails">[];
@@ -92,15 +94,17 @@ const searchAndSortFilterCatalogues = ({
   };
   if (!!query || !!sortBy) {
     const normalizedQuery = query.toLowerCase();
-    const benchmarkStatusData: Record<string, BenchmarkSummary> = {};
-    benchmarkData?.forEach((data) => {
-      benchmarkStatusData[data.scenario_id] = data;
-    });
+    const benchmarkStatusData: Record<string, BenchmarkStatusKey> = {};
+
+    for (const catalogue of catalogues) {
+      const { algorithm } = catalogue;
+      benchmarkStatusData[algorithm.id] = calculateStatusFromSummary(algorithm.id, benchmarkData)
+    }
 
     return catalogues
       .filter(({ algorithm, platform, provider }) => {
         const { type, properties, id } = algorithm;
-        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]?.status || "no benchmark";
+        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id] || "no benchmark";
         const hitSearch =
           type.toLowerCase().includes(normalizedQuery) ||
           properties.keywords.find((k) =>
@@ -160,9 +164,8 @@ const searchAndSortFilterCatalogues = ({
             : -1;
         }
 
-        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id]?.status || "no benchmark";
-        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id]?.status || "no benchmark";
-
+        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id] || "no benchmark";
+        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id] || "no benchmark";
         return (
           statusOrder[benchmarkStatusDataA] - statusOrder[benchmarkStatusDataB]
         );

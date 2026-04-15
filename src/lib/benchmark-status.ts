@@ -1,7 +1,9 @@
 import type {
   AdminBenchmarkSummary,
   BenchmarkStatusKey,
+  BenchmarkSummary,
 } from "@/types/models/benchmark";
+import benchmarkMapping from "@/benchmark-mapping.json";
 
 export const statusDescriptions: Record<BenchmarkStatusKey, string> = {
   "no benchmark": "No test benchmark found",
@@ -26,6 +28,31 @@ export const getBenchmarkStatus = (
       return "healthy";
     }
     return "warning";
+  }
+  return "no benchmark";
+};
+
+export const calculateStatusFromSummary = (
+  scenarioId: string,
+  data?: BenchmarkSummary[],
+): BenchmarkStatusKey => {
+  //@ts-ignore
+  const mappedScenarioId = benchmarkMapping[scenarioId] || [scenarioId];
+  if (data) {
+    const summaryData = data.filter((item) =>
+      mappedScenarioId.includes(item.scenario_id),
+    );
+    return (
+      summaryData.reduce(
+        (acc, item) => {
+          if (item.status === "critical") return "critical";
+          if (item.status === "warning" && acc !== "critical") return "warning";
+          if (item.status === "healthy" && acc === undefined) return "healthy";
+          return acc;
+        },
+        undefined as BenchmarkStatusKey | undefined,
+      ) || "no benchmark"
+    );
   }
   return "no benchmark";
 };
