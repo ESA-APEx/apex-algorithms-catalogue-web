@@ -3,7 +3,6 @@ import type { AdminBenchmarkData } from "@/types/models/benchmark";
 import { addMonths, formatDate } from "date-fns";
 import React, { useState, useEffect } from "react";
 import { Spinner } from "./Spinner";
-import { getBenchmarkStatus } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { BenchmarkLineChart } from "./BenchmarkLineChart";
 import { BenchmarkMetricsTable } from "./BenchmarkMetricsTable";
@@ -104,16 +103,9 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   };
 
   const runs = data?.length;
-  const success = data?.filter((d) => d.status === "passed").length;
-  const failed = data?.filter((d) => d.status === "failed").length;
-  const successRate =
-    success !== undefined && runs !== undefined ? (success / runs) * 100 : 0;
-  const status = getBenchmarkStatus({
-    runs: runs || 0,
-    scenario_id: id,
-    success_count: success || 0,
-    failed_count: failed || 0,
-  });
+  const success = data?.filter((d) => d.test_outcome === "passed").length;
+  const failed = data?.filter((d) => d.test_outcome === "failed").length;
+  const status = data?.[0]?.status || "no benchmark";
 
   const lastTestTime =
     data && data?.length > 0
@@ -163,31 +155,34 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
         <>
           <div className="flex gap-4 px-4 mb-6 text-white">
             <div className="flex-1 flex flex-col">
-              <p>Total Runs</p>
+              <p>Total runs</p>
               <p className="text-6xl py-4" data-testid="stat-value">
                 {runs}
               </p>
             </div>
             <div className="flex-1 flex flex-col">
-              <p>Successful Runs</p>
+              <p>Successful runs</p>
               <p className="text-6xl py-4" data-testid="stat-value">
                 {success}
               </p>
             </div>
             <div className="flex-1 flex flex-col">
-              <p>Failed Runs</p>
+              <p>Failed runs</p>
               <p className="text-6xl py-4" data-testid="stat-value">
                 {failed}
               </p>
             </div>
             <div className="flex-1 flex flex-col">
-              <p>Status</p>
+              <p>Last phase end</p>
+              <p className="text-xl flex items-center h-full" data-testid="stat-value">
+                {data?.[0]?.test_phase_end || "N/A"}
+              </p>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <p>Last status</p>
               <div className="flex-1 flex flex-col justify-center">
-                <div className="flex gap-1 text-xl">
+                <div className="flex text-xl">
                   <BenchmarkStatusBadge status={status} forcedEnabled />
-                  <span className="font-medium text-gray-300">
-                    ({successRate.toFixed(2)}%)
-                  </span>
                 </div>
               </div>
             </div>

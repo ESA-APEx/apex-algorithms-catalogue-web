@@ -82,7 +82,7 @@ test.describe("Service Details Test", () => {
 
     await expect(statusBadge).toBeVisible();
 
-    const statusBadgeLabel = statusBadge.getByText("Stable");
+    const statusBadgeLabel = statusBadge.getByText("Healthy");
 
     await statusBadgeLabel.waitFor({ state: "visible", timeout: 50000 });
     await expect(statusBadgeLabel).toBeVisible({ timeout: 50000 });

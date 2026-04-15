@@ -24,7 +24,7 @@ export const ParameterDescriptionMarkdown = ({
           code: ({ className: codeClassName, ...props }) => (
             <code
               {...props}
-              className={cn("bg-gray-700 rounded p-1 text-xs", codeClassName)}
+              className={cn("bg-gray-700 rounded p-1 text-xs whitespace-normal", codeClassName)}
             />
           ),
         }}

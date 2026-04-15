@@ -75,9 +75,15 @@ import { isFeatureEnabled } from "@/lib/featureflag";
  *                       network_received:
  *                         type: number
  *                         description: Amount of data received over the network in bytes.
+ *                       test_phase_end:
+ *                         type: string
+ *                         description: The phase in which the test ended (e.g., 'create-job', 'run-job').
+ *                       test_outcome:
+ *                         type: string
+ *                         description: The outcome of the test (e.g., 'passed', 'failed').
  *                       status:
  *                         type: string
- *                         description: Status of the benchmark ('passed' or 'failed').
+ *                         description: Status of the benchmark ('healthy', 'warning', 'critical', or 'no benchmark').
  *       400:
  *         description: Bad request
  *         content:
@@ -141,7 +147,14 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
         round("usage:max_executor_memory:gb", 2) as max_executor_memory,
         round("usage:network_received:b", 2) as network_received,
         strptime("test:start:datetime", '%Y-%m-%dT%H:%M:%SZ') as start_time,
-        "test:outcome" as status
+        "test:phase:end" as 'test_phase_end',
+        "test:outcome" as 'test_outcome',
+        CASE
+          WHEN "test:outcome" = 'failed' AND "test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
+          WHEN "test:outcome" = 'failed'                                                    THEN 'warning'
+          WHEN "test:outcome" = 'passed'                                                    THEN 'healthy'
+          ELSE 'no benchmark'
+        END AS status
       FROM parquet_scan([${urls.map((url) => `"${url}"`)}])
       WHERE "scenario_id" = '${scenario}'
         ${dateFilter}

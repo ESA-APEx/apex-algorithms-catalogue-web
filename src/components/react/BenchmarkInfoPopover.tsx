@@ -1,7 +1,7 @@
 import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
 import { Info } from "lucide-react";
-import { STATUS_THRESHOLD } from "@/lib/benchmark-status";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
+import { statusDescriptions, statusOrder } from "@/lib/benchmark-status";
 
 export const BenchmarkInfoPopover = () => {
   return (
@@ -9,24 +9,18 @@ export const BenchmarkInfoPopover = () => {
       <PopoverTrigger>
         <Info className="w-4 h-4 text-white rounded-full hover:bg-brand-teal-50/20 cursor-pointer" />
       </PopoverTrigger>
-      <PopoverContent className="relative">
+      <PopoverContent className="relative w-[300px]">
         <article>
           <p className="text-sm mb-2">
-            The percentage of successful executions is categorized into three
-            status:
+            The benchmark status is determined based on the algorithm's latest test run:
           </p>
-          <ul className="text-sm">
-            <li className="flex items-center gap-1 flex-wrap">
-              <BenchmarkStatusBadge status="stable" />
-              <span className="flex-1">{`(success rate >= ${STATUS_THRESHOLD.stable})`}</span>
-            </li>
-            <li className="flex items-center gap-1">
-              <BenchmarkStatusBadge status="unstable" />
-              <span className="flex-1">{`(${STATUS_THRESHOLD.unstable} <= success rate < ${STATUS_THRESHOLD.stable})`}</span>
-            </li>
-            <li className="flex items-center gap-1">
-              <BenchmarkStatusBadge status="no benchmark" />
-            </li>
+          <ul className="text-sm space-y-1">
+            {statusOrder.map((s) => (
+              <li key={s}>
+                <BenchmarkStatusBadge className="inline-flex" status={s} forcedEnabled />
+                <span className="ml-1 lowercase">({statusDescriptions[s]})</span>
+              </li>
+            ))}
           </ul>
         </article>
       </PopoverContent>

@@ -17,15 +17,25 @@ export interface BenchmarkData {
 }
 
 export interface AdminBenchmarkData extends BenchmarkData {
-  status: "passed" | "failed";
+  test_outcome: string;
+  test_phase_end: string;
+  status: BenchmarkStatusKey;
+}
+
+export interface AdminBenchmarkSummary {
+  scenario_id: string;
+  runs: number;
+  success_count: number;
+  failed_count: number;
+  last_test_datetime: string;
+  last_test_phase: string;
+  status: BenchmarkStatusKey;
 }
 
 export interface BenchmarkSummary {
-  runs: number;
   scenario_id: string;
-  success_count: number;
-  failed_count: number;
-  last_test_datetime?: string;
+  status: BenchmarkStatusKey;
+  last_test_datetime: string;
 }
 
-export type BenchmarkStatusKey = "stable" | "unstable" | "no benchmark";
+export type BenchmarkStatusKey = "healthy" | "warning" | "critical" | "no benchmark";

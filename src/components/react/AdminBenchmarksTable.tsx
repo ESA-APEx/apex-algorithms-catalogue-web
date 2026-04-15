@@ -10,8 +10,7 @@ import {
   type ColumnFiltersState,
 } from "@tanstack/react-table";
 import { getAdminBenchmarks } from "@/lib/api";
-import type { BenchmarkSummary } from "@/types/models/benchmark";
-import { getBenchmarkStatus } from "@/lib/benchmark-status";
+import type { AdminBenchmarkSummary } from "@/types/models/benchmark";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { Spinner } from "./Spinner";
 import { Input } from "./Input";
@@ -31,12 +30,12 @@ interface AdminBenchmarksTableProps {
   className?: string;
 }
 
-const columnHelper = createColumnHelper<BenchmarkSummary>();
+const columnHelper = createColumnHelper<AdminBenchmarkSummary>();
 
 export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
   className,
 }) => {
-  const [data, setData] = useState<BenchmarkSummary[]>([]);
+  const [data, setData] = useState<AdminBenchmarkSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>("");
@@ -98,23 +97,21 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
         ),
         enableSorting: true,
       }),
+      columnHelper.accessor("last_test_phase", {
+        header: "Last Phase",
+        cell: (info) => info.getValue(),
+        enableSorting: true,  
+      }),
       columnHelper.display({
         id: "status",
-        header: "Status",
+        header: "Last Status",
         cell: (info) => {
           const benchmark = info.row.original;
-          const successRate = calculateSuccessRate(
-            benchmark.success_count,
-            benchmark.runs,
-          );
-          const status = getBenchmarkStatus(benchmark);
+          const status = benchmark.status;
 
           return (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center">
               <BenchmarkStatusBadge status={status} forcedEnabled />
-              <span className="font-medium text-gray-300">
-                ({successRate}%)
-              </span>
             </div>
           );
         },

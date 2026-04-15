@@ -33,9 +33,10 @@ import type {
   BenchmarkSummary,
 } from "@/types/models/benchmark";
 import { getBenchmarkSummary } from "@/lib/api";
-import { getBenchmarkStatus, STATUS_THRESHOLD } from "@/lib/benchmark-status";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import type { Catalogue } from "@/types/models/catalogue";
+import { ca } from "date-fns/locale";
+import { calculateStatusFromSummary } from "@/lib/benchmark-status";
 
 interface CatalogueListProps {
   catalogues: Omit<Catalogue, "applicationDetails">[];
@@ -86,23 +87,24 @@ const searchAndSortFilterCatalogues = ({
   filterBy,
 }: SearchAndSortFilterParams) => {
   const statusOrder = {
-    stable: 0,
-    unstable: 1,
-    "no benchmark": 2,
+    healthy: 0,
+    warning: 1,
+    critical: 2,
+    "no benchmark": 3,
   };
   if (!!query || !!sortBy) {
     const normalizedQuery = query.toLowerCase();
-    const benchmarkStatusData: Record<string, BenchmarkSummary> = {};
-    benchmarkData?.forEach((data) => {
-      benchmarkStatusData[data.scenario_id] = data;
-    });
+    const benchmarkStatusData: Record<string, BenchmarkStatusKey> = {};
+
+    for (const catalogue of catalogues) {
+      const { algorithm } = catalogue;
+      benchmarkStatusData[algorithm.id] = calculateStatusFromSummary(algorithm.id, benchmarkData)
+    }
 
     return catalogues
       .filter(({ algorithm, platform, provider }) => {
         const { type, properties, id } = algorithm;
-        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id]
-          ? getBenchmarkStatus(benchmarkStatusData[id])
-          : "no benchmark";
+        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id] || "no benchmark";
         const hitSearch =
           type.toLowerCase().includes(normalizedQuery) ||
           properties.keywords.find((k) =>
@@ -162,13 +164,8 @@ const searchAndSortFilterCatalogues = ({
             : -1;
         }
 
-        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id]
-          ? getBenchmarkStatus(benchmarkStatusData[a.algorithm.id])
-          : "no benchmark";
-        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id]
-          ? getBenchmarkStatus(benchmarkStatusData[b.algorithm.id])
-          : "no benchmark";
-
+        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id] || "no benchmark";
+        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id] || "no benchmark";
         return (
           statusOrder[benchmarkStatusDataA] - statusOrder[benchmarkStatusDataB]
         );
@@ -183,6 +180,12 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
   const types: string[] = [];
   const providers: string[] = [];
   const platforms: string[] = [];
+  const status = [
+    { label: "healthy", value: "healthy" },
+    { label: "warning", value: "warning" },
+    { label: "critical", value: "critical" },
+    { label: "no benchmark", value: "no benchmark" },
+  ];
 
   for (const catalogue of catalogues) {
     const { algorithm, provider, platform } = catalogue;
@@ -204,7 +207,7 @@ const getCataloguesFilterList = (catalogues: Catalogue[]) => {
     labels: generateUniqueOptions(labels),
     licenses: generateUniqueOptions(licenses),
     types: generateUniqueOptions(types),
-    benchmarkStatus: generateUniqueOptions(Object.keys(STATUS_THRESHOLD)),
+    benchmarkStatus: status,
     providers: generateUniqueOptions(providers),
     platforms: generateUniqueOptions(platforms),
   };

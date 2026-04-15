@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/pages/api/services/[id]/benchmarks.json";
 import { getUrls } from "@/lib/parquet-datasource";
 import { executeQuery } from "@/lib/db";
+import type { BenchmarkData } from "@/types/models/benchmark";
 
 vi.mock("@/lib/parquet-datasource", () => ({
   getUrls: vi.fn(),
@@ -32,8 +33,10 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
   });
 
   it("should return benchmark data for a specific scenario", async () => {
-    const mockData = [
+    const mockData: BenchmarkData[] = [
       {
+        scenario_id: "max_ndvi_composite",
+        area_size: 400,
         cpu: 100,
         memory: 200,
         costs: 300,
@@ -42,7 +45,6 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
         max_executor_memory: 600,
         network_received: 700,
         start_time: "2024-02-27T12:00:00Z",
-        status: "success",
       },
     ];
 

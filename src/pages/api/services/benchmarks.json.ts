@@ -24,18 +24,12 @@ import {
  *               items:
  *                 type: object
  *                 properties:
- *                   runs:
- *                     type: integer
- *                     description: Total number of test runs.
  *                   scenario_id:
  *                     type: string
  *                     description: Unique identifier for the scenario.
- *                   success_count:
- *                     type: integer
- *                     description: Total number of successful runs.
- *                   failed_count:
- *                     type: integer
- *                     description: Total number of failed runs.
+ *                   status:
+ *                     type: string
+ *                     description: Status of the benchmark ('healthy', 'warning', 'critical', or 'no benchmark').
  *                   last_test_datetime:
  *                     type: string
  *                     format: date-time
@@ -55,21 +49,30 @@ export const GET: APIRoute = async () => {
       updateCacheExpiration();
     }
 
-    // Use default date filter for the last N months
-    const dateFilter = `AND CAST("test:start:datetime" AS TIMESTAMP) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '${PARQUET_MONTH_COVERAGE}' MONTH`;
-
     const query = `
-            SELECT count()::INTEGER                                                   as "runs",
-                "scenario_id",
-                SUM(case when "test:outcome" = 'passed' then 1 else 0 end)::INTEGER   as "success_count",
-                SUM(case when "test:outcome" != 'passed' then 1 else 0 end)::INTEGER  as "failed_count",
-                MAX(CAST("test:start:datetime" AS TIMESTAMP)) as "last_test_datetime"
-            FROM benchmarks
-            WHERE "scenario_id" IS NOT NULL
-              ${dateFilter}
-            GROUP BY "scenario_id"
-            ORDER BY "scenario_id"; 
-        `;
+      WITH last_runs AS (
+          SELECT *,
+              ROW_NUMBER() OVER (
+                  PARTITION BY "scenario_id"
+                  ORDER BY CAST("test:start:datetime" AS TIMESTAMP) DESC
+              ) AS rn
+          FROM benchmarks
+          WHERE "scenario_id" IS NOT NULL
+      )
+      SELECT
+          "scenario_id",
+          CASE
+              WHEN "test:outcome" = 'failed' AND "test:phase:end" IN ('create-job', 'run-job') THEN 'critical'
+              WHEN "test:outcome" = 'failed'                                                    THEN 'warning'
+              WHEN "test:outcome" = 'passed'                                                    THEN 'healthy'
+              ELSE 'no benchmark'
+          END AS status,
+          CAST("test:start:datetime" AS TIMESTAMP) AS "last_test_datetime",
+          "test:phase:end" AS "last_test_phase"
+      FROM last_runs
+      WHERE rn = 1
+      ORDER BY "scenario_id";
+    `;
 
     const data = (await executeQuery(query)) as BenchmarkSummary[];
     return Response.json(data);

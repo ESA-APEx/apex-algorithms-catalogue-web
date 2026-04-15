@@ -35,16 +35,12 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
     const mockData: BenchmarkSummary[] = [
       {
         scenario_id: "A",
-        runs: 5,
-        success_count: 5,
-        failed_count: 0,
+        status: "healthy",
         last_test_datetime: "2024-11-01T10:00:00Z",
       },
       {
         scenario_id: "B",
-        runs: 10,
-        success_count: 8,
-        failed_count: 2,
+        status: "warning",
         last_test_datetime: "2024-11-02T15:30:00Z",
       },
     ];
@@ -63,9 +59,9 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
     // Verify that getUrls is called without date parameters (uses default range)
     expect(getUrls).toHaveBeenCalledWith();
 
-    // Verify that the query uses default date filter (last 2 months)
+    // Verify that the query does not filter on a specific date range.
     expect(executeQuery).toHaveBeenCalledWith(
-      expect.stringContaining(
+      expect.not.stringContaining(
         "DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2' MONTH",
       ),
     );
@@ -117,9 +113,7 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
       { length: 100 },
       (_, i) => ({
         scenario_id: `scenario_${i}`,
-        runs: Math.floor(Math.random() * 50) + 1,
-        success_count: Math.floor(Math.random() * 40),
-        failed_count: Math.floor(Math.random() * 10),
+        status: "healthy",
         last_test_datetime: new Date(2024, 10, (i % 30) + 1).toISOString(),
       }),
     );
