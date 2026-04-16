@@ -7,6 +7,7 @@ import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { BenchmarkLineChart } from "./BenchmarkLineChart";
 import { BenchmarkMetricsTable } from "./BenchmarkMetricsTable";
 import { DateRangeFilter } from "./DateRangeFilter";
+import { getStatusDescription } from "@/lib/benchmark-status";
 
 interface AdminBenchmarksChartProps {
   className?: string;
@@ -106,6 +107,7 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
   const success = data?.filter((d) => d.test_outcome === "passed").length;
   const failed = data?.filter((d) => d.test_outcome === "failed").length;
   const status = data?.[0]?.status || "no benchmark";
+  const description = getStatusDescription(status);
 
   const lastTestTime =
     data && data?.length > 0
@@ -182,7 +184,7 @@ export const AdminBenchmarksChart: React.FC<AdminBenchmarksChartProps> = ({
               <p>Last status</p>
               <div className="flex-1 flex flex-col justify-center">
                 <div className="flex text-xl">
-                  <BenchmarkStatusBadge status={status} forcedEnabled />
+                  <BenchmarkStatusBadge status={{status, description}} forcedEnabled />
                 </div>
               </div>
             </div>

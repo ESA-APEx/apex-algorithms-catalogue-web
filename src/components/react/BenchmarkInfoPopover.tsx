@@ -1,7 +1,7 @@
 import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
 import { Info } from "lucide-react";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
-import { statusDescriptions, statusOrder } from "@/lib/benchmark-status";
+import { getStatusDescription, statusOrder } from "@/lib/benchmark-status";
 
 export const BenchmarkInfoPopover = () => {
   return (
@@ -17,8 +17,8 @@ export const BenchmarkInfoPopover = () => {
           <ul className="text-sm space-y-1">
             {statusOrder.map((s) => (
               <li key={s}>
-                <BenchmarkStatusBadge className="inline-flex" status={s} forcedEnabled />
-                <span className="ml-1 lowercase">({statusDescriptions[s]})</span>
+                <BenchmarkStatusBadge className="inline-flex font-bold" status={{status: s, description: getStatusDescription(s)}} forcedEnabled />
+                <span className="ml-1 lowercase">{getStatusDescription(s)}</span>
               </li>
             ))}
           </ul>

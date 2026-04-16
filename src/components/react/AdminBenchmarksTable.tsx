@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "./Table";
 import { navigate } from "astro:transitions/client";
+import { getStatusDescription } from "@/lib/benchmark-status";
 
 interface AdminBenchmarksTableProps {
   className?: string;
@@ -47,14 +48,6 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
     },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const calculateSuccessRate = (
-    successCount: number,
-    totalRuns: number,
-  ): number => {
-    if (totalRuns === 0) return 0;
-    return Number(((successCount / totalRuns) * 100).toFixed(1));
-  };
 
   const formatNumber = (num: number): string => {
     return num.toLocaleString();
@@ -111,7 +104,7 @@ export const AdminBenchmarksTable: React.FC<AdminBenchmarksTableProps> = ({
 
           return (
             <div className="flex items-center">
-              <BenchmarkStatusBadge status={status} forcedEnabled />
+              <BenchmarkStatusBadge status={{status, description: getStatusDescription(status)}} forcedEnabled />
             </div>
           );
         },
