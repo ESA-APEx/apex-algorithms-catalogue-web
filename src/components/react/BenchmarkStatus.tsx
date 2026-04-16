@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import type {
-  BenchmarkSummary,
-  BenchmarkStatusKey,
-} from "@/types/models/benchmark";
-import { isFeatureEnabled } from "@/lib/featureflag";
-import { calculateStatusFromSummary } from "@/lib/benchmark-status";
 import { getBenchmarkSummary } from "@/lib/api";
+import { calculateStatusFromSummary, getDefaultBenchmarkStatusInfo, type BenchmarkStatusInfo } from "@/lib/benchmark-status";
+import { isFeatureEnabled } from "@/lib/featureflag";
+import type {
+  BenchmarkSummary
+} from "@/types/models/benchmark";
+import { useEffect, useState } from "react";
 import { BenchmarkStatusBadge } from "./BenchmarkStatusBadge";
 import { Spinner } from "./Spinner";
 
@@ -17,7 +16,7 @@ interface BenchmarkStatusProps {
 export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
   const isEnabled = isFeatureEnabled(window.location.href, "benchmarkStatus");
 
-  const [status, setStatus] = useState<BenchmarkStatusKey>();
+  const [status, setStatus] = useState<BenchmarkStatusInfo>();
 
   const fetchData = async () => {
     try {
@@ -25,13 +24,13 @@ export const BenchmarkStatus = ({ scenarioId, data }: BenchmarkStatusProps) => {
       if (result) {
         setStatus(calculateStatusFromSummary(scenarioId, result));
       } else {
-        setStatus("no benchmark");
+        setStatus(getDefaultBenchmarkStatusInfo());
         console.error(
           "The response is not ok, setting it to fallback 'no benchmark'.",
         );
       }
     } catch (error) {
-      setStatus("no benchmark");
+      setStatus(getDefaultBenchmarkStatusInfo());
       console.error("Failed to fetch benchmark status", error);
     }
   };

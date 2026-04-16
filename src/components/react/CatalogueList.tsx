@@ -1,11 +1,37 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { getBenchmarkSummary } from "@/lib/api";
+import {
+  calculateStatusFromSummary,
+  getDefaultBenchmarkStatusInfo,
+  type BenchmarkStatusInfo,
+} from "@/lib/benchmark-status";
+import { isFeatureEnabled } from "@/lib/featureflag";
+import type {
+  BenchmarkSummary
+} from "@/types/models/benchmark";
+import type { Catalogue } from "@/types/models/catalogue";
 import { FilterIcon, SearchIcon } from "lucide-react";
-import { Card } from "./Card";
-import { Input } from "./Input";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  getValidatedParamsFromUrl,
+  updateUrlWithParams,
+  type ValidationOptions,
+} from "../../lib/url-params";
+import { cn, generateUniqueOptions, getLogoRel } from "../../lib/utils";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
+import { Card } from "./Card";
 import { Checkbox } from "./Checkbox";
+import { Input } from "./Input";
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from "./MultiSelect";
 import { Pagination } from "./Pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "./Popover";
 import {
   Select,
   SelectContent,
@@ -13,30 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./Select";
-import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
-import {
-  MultiSelector,
-  MultiSelectorTrigger,
-  MultiSelectorInput,
-  MultiSelectorContent,
-  MultiSelectorList,
-  MultiSelectorItem,
-} from "./MultiSelect";
-import { generateUniqueOptions, getLogoRel, cn } from "../../lib/utils";
-import {
-  getValidatedParamsFromUrl,
-  updateUrlWithParams,
-  type ValidationOptions,
-} from "../../lib/url-params";
-import type {
-  BenchmarkStatusKey,
-  BenchmarkSummary,
-} from "@/types/models/benchmark";
-import { getBenchmarkSummary } from "@/lib/api";
-import { isFeatureEnabled } from "@/lib/featureflag";
-import type { Catalogue } from "@/types/models/catalogue";
-import { ca } from "date-fns/locale";
-import { calculateStatusFromSummary } from "@/lib/benchmark-status";
 
 interface CatalogueListProps {
   catalogues: Omit<Catalogue, "applicationDetails">[];
@@ -94,17 +96,21 @@ const searchAndSortFilterCatalogues = ({
   };
   if (!!query || !!sortBy) {
     const normalizedQuery = query.toLowerCase();
-    const benchmarkStatusData: Record<string, BenchmarkStatusKey> = {};
+    const benchmarkStatusData: Record<string, BenchmarkStatusInfo> = {};
 
     for (const catalogue of catalogues) {
       const { algorithm } = catalogue;
-      benchmarkStatusData[algorithm.id] = calculateStatusFromSummary(algorithm.id, benchmarkData)
+      benchmarkStatusData[algorithm.id] = calculateStatusFromSummary(
+        algorithm.id,
+        benchmarkData,
+      );
     }
 
     return catalogues
       .filter(({ algorithm, platform, provider }) => {
         const { type, properties, id } = algorithm;
-        const benchmarkStatus: BenchmarkStatusKey = benchmarkStatusData[id] || "no benchmark";
+        const benchmarkStatus: BenchmarkStatusInfo =
+          benchmarkStatusData[id] || getDefaultBenchmarkStatusInfo();
         const hitSearch =
           type.toLowerCase().includes(normalizedQuery) ||
           properties.keywords.find((k) =>
@@ -132,14 +138,16 @@ const searchAndSortFilterCatalogues = ({
           ? filterBy.types.includes(type)
           : true;
         const hitFilterByBenchmarkStatus = filterBy.benchmarkStatus.length
-          ? filterBy.benchmarkStatus.includes(benchmarkStatus)
+          ? filterBy.benchmarkStatus.includes(benchmarkStatus.status)
           : true;
-        const hitFilterByProviders = filterBy.providers.length && provider
-          ? filterBy.providers.includes(provider.properties.title || "")
-          : true;
-        const hitFilterByPlatforms = filterBy.platforms.length && platform
-          ? filterBy.platforms.includes(platform.properties.title || "")
-          : true;
+        const hitFilterByProviders =
+          filterBy.providers.length && provider
+            ? filterBy.providers.includes(provider.properties.title || "")
+            : true;
+        const hitFilterByPlatforms =
+          filterBy.platforms.length && platform
+            ? filterBy.platforms.includes(platform.properties.title || "")
+            : true;
 
         return (
           hitSearch &&
@@ -164,10 +172,15 @@ const searchAndSortFilterCatalogues = ({
             : -1;
         }
 
-        const benchmarkStatusDataA = benchmarkStatusData[a.algorithm.id] || "no benchmark";
-        const benchmarkStatusDataB = benchmarkStatusData[b.algorithm.id] || "no benchmark";
+        const benchmarkStatusDataA =
+          benchmarkStatusData[a.algorithm.id] ||
+          getDefaultBenchmarkStatusInfo();
+        const benchmarkStatusDataB =
+          benchmarkStatusData[b.algorithm.id] ||
+          getDefaultBenchmarkStatusInfo();
         return (
-          statusOrder[benchmarkStatusDataA] - statusOrder[benchmarkStatusDataB]
+          statusOrder[benchmarkStatusDataA.status] -
+          statusOrder[benchmarkStatusDataB.status]
         );
       });
   }
@@ -241,7 +254,15 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       availableProviders: providers.map((opt) => opt.value),
       availablePlatforms: platforms.map((opt) => opt.value),
     }),
-    [labels, licenses, types, benchmarkStatus, providers, platforms, toggledSortOptions],
+    [
+      labels,
+      licenses,
+      types,
+      benchmarkStatus,
+      providers,
+      platforms,
+      toggledSortOptions,
+    ],
   );
 
   // Parse and validate URL params against available options
@@ -431,7 +452,13 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                 ) : null}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className={cn("relative", isPlatformProviderFilterEnabled && "w-[700px]")}>
+            <PopoverContent
+              align="end"
+              className={cn(
+                "relative",
+                isPlatformProviderFilterEnabled && "w-[700px]",
+              )}
+            >
               <Button
                 variant="link"
                 onClick={clearFilters}
@@ -477,9 +504,14 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                           checked={filterByLicenses.includes(value)}
                           onCheckedChange={(checked) => {
                             return checked
-                              ? setFilterByLicenses([...filterByLicenses, value])
+                              ? setFilterByLicenses([
+                                  ...filterByLicenses,
+                                  value,
+                                ])
                               : setFilterByLicenses(
-                                  filterByLicenses.filter((item) => item != value),
+                                  filterByLicenses.filter(
+                                    (item) => item != value,
+                                  ),
                                 );
                           }}
                         />

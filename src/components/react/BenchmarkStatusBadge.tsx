@@ -1,13 +1,12 @@
-import type { BenchmarkStatusKey } from "@/types/models/benchmark";
-import { cva } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import { type BenchmarkStatusInfo } from "@/lib/benchmark-status";
 import { isFeatureEnabled } from "@/lib/featureflag";
-import { statusDescriptions } from "@/lib/benchmark-status";
+import { cn } from "@/lib/utils";
+import { cva } from "class-variance-authority";
 import { useState } from "react";
-import { Popover, PopoverTrigger, PopoverContent } from "./Popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./Popover";
 
 interface BenchmarkStatusBadgeProps {
-  status: BenchmarkStatusKey;
+  status: BenchmarkStatusInfo;
   forcedEnabled?: boolean;
   className?: string;
 }
@@ -44,18 +43,16 @@ export const BenchmarkStatusBadge = ({
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          <span className={cn(statusVariant({ status }))}></span>
-          <span className="capitalize">{status}</span>
+          <span className={cn(statusVariant({ status: status.status }))}></span>
+          <span className="capitalize" dangerouslySetInnerHTML={{ __html: status.status }}></span>
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto"
+        className="w-64"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
       >
-        <p className="text-sm">
-          {statusDescriptions[status]}
-        </p>
+        <p className="text-sm" dangerouslySetInnerHTML={{ __html: status.description }}></p>
       </PopoverContent>
     </Popover>
   ) : null;
