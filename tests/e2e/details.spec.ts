@@ -2,7 +2,22 @@ import { expect, type Page } from "@playwright/test";
 import { test } from "./utils.ts";
 
 const openService = async (page: Page, name: string) => {
-  await page.getByTestId("service-card").getByText(name).first().click();
+  let found = false;
+  while (!found) {
+    const serviceCard = page.getByTestId("service-card").getByText(name).first();
+    if (await serviceCard.isVisible().catch(() => false)) {
+      await serviceCard.click();
+      found = true;
+    } else {
+      const nextButton = page.getByRole("button", { name: /next/i });
+      if (await nextButton.isEnabled().catch(() => false)) {
+        await nextButton.click();
+        await page.waitForLoadState("networkidle");
+      } else {
+        throw new Error(`Service "${name}" not found`);
+      }
+    }
+  }
 };
 
 test.describe("Service Details Test", () => {
