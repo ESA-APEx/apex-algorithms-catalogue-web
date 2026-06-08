@@ -230,7 +230,7 @@ test.describe("Detail page tabs", () => {
     await expect(parametersTable).toBeVisible();
 
     const rows = parametersTable.locator("tr");
-    await expect(rows).toHaveCount(6);
+    await expect(rows).toHaveCount(10);
 
     // Check if the first row contains header information
     const headerCells = rows.first().locator("th");
