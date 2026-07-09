@@ -47,6 +47,10 @@ test.describe("Catalog Tests", () => {
   test("Should display powered by logo in service cards", async ({ page }) => {
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
+    await page
+      .getByRole("textbox", { name: /Search algorithms/i })
+      .fill("worldcereal");
+      
     const serviceCard = page
       .getByTestId("service-card")
       .getByText("ESA worldcereal global crop type detector")
