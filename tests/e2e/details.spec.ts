@@ -221,6 +221,27 @@ test.describe("Detail page tabs", () => {
     ).toBeVisible();
   });
 
+  test("should show generated Python openEO example for benchmarked service", async ({
+    page,
+  }) => {
+    await openService(page, "Max NDVI Composite based on Sentinel-2 data");
+
+    const examplePanel = page.getByTestId("openeo-python-example");
+    await expect(examplePanel).toBeVisible();
+
+    await examplePanel.getByText("Python openEO example").click();
+
+    await expect(
+      examplePanel.getByText(/auto-generated from UDP and benchmark scenario data/i),
+    ).toBeVisible();
+
+    const code = examplePanel.locator("code");
+    await expect(code).toContainText("import openeo");
+    await expect(code).toContainText("connection = openeo.connect(");
+    await expect(code).toContainText('process_id="max_ndvi_composite"');
+    await expect(code).toContainText(/out_format="(GTiff|GeoTIFF)"/);
+  });
+
   test("Should show parameters in the details page for OpenEO service", async ({
     page,
   }) => {
