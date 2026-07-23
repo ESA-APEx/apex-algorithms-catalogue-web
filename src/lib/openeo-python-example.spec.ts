@@ -21,7 +21,7 @@ const baseScenario: BenchmarkScenario = {
       process_id: "save_result",
       arguments: {
         data: { from_node: "process1" },
-        format: "GeoTIFF",
+        format: "GTiff",
       },
       result: true,
     },
@@ -54,7 +54,7 @@ describe("generateOpenEOPythonExample", () => {
     expect(code).toContain('startdate="2024-01-01"');
     expect(code).toContain('enddate="2024-12-31"');
     expect(code).toContain('output="FAPAR"');
-    expect(code).toContain('out_format="GeoTIFF"');
+    expect(code).toContain('out_format="GTiff"');
   });
 
   it("serializes benchmark argument values as valid python literals", () => {
@@ -119,6 +119,6 @@ describe("generateOpenEOPythonExample", () => {
       benchmarkScenarios: [scenario],
     });
 
-    expect(code).toContain('out_format="GeoTIFF"');
+    expect(code).toContain('out_format="GTiff"');
   });
 });
