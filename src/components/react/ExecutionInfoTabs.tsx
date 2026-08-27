@@ -4,7 +4,6 @@ import { Badge } from "./Badge";
 import { ClipboardButton } from "./ClipboardButton";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import { getBenchmarkDetails } from "@/lib/api";
-import { generateOpenEOPythonExample } from "@/lib/openeo-python-example";
 import { format } from "date-fns";
 import { CatalogueDetailParametersTable } from "./CatalogueDetailParametersTable";
 import { CatalogueCwlDetailParametersTable } from "./CatalogueCwlDetailParametersTable";
@@ -34,7 +33,6 @@ const ExecutionInfoContent = ({
   hasProcessInfo,
   hasServiceLinks,
   hasParameters,
-  pythonExample,
 }: {
   algorithm: Algorithm;
   applicationDetails?: any;
@@ -46,7 +44,6 @@ const ExecutionInfoContent = ({
   hasProcessInfo: boolean;
   hasServiceLinks: boolean;
   hasParameters: boolean;
-  pythonExample?: string;
 }) => {
   return (
     <>
@@ -96,28 +93,6 @@ const ExecutionInfoContent = ({
             <CatalogueCwlDetailParametersTable cwlUrl={cwlUrl} />
           )}
         </>
-      )}
-      {pythonExample && (
-        <section className="mt-8" data-testid="openeo-python-example">
-          <details className="bg-white/5 rounded-lg border border-white/10 p-4">
-            <summary className="cursor-pointer text-white font-medium">
-              Python openEO example
-            </summary>
-            <p className="text-gray-300 text-sm mt-3 mb-3">
-              This snippet was auto-generated from UDP and benchmark scenario
-              data. It is intended as a runnable starting point and may need
-              tuning for your account, quotas, or preferred output format.
-            </p>
-            <div className="relative">
-              <pre className="bg-black/25 rounded-md p-4 overflow-x-auto text-sm text-gray-100">
-                <code>{pythonExample}</code>
-              </pre>
-              <div className="absolute top-2 right-2">
-                <ClipboardButton text={pythonExample} />
-              </div>
-            </div>
-          </details>
-        </section>
       )}
     </>
   );
@@ -373,17 +348,6 @@ export const ExecutionInfoTabs = ({
   const executionLinks = algorithm.links.filter((link) =>
     executionInfoLinksRel.includes(link.rel),
   );
-  const udpUrl = algorithm.links.find((link) => link.rel === "application")?.href;
-  const endpoint = algorithm.links.find((link) => link.rel === "service")?.href;
-  const pythonExample =
-    algorithm.type === AlgorithmType.OPENEO
-      ? generateOpenEOPythonExample({
-          processId: algorithm.id,
-          udpUrl,
-          endpoint,
-          benchmarkScenarios,
-        })
-      : undefined;
 
   const hasProcessInfo =
     applicationDetails && algorithm.type === AlgorithmType.OPENEO;
@@ -425,7 +389,6 @@ export const ExecutionInfoTabs = ({
           hasProcessInfo={hasProcessInfo}
           hasServiceLinks={hasServiceLinks}
           hasParameters={hasParameters}
-          pythonExample={pythonExample}
         />
       </section>
     );
@@ -479,7 +442,6 @@ export const ExecutionInfoTabs = ({
             hasProcessInfo={hasProcessInfo}
             hasServiceLinks={hasServiceLinks}
             hasParameters={hasParameters}
-            pythonExample={pythonExample}
           />
         </TabsContent>
         {benchmarkScenarios.length > 0 ? (
