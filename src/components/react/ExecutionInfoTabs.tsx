@@ -110,7 +110,7 @@ const ExecutionInfoContent = ({
             </p>
             <div className="relative">
               <pre className="bg-black/25 rounded-md p-4 overflow-x-auto text-sm text-gray-100">
-                <code>{pythonExample}</code>
+                <code className="whitespace-pre-wrap">{pythonExample}</code>
               </pre>
               <div className="absolute top-2 right-2">
                 <ClipboardButton text={pythonExample} />
