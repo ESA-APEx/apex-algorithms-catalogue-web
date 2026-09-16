@@ -204,7 +204,7 @@ export const fetchApplicationDetails = async (
 
   try {
     if (type === AlgorithmType.OPENEO) {
-      return fetchOpenEOApplicationDetails(url);
+      return await fetchOpenEOApplicationDetails(url);
     } else {
       return undefined;
     }
