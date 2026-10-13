@@ -64,6 +64,10 @@ To deploy the website, follow these steps:
 > - Prod url: https://algorithm-catalogue.apex.esa.int/
 > - Dev url: https://algorithm-catalogue.dev.apex.esa.int/
 
+### APEx User Forum feedback topics
+
+The production build synchronizes one Discourse topic per public service using the service record ID as the topic's `external_id`. It creates missing topics, updates titles when services are renamed, and archives topics for removed services. Configure the `DISCOURSE_API_KEY`, `DISCOURSE_API_USERNAME`, and `DISCOURSE_CATEGORY_ID` environment variables locally or as GitHub Actions repository secrets. `FORUM_URL` optionally selects the HTTPS forum base URL and defaults to `https://forum.apex.esa.int`; configure it as a GitHub Actions variable for CI builds. The dedicated category must be created on the forum and watched by the APEx team. The API key is only used by the build-time sync and is not exposed to the generated site.
+
 ## Commands
 
 All commands are run from the root of the project, from a terminal:

@@ -25,6 +25,7 @@ import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
 import { type Algorithm, AlgorithmType } from "../../types/models/algorithm";
 import { isFeatureEnabled } from "@/lib/featureflag";
+import { getFeedbackTopic } from "@/lib/discourse";
 
 export const prerender = true;
 
@@ -86,6 +87,14 @@ export const getStaticPaths = (async () => {
     )) as ToCElement[];
 
     const isDefinitionProtected = await isAlgorithmDefProtected(algorithm);
+    const feedbackTopic = ["production", "staging"].includes(
+      process.env.BUILD_TARGET || "",
+    )
+      ? await getFeedbackTopic(algorithm.id)
+      : undefined;
+    if (process.env.BUILD_TARGET === "production" && !feedbackTopic) {
+      throw new Error(`Missing Discourse feedback topic for ${algorithm.id}`);
+    }
 
     result.push({
       params: { id: item.algorithm.id },
@@ -98,6 +107,7 @@ export const getStaticPaths = (async () => {
           benchmarkScenarios,
         },
         isDefinitionProtected,
+        feedbackTopic,
         description,
         toc,
       },
@@ -109,7 +119,7 @@ export const getStaticPaths = (async () => {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { data, toc, description, isDefinitionProtected } = Astro.props;
+const { data, toc, description, isDefinitionProtected, feedbackTopic } = Astro.props;
 const { applicationDetails, algorithm, platform, provider, benchmarkScenarios } = data;
 
 const UDP_DOCS_URL =
@@ -366,6 +376,21 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
             <div class="text-white mb-1">Last updated</div>
             <div>{getDate(algorithm.properties.updated)}</div>
           </li>
+          {
+            feedbackTopic && (
+              <li class="mt-2">
+                <a
+                  class="btn btn-secondary !flex items-center justify-center gap-2"
+                  href={feedbackTopic.url}
+                  target="__blank"
+                  rel="noopener noreferrer"
+                >
+                  Give feedback ({feedbackTopic.replyCount})
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                </a>
+              </li>
+            )
+          }
           {
             documentationUrl && (
               <li class="mt-2">
