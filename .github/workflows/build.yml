@@ -33,6 +33,7 @@ jobs:
           DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
           DISCOURSE_API_USERNAME: ${{ secrets.DISCOURSE_API_USERNAME }}
           DISCOURSE_CATEGORY_ID: ${{ secrets.DISCOURSE_CATEGORY_ID }}
+          FORUM_URL: ${{ vars.FORUM_URL }}
 
   test:
     timeout-minutes: 60
@@ -140,8 +141,10 @@ jobs:
           DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
           DISCOURSE_API_USERNAME: ${{ secrets.DISCOURSE_API_USERNAME }}
           DISCOURSE_CATEGORY_ID: ${{ secrets.DISCOURSE_CATEGORY_ID }}
+          FORUM_URL: ${{ vars.FORUM_URL }}
         run: |
           docker build \
+            --build-arg FORUM_URL="$FORUM_URL" \
             --secret id=discourse_api_key,env=DISCOURSE_API_KEY \
             --secret id=discourse_api_username,env=DISCOURSE_API_USERNAME \
             --secret id=discourse_category_id,env=DISCOURSE_CATEGORY_ID \

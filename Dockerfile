@@ -16,6 +16,7 @@ RUN npm install
 
 FROM build-deps AS build
 COPY . .
+ARG FORUM_URL
 RUN --mount=type=secret,id=discourse_api_key,env=DISCOURSE_API_KEY \
     --mount=type=secret,id=discourse_api_username,env=DISCOURSE_API_USERNAME \
     --mount=type=secret,id=discourse_category_id,env=DISCOURSE_CATEGORY_ID \

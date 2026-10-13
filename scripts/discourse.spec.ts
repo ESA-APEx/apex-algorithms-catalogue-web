@@ -1,8 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createDiscourseClient,
   reconcileServiceTopics,
 } from "./discourse.mjs";
+
+afterEach(() => vi.unstubAllEnvs());
 
 describe("Discourse feedback topic reconciliation", () => {
   it("creates topics, updates renamed topics, and archives removed topics", async () => {
@@ -39,6 +41,7 @@ describe("Discourse feedback topic reconciliation", () => {
   });
 
   it("uses the topic external ID lookup and keeps API credentials out of URLs", async () => {
+    vi.stubEnv("FORUM_URL", "https://forum.example.org/");
     const fetcher = vi.fn(async () =>
       new Response(JSON.stringify({ id: 1 }), { status: 200 }),
     );
@@ -51,10 +54,20 @@ describe("Discourse feedback topic reconciliation", () => {
     await client.findByExternalId("service/one");
 
     expect(fetcher).toHaveBeenCalledWith(
-      new URL("https://forum.apex.esa.int/t/external_id/service%2Fone.json"),
+      new URL("https://forum.example.org/t/external_id/service%2Fone.json"),
       expect.objectContaining({
         headers: expect.objectContaining({ "Api-Key": "unit-test-key" }),
       }),
     );
+  });
+
+  it("rejects insecure forum URLs before making authenticated requests", () => {
+    expect(() =>
+      createDiscourseClient({
+        apiKey: "unit-test-key",
+        apiUsername: "bot",
+        forumUrl: "http://forum.example.org",
+      }),
+    ).toThrow("FORUM_URL must use HTTPS");
   });
 });

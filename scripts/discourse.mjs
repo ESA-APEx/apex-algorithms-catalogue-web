@@ -1,14 +1,24 @@
-const FORUM_URL = "https://forum.apex.esa.int";
+const DEFAULT_FORUM_URL = "https://forum.apex.esa.int";
+
+const getForumOrigin = (forumUrl) => {
+  const url = new URL(forumUrl || DEFAULT_FORUM_URL);
+  if (url.protocol !== "https:") {
+    throw new Error("FORUM_URL must use HTTPS");
+  }
+  return url.origin;
+};
 
 export const createDiscourseClient = ({
   apiKey,
   apiUsername,
   fetcher = fetch,
+  forumUrl = process.env.FORUM_URL,
 }) => {
+  const forumOrigin = getForumOrigin(forumUrl);
   const request = async (path, options = {}) => {
     const { allowNotFound, ...requestOptions } = options;
-    const url = new URL(path, FORUM_URL);
-    if (url.origin !== FORUM_URL) {
+    const url = new URL(path, forumOrigin);
+    if (url.origin !== forumOrigin) {
       throw new Error("Discourse API returned an unexpected URL");
     }
 

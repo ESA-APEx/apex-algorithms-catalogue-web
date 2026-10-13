@@ -1,4 +1,12 @@
-const FORUM_URL = "https://forum.apex.esa.int";
+const DEFAULT_FORUM_URL = "https://forum.apex.esa.int";
+
+const getForumOrigin = (forumUrl: string | undefined): string => {
+  const url = new URL(forumUrl || DEFAULT_FORUM_URL);
+  if (url.protocol !== "https:") {
+    throw new Error("FORUM_URL must use HTTPS");
+  }
+  return url.origin;
+};
 
 export interface FeedbackTopic {
   url: string;
@@ -8,10 +16,12 @@ export interface FeedbackTopic {
 export const getFeedbackTopic = async (
   serviceId: string,
   fetcher: typeof fetch = fetch,
+  forumUrl = process.env.FORUM_URL,
 ): Promise<FeedbackTopic | undefined> => {
+  const forumOrigin = getForumOrigin(forumUrl);
   try {
     const response = await fetcher(
-      `${FORUM_URL}/t/external_id/${encodeURIComponent(serviceId)}.json`,
+      `${forumOrigin}/t/external_id/${encodeURIComponent(serviceId)}.json`,
     );
     if (!response.ok) {
       return undefined;
@@ -28,7 +38,7 @@ export const getFeedbackTopic = async (
     }
 
     return {
-      url: `${FORUM_URL}/t/${encodeURIComponent(topic.slug)}/${topic.id}`,
+      url: `${forumOrigin}/t/${encodeURIComponent(topic.slug)}/${topic.id}`,
       replyCount: topic.reply_count,
     };
   } catch {
