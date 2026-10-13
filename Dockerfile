@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM node:20.17-bookworm-slim AS base
 WORKDIR /app
 
@@ -15,7 +16,10 @@ RUN npm install
 
 FROM build-deps AS build
 COPY . .
-RUN BUILD_TARGET=production npm run build
+RUN --mount=type=secret,id=discourse_api_key,env=DISCOURSE_API_KEY \
+    --mount=type=secret,id=discourse_api_username,env=DISCOURSE_API_USERNAME \
+    --mount=type=secret,id=discourse_category_id,env=DISCOURSE_CATEGORY_ID \
+    BUILD_TARGET=production npm run build
 
 FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules
