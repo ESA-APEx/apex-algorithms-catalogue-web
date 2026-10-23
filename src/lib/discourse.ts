@@ -1,3 +1,5 @@
+import { getDiscourseExternalId } from "./discourse-external-id.mjs";
+
 const DEFAULT_FORUM_URL = "https://forum.apex.esa.int";
 
 const getForumOrigin = (forumUrl: string | undefined): string => {
@@ -21,7 +23,7 @@ export const getFeedbackTopic = async (
   const forumOrigin = getForumOrigin(forumUrl);
   try {
     const response = await fetcher(
-      `${forumOrigin}/t/external_id/${encodeURIComponent(serviceId)}.json`,
+      `${forumOrigin}/t/external_id/${encodeURIComponent(getDiscourseExternalId(serviceId))}.json`,
     );
     if (!response.ok) {
       return undefined;
