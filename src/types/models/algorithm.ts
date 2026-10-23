@@ -4,9 +4,20 @@ export enum AlgorithmType {
   OGC_API_PROCESS = "OGC API Process",
 }
 
+export type CertificationCategory =
+  | "validated"
+  | "r_and_d"
+  | "community_contributed";
+
+export interface CertificationMetadata {
+  category: "validated" | "r_and_d";
+  funding: "esa" | "other";
+}
+
 export interface Algorithm {
   id: string;
   type: AlgorithmType;
+  certificationCategory: CertificationCategory;
   conformsTo: string[];
   properties: Properties;
   linkTemplates: any[];
@@ -29,6 +40,7 @@ export interface Properties {
   formats: Format[];
   license: string;
   visibility?: "public" | "private" | undefined;
+  certification?: CertificationMetadata;
 }
 
 export interface Language {
