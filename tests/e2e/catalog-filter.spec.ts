@@ -207,6 +207,29 @@ test.describe("Catalog Filter Tests", () => {
     expect(finalTotal).toBeGreaterThan(ogcTotal);
   });
 
+  test("Should filter by certification and persist it in the URL", async ({
+    page,
+  }) => {
+    await page.getByRole("button").getByText("Filter").click();
+
+    const contributedFilter = page
+      .getByTestId("filter-certification-item")
+      .filter({ hasText: "Contributed" });
+    await contributedFilter.scrollIntoViewIfNeeded();
+    await contributedFilter.getByRole("checkbox").click();
+
+    expect(page.url()).toContain("certification=contributed");
+
+    await page.reload();
+    await page.getByRole("button").getByText("Filter").click();
+    await expect(
+      page
+        .getByTestId("filter-certification-item")
+        .filter({ hasText: "Contributed" })
+        .getByRole("checkbox"),
+    ).toHaveAttribute("data-state", "checked");
+  });
+
   test.skip("Should persist pagination to URL and load from URL", async ({
     page,
   }) => {

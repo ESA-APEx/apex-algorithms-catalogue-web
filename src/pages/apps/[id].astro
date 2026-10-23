@@ -20,6 +20,7 @@ import { BenchmarkStatusSideNavItem } from "../../components/react/BenchmarkStat
 import { CostEstimateSideNavItem } from "../../components/react/CostEstimateSideNavItem";
 import { InfoPopover } from "../../components/react/InfoPopover";
 import { PlatformProviderLogos } from "../../components/react/PlatformProviderLogos";
+import { CertificationBadge } from "../../components/react/CertificationBadge";
 
 import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
@@ -163,7 +164,13 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
     >
       <section class="flex-1">
         <header class="mb-12">
-          <p class="text-brand-teal-50 mb-6">{algorithm.type}</p>
+          <div class="text-brand-teal-50 mb-6 flex items-center gap-3">
+            <p>{algorithm.type}</p>
+            <CertificationBadge
+              category={algorithm.properties.certification?.category}
+              client:idle
+            />
+          </div>
           <h1
             class="text-3xl md:text-5xl mb-8 pb-10 text-white after:content-[''] relative after:absolute after:w-16 after:h-[2px] after:bottom-0 after:left-0 after:bg-brand-teal-50 break-words text-balance"
           >
