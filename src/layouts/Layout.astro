@@ -6,6 +6,7 @@ import Footer from "../components/Footer.astro";
 import HamburgerMenu from "../components/HamburgerMenu.astro";
 import Matomo from "../components/Matomo.astro";
 import { Toaster } from "../components/react/Toaster";
+import { getMainSiteNavigation } from "@/lib/main-site-navigation";
 
 interface Props {
   title: string;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+const navigation = await getMainSiteNavigation();
 
 const metaTitle = title || "APEx Algorithm Catalogue";
 
@@ -38,11 +41,38 @@ const metaDescription =
   </head>
   <body>
     <div class="bg-container">
-      <NavBar />
+      {
+        navigation ? (
+          <nav
+            class="text-white w-full max-w-screen-2xl mx-auto px-3"
+            set:html={navigation.header}
+          />
+        ) : (
+          <NavBar />
+        )
+      }
       <slot />
-      <Footer />
+      {
+        navigation ? (
+          <footer
+            class="text-white w-full max-w-screen-2xl mx-auto px-3"
+            set:html={navigation.footer}
+          />
+        ) : (
+          <Footer />
+        )
+      }
     </div>
-    <HamburgerMenu />
+    {
+      navigation ? (
+        <aside
+          class="c-sidebar js-hamburger-menu"
+          set:html={navigation.hamburgerMenu}
+        />
+      ) : (
+        <HamburgerMenu />
+      )
+    }
     <Toaster client:load />
     <script is:inline>
       document.addEventListener("DOMContentLoaded", () => {
