@@ -35,6 +35,27 @@ $ npm run dev
 
 6. Preview the homepage url `https://localhost:4321/algorithms-catalogue` on your browser.
 
+## Catalogue categories
+
+Both catalogue loaders normalize the optional `algorithm.properties.certification`
+metadata defined in
+[the source record schema](https://github.com/ESA-APEx/apex_algorithms/pull/638):
+
+| Source `certification.category` | Loaded `certification.category` | Visitor-facing label |
+| :--- | :--- | :--- |
+| `validated` | `validated` | Validated |
+| `r_and_d` | `r_and_d` | R&D |
+| Missing category or certification metadata | `community_contributed` | Community Contributed |
+
+Category assignments are reviewed during onboarding; the catalogue does not
+infer validation from benchmark presence or results. Funding (`esa` or `other`)
+remains separate in `properties.certification.funding`, defaults to `other` when
+missing, and does not affect the category. Both fields are populated after loading;
+no separate category field is added. No validation document or legacy
+`validation.status` field is required.
+See the [source registration guide](https://github.com/ESA-APEx/apex_algorithms/blob/main/docs/catalogue.md#certification-metadata-and-categories)
+for the metadata and review workflow.
+
 ## UI Testing
 
 This project uses [Playwright](https://playwright.dev/) for UI testing. The test scripts are stored in `tests` folder.

@@ -3,7 +3,11 @@ import path from "path";
 import https from "https";
 import { RECORD_LINK_BASE_URL } from "../config";
 import type { Platform } from "../types/models/platform";
-import { type Algorithm, AlgorithmType } from "../types/models/algorithm";
+import {
+  type Algorithm,
+  AlgorithmType,
+  type CertificationMetadata,
+} from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
 import type { UDP } from "../types/models/udp";
 import type { ApplicationDetails } from "@/types/models/application.ts";
@@ -11,6 +15,13 @@ import type { Provider } from "@/types/models/provider";
 import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms/algorithm_catalog`;
+
+export const normalizeCertification = (
+  certification: Partial<CertificationMetadata> | undefined,
+): CertificationMetadata => ({
+  category: certification?.category ?? "community_contributed",
+  funding: certification?.funding ?? "other",
+});
 
 const fetchJson = (url: string) => {
   return new Promise<any>((resolve, reject) => {
@@ -131,6 +142,9 @@ export const loadCatalogueData = () => {
     const algorithm: Algorithm = JSON.parse(fileData.toString());
 
     algorithm.type = getAlgorithmType(algorithm);
+    algorithm.properties.certification = normalizeCertification(
+      algorithm.properties.certification,
+    );
 
     const visible = (algorithm.properties?.visibility || "public") === "public";
 
@@ -260,6 +274,9 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
 
       algorithm.type = getAlgorithmType(algorithm);
+      algorithm.properties.certification = normalizeCertification(
+        algorithm.properties.certification,
+      );
 
       let applicationDetails: ApplicationDetails | undefined;
       if (applicationUrl) {
