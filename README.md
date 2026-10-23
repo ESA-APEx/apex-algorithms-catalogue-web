@@ -85,6 +85,10 @@ To deploy the website, follow these steps:
 > - Prod url: https://algorithm-catalogue.apex.esa.int/
 > - Dev url: https://algorithm-catalogue.dev.apex.esa.int/
 
+### Navigation sync
+
+The navbar, hamburger menu and footer are fetched from https://apex.esa.int/ at runtime (cached in memory for one hour, see `src/lib/main-site-navigation.ts`). If the main website is unreachable, the bundled `NavBar.astro`, `HamburgerMenu.astro` and `Footer.astro` components are used as fallback. These can be refreshed with `npm run download-navbar-footer`.
+
 ## Commands
 
 All commands are run from the root of the project, from a terminal:
@@ -101,6 +105,7 @@ All commands are run from the root of the project, from a terminal:
 | `npm run test-unit`       | Run unit tests using Vitest                                                                        |
 | `npm run test-e2e`        | Run E2E tests using Playwright                                                                     |
 | `npm run download-source` | Download contents from ESA-APEx/apex_algorithms repository, and store them in `./contents/` folder |
+| `npm run download-navbar-footer` | Refresh the fallback navbar, hamburger menu and footer from https://apex.esa.int/ in `./src/components/` |
 
 ## API Documentation
 
