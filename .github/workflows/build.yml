@@ -29,6 +29,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm install
       - run: BUILD_TARGET=production npm run build
+        env:
+          DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
+          DISCOURSE_API_USERNAME: ${{ secrets.DISCOURSE_API_USERNAME }}
+          DISCOURSE_CATEGORY_ID: ${{ secrets.DISCOURSE_CATEGORY_ID }}
+          FORUM_URL: ${{ vars.FORUM_URL }}
 
   test:
     timeout-minutes: 60
@@ -132,8 +137,18 @@ jobs:
           echo "IMAGE_TAG_RELEASE=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}" >> $GITHUB_ENV
           echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:latest" >> $GITHUB_ENV
       - name: Build docker image
+        env:
+          DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
+          DISCOURSE_API_USERNAME: ${{ secrets.DISCOURSE_API_USERNAME }}
+          DISCOURSE_CATEGORY_ID: ${{ secrets.DISCOURSE_CATEGORY_ID }}
+          FORUM_URL: ${{ vars.FORUM_URL }}
         run: |
-          docker build . --tag $IMAGE_NAME
+          docker build \
+            --build-arg FORUM_URL="$FORUM_URL" \
+            --secret id=discourse_api_key,env=DISCOURSE_API_KEY \
+            --secret id=discourse_api_username,env=DISCOURSE_API_USERNAME \
+            --secret id=discourse_category_id,env=DISCOURSE_CATEGORY_ID \
+            . --tag $IMAGE_NAME
       - name: Log image size
         run: |
           SIZE_BYTES=$(docker image inspect "$IMAGE_NAME" --format='{{.Size}}')
