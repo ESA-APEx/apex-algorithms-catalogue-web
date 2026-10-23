@@ -1,43 +1,65 @@
 import fs from "fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  deriveCertificationCategory,
+  normalizeCertification,
   loadCatalogueData,
   loadCatalogueDetailData,
 } from "./load-catalogue";
-import type {
-  CertificationCategory,
-  CertificationMetadata,
-} from "../types/models/algorithm";
+import type { CertificationMetadata } from "../types/models/algorithm";
 
 const categoryCases: {
-  certification: CertificationMetadata | undefined;
-  expected: CertificationCategory;
+  certification: Partial<CertificationMetadata> | undefined;
+  expected: CertificationMetadata;
 }[] = [
-  { certification: undefined, expected: "community_contributed" },
+  {
+    certification: undefined,
+    expected: { category: "community_contributed", funding: "other" },
+  },
+  {
+    certification: {},
+    expected: { category: "community_contributed", funding: "other" },
+  },
+  {
+    certification: { funding: "esa" },
+    expected: { category: "community_contributed", funding: "esa" },
+  },
+  {
+    certification: { category: "validated" },
+    expected: { category: "validated", funding: "other" },
+  },
+  {
+    certification: { category: "r_and_d" },
+    expected: { category: "r_and_d", funding: "other" },
+  },
+  {
+    certification: { category: "community_contributed", funding: "esa" },
+    expected: { category: "community_contributed", funding: "esa" },
+  },
   {
     certification: { category: "validated", funding: "esa" },
-    expected: "validated",
+    expected: { category: "validated", funding: "esa" },
   },
   {
     certification: { category: "validated", funding: "other" },
-    expected: "validated",
+    expected: { category: "validated", funding: "other" },
   },
   {
     certification: { category: "r_and_d", funding: "esa" },
-    expected: "r_and_d",
+    expected: { category: "r_and_d", funding: "esa" },
   },
   {
     certification: { category: "r_and_d", funding: "other" },
-    expected: "r_and_d",
+    expected: { category: "r_and_d", funding: "other" },
   },
 ];
 
-describe("deriveCertificationCategory", () => {
+describe("normalizeCertification", () => {
   it.each(categoryCases)(
-    "derives $expected from $certification",
+    "normalizes $certification to $expected",
     ({ certification, expected }) => {
-      expect(deriveCertificationCategory(certification)).toBe(expected);
+      const original = certification && { ...certification };
+      expect(normalizeCertification(certification)).toEqual(expected);
+      expect(certification).toEqual(original);
     },
   );
 });
@@ -85,10 +107,8 @@ describe("catalogue certification categories", () => {
 
       for (const entries of [catalogue, details]) {
         expect(entries).toHaveLength(1);
-        expect(entries[0].algorithm.certificationCategory).toBe(expected);
-        expect(entries[0].algorithm.properties.certification).toEqual(
-          certification,
-        );
+        expect(entries[0].algorithm).not.toHaveProperty("certificationCategory");
+        expect(entries[0].algorithm.properties.certification).toEqual(expected);
         expect(entries[0].benchmarkScenarios).toEqual(scenarios);
       }
       expect(error).not.toHaveBeenCalled();

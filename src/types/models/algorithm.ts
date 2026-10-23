@@ -10,14 +10,13 @@ export type CertificationCategory =
   | "community_contributed";
 
 export interface CertificationMetadata {
-  category: "validated" | "r_and_d";
+  category: CertificationCategory;
   funding: "esa" | "other";
 }
 
 export interface Algorithm {
   id: string;
   type: AlgorithmType;
-  certificationCategory: CertificationCategory;
   conformsTo: string[];
   properties: Properties;
   linkTemplates: any[];

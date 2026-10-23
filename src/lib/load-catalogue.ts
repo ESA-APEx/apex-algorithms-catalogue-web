@@ -6,7 +6,6 @@ import type { Platform } from "../types/models/platform";
 import {
   type Algorithm,
   AlgorithmType,
-  type CertificationCategory,
   type CertificationMetadata,
 } from "../types/models/algorithm";
 import type { Catalogue } from "../types/models/catalogue";
@@ -17,14 +16,12 @@ import type { BenchmarkScenario } from "@/types/models/benchmark-scenario";
 
 const CATALOGUE_JSON_DIR = `contents/apex_algorithms/algorithm_catalog`;
 
-export const deriveCertificationCategory = (
-  certification: CertificationMetadata | undefined,
-): CertificationCategory => {
-  const category = certification?.category;
-  return category === "validated" || category === "r_and_d"
-    ? category
-    : "community_contributed";
-};
+export const normalizeCertification = (
+  certification: Partial<CertificationMetadata> | undefined,
+): CertificationMetadata => ({
+  category: certification?.category ?? "community_contributed",
+  funding: certification?.funding ?? "other",
+});
 
 const fetchJson = (url: string) => {
   return new Promise<any>((resolve, reject) => {
@@ -145,8 +142,8 @@ export const loadCatalogueData = () => {
     const algorithm: Algorithm = JSON.parse(fileData.toString());
 
     algorithm.type = getAlgorithmType(algorithm);
-    algorithm.certificationCategory = deriveCertificationCategory(
-      algorithm.properties?.certification,
+    algorithm.properties.certification = normalizeCertification(
+      algorithm.properties.certification,
     );
 
     const visible = (algorithm.properties?.visibility || "public") === "public";
@@ -277,8 +274,8 @@ export const loadCatalogueDetailData = async (): Promise<Catalogue[]> => {
       )?.href;
 
       algorithm.type = getAlgorithmType(algorithm);
-      algorithm.certificationCategory = deriveCertificationCategory(
-        algorithm.properties?.certification,
+      algorithm.properties.certification = normalizeCertification(
+        algorithm.properties.certification,
       );
 
       let applicationDetails: ApplicationDetails | undefined;
