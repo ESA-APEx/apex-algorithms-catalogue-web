@@ -8,6 +8,7 @@ import { isFeatureEnabled } from "@/lib/featureflag";
 import type {
   BenchmarkSummary
 } from "@/types/models/benchmark";
+import type { CertificationCategory } from "@/types/models/algorithm";
 import type { Catalogue } from "@/types/models/catalogue";
 import { FilterIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -66,6 +67,15 @@ const sortOptions: Option[] = [
 
 const ITEMS_PER_PAGE = 15;
 
+const certificationOptions: Option[] = [
+  { value: "esa-validated", label: "ESA-validated" },
+  { value: "contributed", label: "Contributed" },
+];
+
+const getCertificationFilterValue = (
+  category?: CertificationCategory,
+): string => (category === "validated" ? "esa-validated" : "contributed");
+
 interface SearchAndSortFilterParams {
   query: string;
   sortBy: string;
@@ -74,6 +84,7 @@ interface SearchAndSortFilterParams {
     licenses: string[];
     types: string[];
     benchmarkStatus: string[];
+    certification: string[];
     providers: string[];
     platforms: string[];
   };
@@ -140,6 +151,11 @@ const searchAndSortFilterCatalogues = ({
         const hitFilterByBenchmarkStatus = filterBy.benchmarkStatus.length
           ? filterBy.benchmarkStatus.includes(benchmarkStatus.status)
           : true;
+        const hitFilterByCertification = filterBy.certification.length
+          ? filterBy.certification.includes(
+              getCertificationFilterValue(properties.certification?.category),
+            )
+          : true;
         const hitFilterByProviders =
           filterBy.providers.length && provider
             ? filterBy.providers.includes(provider.properties.title || "")
@@ -155,6 +171,7 @@ const searchAndSortFilterCatalogues = ({
           hitFilterByLicense &&
           hitFilterByTypes &&
           hitFilterByBenchmarkStatus &&
+          hitFilterByCertification &&
           hitFilterByProviders &&
           hitFilterByPlatforms
         );
@@ -166,10 +183,17 @@ const searchAndSortFilterCatalogues = ({
             new Date(a.algorithm.properties.updated).getTime()
           );
         } else if (sortBy === "name") {
-          return b.algorithm.properties.title.toLowerCase() <
-            a.algorithm.properties.title.toLowerCase()
-            ? 1
-            : -1;
+          const certificationOrder = (category?: CertificationCategory) =>
+            getCertificationFilterValue(category) === "esa-validated" ? 0 : 1;
+          const categoryDifference =
+            certificationOrder(a.algorithm.properties.certification?.category) -
+            certificationOrder(b.algorithm.properties.certification?.category);
+          if (categoryDifference !== 0) {
+            return categoryDifference;
+          }
+          return a.algorithm.properties.title
+            .toLowerCase()
+            .localeCompare(b.algorithm.properties.title.toLowerCase());
         }
 
         const benchmarkStatusDataA =
@@ -251,6 +275,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       availableLicenses: licenses.map((opt) => opt.value),
       availableTypes: types.map((opt) => opt.value),
       availableBenchmarkStatuses: benchmarkStatus.map((opt) => opt.value),
+      availableCertificationCategories: certificationOptions.map(
+        (opt) => opt.value,
+      ),
       availableProviders: providers.map((opt) => opt.value),
       availablePlatforms: platforms.map((opt) => opt.value),
     }),
@@ -276,6 +303,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
         licenses: [],
         types: [],
         benchmarkStatus: [],
+        certification: [],
         providers: [],
         platforms: [],
       },
@@ -302,6 +330,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
   const [filterByBenchmarkStatus, setFilterByBenchmarkStatus] = useState<
     string[]
   >(validatedParams.filterByBenchmarkStatus);
+  const [filterByCertification, setFilterByCertification] = useState<string[]>(
+    validatedParams.filterByCertification,
+  );
   const [filterByProviders, setFilterByProviders] = useState<string[]>(
     validatedParams.filterByProviders,
   );
@@ -323,6 +354,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       filterByLicenses,
       filterByTypes,
       filterByBenchmarkStatus,
+      filterByCertification,
       filterByProviders,
       filterByPlatforms,
       currentPage,
@@ -334,6 +366,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    filterByCertification,
     filterByProviders,
     filterByPlatforms,
     currentPage,
@@ -349,6 +382,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
       licenses: filterByLicenses,
       types: filterByTypes,
       benchmarkStatus: filterByBenchmarkStatus,
+      certification: filterByCertification,
       providers: filterByProviders,
       platforms: filterByPlatforms,
     },
@@ -358,6 +392,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses.length +
     filterByTypes.length +
     filterByBenchmarkStatus.length +
+    filterByCertification.length +
     filterByProviders.length +
     filterByPlatforms.length;
 
@@ -383,6 +418,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    filterByCertification,
     currentPage,
     updateUrl,
   ]);
@@ -401,6 +437,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     filterByLicenses,
     filterByTypes,
     filterByBenchmarkStatus,
+    filterByCertification,
     filterByProviders,
     filterByPlatforms,
   ]);
@@ -410,6 +447,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
     setFilterByLicenses([]);
     setFilterByTypes([]);
     setFilterByBenchmarkStatus([]);
+    setFilterByCertification([]);
     setFilterByProviders([]);
     setFilterByPlatforms([]);
   };
@@ -551,6 +589,37 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                       </div>
                     </>
                   ) : null}
+                  <p className="mb-1">Certification</p>
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    ESA-validated services have completed scientific validation
+                    review; contributed services have not.
+                  </p>
+                  <div className="flex flex-col mb-4">
+                    {certificationOptions.map(({ label, value }) => (
+                      <label
+                        key={value}
+                        className="flex items-center gap-1"
+                        data-testid="filter-certification-item"
+                      >
+                        <Checkbox
+                          checked={filterByCertification.includes(value)}
+                          onCheckedChange={(checked) =>
+                            checked
+                              ? setFilterByCertification([
+                                  ...filterByCertification,
+                                  value,
+                                ])
+                              : setFilterByCertification(
+                                  filterByCertification.filter(
+                                    (item) => item !== value,
+                                  ),
+                                )
+                          }
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
                   <p>Labels</p>
                   <MultiSelector
                     values={filterByLabels}
@@ -669,6 +738,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
               provider={getLogoRel(item.provider, { darkLogo: true })}
               benchmarkData={benchmarkData}
               isBenchmarkStatusEnabled={isBenchmarkStatusEnabled}
+              certificationCategory={
+                item.algorithm.properties.certification?.category
+              }
             />
           </li>
         ))}
