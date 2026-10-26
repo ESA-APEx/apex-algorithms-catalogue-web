@@ -68,13 +68,13 @@ const sortOptions: Option[] = [
 const ITEMS_PER_PAGE = 15;
 
 const certificationOptions: Option[] = [
-  { value: "esa-validated", label: "ESA-validated" },
+  { value: "validated", label: "Validated" },
   { value: "contributed", label: "Contributed" },
 ];
 
 const getCertificationFilterValue = (
   category?: CertificationCategory,
-): string => (category === "validated" ? "esa-validated" : "contributed");
+): string => (category === "validated" ? "validated" : "contributed");
 
 interface SearchAndSortFilterParams {
   query: string;
@@ -184,7 +184,7 @@ const searchAndSortFilterCatalogues = ({
           );
         } else if (sortBy === "name") {
           const certificationOrder = (category?: CertificationCategory) =>
-            getCertificationFilterValue(category) === "esa-validated" ? 0 : 1;
+            getCertificationFilterValue(category) === "validated" ? 0 : 1;
           const categoryDifference =
             certificationOrder(a.algorithm.properties.certification?.category) -
             certificationOrder(b.algorithm.properties.certification?.category);
@@ -591,7 +591,7 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                   ) : null}
                   <p className="mb-1">Certification</p>
                   <p className="mb-2 text-xs text-muted-foreground">
-                    ESA-validated services have completed scientific validation
+                    Validated services have completed scientific validation
                     review; contributed services have not.
                   </p>
                   <div className="flex flex-col mb-4">

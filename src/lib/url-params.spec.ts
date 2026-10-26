@@ -12,7 +12,7 @@ const validationOptions: ValidationOptions = {
   availableLicenses: [],
   availableTypes: [],
   availableBenchmarkStatuses: [],
-  availableCertificationCategories: ["esa-validated", "contributed"],
+  availableCertificationCategories: ["validated", "contributed"],
   availableProviders: [],
   availablePlatforms: [],
 };
@@ -22,7 +22,7 @@ describe("certification URL parameters", () => {
 
   beforeEach(() => {
     vi.stubGlobal("window", {
-      location: { search: "?certification=esa-validated,contributed,invalid", pathname: "/" },
+      location: { search: "?certification=validated,contributed,invalid", pathname: "/" },
       history: { replaceState },
     });
   });
@@ -34,7 +34,7 @@ describe("certification URL parameters", () => {
 
   it("parses and validates certification filter values", () => {
     expect(getValidatedParamsFromUrl(validationOptions).filterByCertification).toEqual([
-      "esa-validated",
+      "validated",
       "contributed",
     ]);
   });
@@ -47,7 +47,7 @@ describe("certification URL parameters", () => {
       filterByLicenses: [],
       filterByTypes: [],
       filterByBenchmarkStatus: [],
-      filterByCertification: ["esa-validated", "contributed"],
+      filterByCertification: ["validated", "contributed"],
       filterByProviders: [],
       filterByPlatforms: [],
       currentPage: 1,
@@ -58,7 +58,7 @@ describe("certification URL parameters", () => {
     expect(replaceState).toHaveBeenCalledWith(
       null,
       "",
-      "/?certification=esa-validated%2Ccontributed",
+      "/?certification=validated%2Ccontributed",
     );
   });
 });

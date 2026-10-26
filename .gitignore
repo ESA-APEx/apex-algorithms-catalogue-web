@@ -40,3 +40,6 @@ terraform.tfstate.backup
 # generated files
 acl-mapping.json
 benchmark-mapping.json
+
+# environment files
+.env*

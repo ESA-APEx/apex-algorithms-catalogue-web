@@ -36,7 +36,7 @@ test.describe("Catalog Tests", () => {
     await expect(page.getByText(/This service/)).toBeVisible();
   });
 
-  test("Should prioritize ESA-validated services in the default order", async ({
+  test("Should prioritize validated services in the default order", async ({
     page,
   }) => {
     await expect(page.getByTestId("service-card").first()).toBeVisible();
@@ -46,7 +46,7 @@ test.describe("Catalog Tests", () => {
       if (label.includes("Contributed")) {
         sawContributed = true;
       }
-      if (label.includes("ESA-validated")) {
+      if (label.includes("Validated")) {
         expect(sawContributed).toBe(false);
       }
     }
