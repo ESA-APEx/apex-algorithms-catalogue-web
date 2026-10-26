@@ -5,7 +5,7 @@ on:
     types: [catalogue-pr-updated, catalogue-pr-closed]
 
 env:
-  NODE_VERSION: 20.17.0
+  NODE_VERSION: 24.22.1
   PREVIEW_BASE_URL: https://esa-apex.github.io/apex-algorithms-catalogue-web
   PR_NUMBER: ${{ github.event.client_payload.pr_number }}
   PUBLIC_ALGO_REF: ${{ github.event.client_payload.head_ref }}
