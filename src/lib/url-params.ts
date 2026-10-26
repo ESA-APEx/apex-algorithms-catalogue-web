@@ -5,6 +5,7 @@ interface UrlFilterParams {
   filterByLicenses: string[];
   filterByTypes: string[];
   filterByBenchmarkStatus: string[];
+  filterByCertification: string[];
   filterByProviders: string[];
   filterByPlatforms: string[];
   currentPage: number;
@@ -17,6 +18,7 @@ interface UrlParamConfig {
   filterByLicenses: { key: string; defaultValue: string[] };
   filterByTypes: { key: string; defaultValue: string[] };
   filterByBenchmarkStatus: { key: string; defaultValue: string[] };
+  filterByCertification: { key: string; defaultValue: string[] };
   filterByProviders: { key: string; defaultValue: string[] };
   filterByPlatforms: { key: string; defaultValue: string[] };
   currentPage: { key: string; defaultValue: number };
@@ -29,6 +31,7 @@ const DEFAULT_URL_CONFIG: UrlParamConfig = {
   filterByLicenses: { key: "licenses", defaultValue: [] },
   filterByTypes: { key: "types", defaultValue: [] },
   filterByBenchmarkStatus: { key: "benchmarkStatus", defaultValue: [] },
+  filterByCertification: { key: "certification", defaultValue: [] },
   filterByProviders: { key: "providers", defaultValue: [] },
   filterByPlatforms: { key: "platforms", defaultValue: [] },
   currentPage: { key: "page", defaultValue: 1 },
@@ -40,6 +43,7 @@ interface ValidationOptions {
   availableLicenses: string[];
   availableTypes: string[];
   availableBenchmarkStatuses: string[];
+  availableCertificationCategories: string[];
   availableProviders: string[];
   availablePlatforms: string[];
   maxPage?: number;
@@ -69,6 +73,11 @@ export const getValidatedParamsFromUrl = (
         .get(config.filterByBenchmarkStatus.key)
         ?.split(",")
         .filter(Boolean) || config.filterByBenchmarkStatus.defaultValue,
+    filterByCertification:
+      urlParams
+        .get(config.filterByCertification.key)
+        ?.split(",")
+        .filter(Boolean) || config.filterByCertification.defaultValue,
     filterByProviders:
       urlParams.get(config.filterByProviders.key)?.split(",").filter(Boolean) ||
       config.filterByProviders.defaultValue,
@@ -99,6 +108,9 @@ export const getValidatedParamsFromUrl = (
     ),
     filterByBenchmarkStatus: rawParams.filterByBenchmarkStatus.filter(
       (status) => validationOptions.availableBenchmarkStatuses.includes(status),
+    ),
+    filterByCertification: rawParams.filterByCertification.filter((category) =>
+      validationOptions.availableCertificationCategories.includes(category),
     ),
     filterByProviders: rawParams.filterByProviders.filter((provider) =>
       validationOptions.availableProviders.includes(provider),
@@ -150,6 +162,13 @@ export const updateUrlWithParams = (
     urlParams.set(
       config.filterByBenchmarkStatus.key,
       params.filterByBenchmarkStatus.join(","),
+    );
+  }
+
+  if (params.filterByCertification.length > 0) {
+    urlParams.set(
+      config.filterByCertification.key,
+      params.filterByCertification.join(","),
     );
   }
 

@@ -27,6 +27,29 @@ test.describe("Catalog Tests", () => {
     await expect(card.getByTestId("service-label").nth(1)).toContainText(
       "Sentinel-2",
     );
+    const certificationBadge = page
+      .getByTestId("service-card")
+      .filter({ hasText: "ESA worldcereal global crop type detector" })
+      .getByTestId("certification-badge");
+    await expect(certificationBadge).toBeVisible();
+    await certificationBadge.hover();
+    await expect(page.getByText(/This service/)).toBeVisible();
+  });
+
+  test("Should prioritize validated services in the default order", async ({
+    page,
+  }) => {
+    await expect(page.getByTestId("service-card").first()).toBeVisible();
+    const labels = await page.getByTestId("certification-badge").allTextContents();
+    let sawContributed = false;
+    for (const label of labels) {
+      if (label.includes("Contributed")) {
+        sawContributed = true;
+      }
+      if (label.includes("Validated")) {
+        expect(sawContributed).toBe(false);
+      }
+    }
   });
 
   test("Should not show a private algorithm", async ({ page }) => {

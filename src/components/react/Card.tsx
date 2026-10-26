@@ -2,6 +2,8 @@ import type { BenchmarkSummary } from "@/types/models/benchmark";
 import { BenchmarkStatus } from "./BenchmarkStatus";
 import { isFeatureEnabled } from "@/lib/featureflag";
 import { Spinner } from "./Spinner";
+import { CertificationBadge } from "./CertificationBadge";
+import type { CertificationCategory } from "@/types/models/algorithm";
 
 interface CardProps {
   id: string;
@@ -25,6 +27,7 @@ interface CardProps {
   };
   benchmarkData?: BenchmarkSummary[];
   isBenchmarkStatusEnabled?: boolean;
+  certificationCategory?: CertificationCategory;
 }
 
 const truncateBody = (text: string, wordLimit = 20) => {
@@ -50,6 +53,7 @@ export const Card = ({
   maxDisplayedLabels = 3,
   benchmarkData = [],
   isBenchmarkStatusEnabled = false,
+  certificationCategory,
 }: CardProps) => {
   const truncatedBody = truncateBody(body);
   const displayedLabels = labels?.slice(0, maxDisplayedLabels);
@@ -79,19 +83,22 @@ export const Card = ({
           <span className="text-sm" data-testid="service-type">
             {type}
           </span>
-          {isBenchmarkStatusEnabled ? (
-            <div className="text-brand-teal-80 text-sm">
-              {benchmarkData ? (
-                <BenchmarkStatus
-                  key={`status-${id}`}
-                  scenarioId={id}
-                  data={benchmarkData}
-                />
-              ) : (
-                <Spinner />
-              )}
-            </div>
-          ) : null}
+          <div className="flex items-center gap-2">
+            <CertificationBadge category={certificationCategory} />
+            {isBenchmarkStatusEnabled ? (
+              <div className="text-brand-teal-80 text-sm">
+                {benchmarkData ? (
+                  <BenchmarkStatus
+                    key={`status-${id}`}
+                    scenarioId={id}
+                    data={benchmarkData}
+                  />
+                ) : (
+                  <Spinner />
+                )}
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <h2 className="card-title text-lg font-extrabold text-brand-teal-80">
