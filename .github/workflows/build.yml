@@ -133,7 +133,7 @@ jobs:
           echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:latest" >> $GITHUB_ENV
       - name: Build docker image
         run: |
-          docker build . --tag $IMAGE_NAME
+          docker build --platform=linux/amd64 . --tag $IMAGE_NAME
       - name: Log image size
         run: |
           SIZE_BYTES=$(docker image inspect "$IMAGE_NAME" --format='{{.Size}}')
