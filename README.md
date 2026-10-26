@@ -11,7 +11,7 @@ Follow these steps to start developing the site:
 2. Install the Nodejs with correct version using Volta:
 
 ```sh
-$ volta install node@20.17.0
+$ volta install node@24.22.1
 ```
 
 3. Clone the repository.

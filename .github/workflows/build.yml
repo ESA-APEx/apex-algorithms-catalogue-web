@@ -9,7 +9,7 @@ env:
   DOCKER_REGISTRY_REGION: eu-nl
   DOCKER_REGISTRY_URL: swr.eu-nl.otc.t-systems.com
   DOCKER_REGISTRY_BUCKET: vito
-  NODE_VERSION: 20.17.0
+  NODE_VERSION: 24.22.1
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
 
 permissions:
