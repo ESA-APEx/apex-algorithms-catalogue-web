@@ -492,10 +492,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
             </PopoverTrigger>
             <PopoverContent
               align="end"
-              className={cn(
-                "relative",
-                isPlatformProviderFilterEnabled && "w-[700px]",
-              )}
+              side="bottom"
+              avoidCollisions={false}
+              className="relative w-[700px] max-w-[calc(100vw-2rem)]"
             >
               <Button
                 variant="link"
@@ -589,6 +588,27 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                       </div>
                     </>
                   ) : null}
+                  <p>Labels</p>
+                  <MultiSelector
+                    values={filterByLabels}
+                    onValuesChange={setFilterByLabels}
+                    loop={false}
+                  >
+                    <MultiSelectorTrigger>
+                      <MultiSelectorInput placeholder="Select labels" />
+                    </MultiSelectorTrigger>
+                    <MultiSelectorContent>
+                      <MultiSelectorList>
+                        {labels.map((option, i) => (
+                          <MultiSelectorItem key={i} value={option.value}>
+                            {option.label}
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </div>
+                <div className="flex-1 min-w-0">
                   <p className="mb-1">Certification</p>
                   <p className="mb-2 text-xs text-muted-foreground">
                     Validated services have completed scientific validation
@@ -620,28 +640,8 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                       </label>
                     ))}
                   </div>
-                  <p>Labels</p>
-                  <MultiSelector
-                    values={filterByLabels}
-                    onValuesChange={setFilterByLabels}
-                    loop={false}
-                  >
-                    <MultiSelectorTrigger>
-                      <MultiSelectorInput placeholder="Select labels" />
-                    </MultiSelectorTrigger>
-                    <MultiSelectorContent>
-                      <MultiSelectorList>
-                        {labels.map((option, i) => (
-                          <MultiSelectorItem key={i} value={option.value}>
-                            {option.label}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    </MultiSelectorContent>
-                  </MultiSelector>
-                </div>
-                {isPlatformProviderFilterEnabled ? (
-                  <div className="flex-1">
+                  {isPlatformProviderFilterEnabled ? (
+                    <>
                     <div className="mb-4">
                       <p className="mb-1">Provided by</p>
                       <MultiSelector
@@ -684,8 +684,9 @@ export const CatalogueList = ({ catalogues }: CatalogueListProps) => {
                         </MultiSelectorContent>
                       </MultiSelector>
                     </div>
-                  </div>
-                ) : null}
+                    </>
+                  ) : null}
+                </div>
               </div>
             </PopoverContent>
           </Popover>

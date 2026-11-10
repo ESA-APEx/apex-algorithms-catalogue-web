@@ -39,11 +39,17 @@ test.describe("Catalog Filter Tests", () => {
     await page.getByRole("option", { name: "Last updated" }).click();
 
     await page.getByRole("button").getByText("Filter").click();
-    const typeFilter = page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    const licenseFilter = page.getByTestId("filter-license-item").first();
+    const licenseFilter = page
+      .getByTestId("filter-license-item")
+      .first()
+      .getByRole("checkbox");
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
 
@@ -68,7 +74,10 @@ test.describe("Catalog Filter Tests", () => {
     await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
@@ -100,7 +109,10 @@ test.describe("Catalog Filter Tests", () => {
     await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
@@ -142,7 +154,10 @@ test.describe("Catalog Filter Tests", () => {
     await textbox.fill("ESA");
     await page.getByRole("button").getByText("Filter").click();
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
@@ -170,7 +185,8 @@ test.describe("Catalog Filter Tests", () => {
 
     const openEOFilter = await page
       .getByTestId("filter-type-item")
-      .getByText("openEO");
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await openEOFilter.scrollIntoViewIfNeeded();
     await openEOFilter.click();
 
@@ -189,7 +205,8 @@ test.describe("Catalog Filter Tests", () => {
 
     const ogcFilter = await page
       .getByTestId("filter-type-item")
-      .getByText("OGC API Process");
+      .filter({ hasText: "OGC API Process" })
+      .getByRole("checkbox");
     await ogcFilter.scrollIntoViewIfNeeded();
     await ogcFilter.click();
 
