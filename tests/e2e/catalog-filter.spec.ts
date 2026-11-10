@@ -80,7 +80,7 @@ test.describe("Catalog Filter Tests", () => {
   test("Should clear URL params when filters are reset", async ({ page }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const typeFilter = page
       .getByTestId("filter-type-item")
@@ -89,13 +89,13 @@ test.describe("Catalog Filter Tests", () => {
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     await page.getByRole("button", { name: "Reset" }).click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).not.toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).not.toHaveURL(/types=[^&]+/);
   });
 
   test("Should handle invalid URL parameters gracefully", async ({ page }) => {
