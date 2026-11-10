@@ -9,7 +9,7 @@ env:
   DOCKER_REGISTRY_REGION: eu-nl
   DOCKER_REGISTRY_URL: swr.eu-nl.otc.t-systems.com
   DOCKER_REGISTRY_BUCKET: vito
-  NODE_VERSION: 20.17.0
+  NODE_VERSION: 22.23.4
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
 
 permissions:
@@ -133,7 +133,7 @@ jobs:
           echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:latest" >> $GITHUB_ENV
       - name: Build docker image
         run: |
-          docker build . --tag $IMAGE_NAME
+          docker build --platform=linux/amd64 . --tag $IMAGE_NAME
       - name: Log image size
         run: |
           SIZE_BYTES=$(docker image inspect "$IMAGE_NAME" --format='{{.Size}}')
