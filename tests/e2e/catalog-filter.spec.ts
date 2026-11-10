@@ -1,7 +1,15 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { test } from "./utils.ts";
 
 test.describe("Catalog Filter Tests", () => {
+  const openFilters = async (page: Page) => {
+    const filterButton = page.getByRole("button", { name: /^Filter/ });
+    await filterButton.evaluate((button) =>
+      button.scrollIntoView({ block: "start" }),
+    );
+    await filterButton.click();
+  };
+
   const getAlgorithmCount = async (page: any) => {
     const resultsText = await page.getByText("Showing").textContent();
     const totalMatch = resultsText?.match(/of (\d+) algorithms/);
@@ -38,7 +46,7 @@ test.describe("Catalog Filter Tests", () => {
     await page.getByRole("combobox").click();
     await page.getByRole("option", { name: "Last updated" }).click();
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     const typeFilter = page
       .getByTestId("filter-type-item")
       .filter({ hasText: "openEO" })
@@ -48,7 +56,7 @@ test.describe("Catalog Filter Tests", () => {
 
     const licenseFilter = page
       .getByTestId("filter-license-item")
-      .first()
+      .filter({ hasText: "Apache-2.0" })
       .getByRole("checkbox");
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
@@ -306,18 +314,21 @@ test.describe("Catalog Filter Tests", () => {
   });
 
   test("Should apply provider filtering", async ({ page }) => {
+    const provider = "Vlaams Instituut voor Technologisch Onderzoek";
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const providerInput = page.getByPlaceholder("Select providers");
     await providerInput.scrollIntoViewIfNeeded();
     await providerInput.click();
 
-    await page.getByRole("option").first().click();
+    await page.getByRole("option", { name: provider, exact: true }).click();
 
+    await expect.poll(() => new URL(page.url()).searchParams.get("providers"))
+      .toBe(provider);
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -330,29 +341,32 @@ test.describe("Catalog Filter Tests", () => {
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await page
-      .getByRole("button", { name: /Remove .* option/ })
-      .first()
+      .getByRole("button", { name: `Remove ${provider} option`, exact: true })
       .click();
 
+    await expect(page).not.toHaveURL(/[?&]providers=/);
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
   });
 
   test("Should apply platform filtering", async ({ page }) => {
+    const platform = "CDSE openEO Federation processing backend";
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const platformInput = page.getByPlaceholder("Select platforms");
     await platformInput.scrollIntoViewIfNeeded();
     await platformInput.click();
 
-    await page.getByRole("option").first().click();
+    await page.getByRole("option", { name: platform, exact: true }).click();
 
+    await expect.poll(() => new URL(page.url()).searchParams.get("platforms"))
+      .toBe(platform);
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -365,13 +379,12 @@ test.describe("Catalog Filter Tests", () => {
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await page
-      .getByRole("button", { name: /Remove .* option/ })
-      .first()
+      .getByRole("button", { name: `Remove ${platform} option`, exact: true })
       .click();
 
-
+    await expect(page).not.toHaveURL(/[?&]platforms=/);
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
   });
