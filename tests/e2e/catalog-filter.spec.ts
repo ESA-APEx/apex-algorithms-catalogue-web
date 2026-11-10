@@ -61,11 +61,10 @@ test.describe("Catalog Filter Tests", () => {
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
 
-    const url = page.url();
-    expect(url).toContain("q=ESA");
-    expect(url).toContain("sort=last+updated");
-    expect(url).toMatch(/types=[^&]+/);
-    expect(url).toMatch(/licenses=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/sort=last\+updated/);
+    await expect(page).toHaveURL(/types=[^&]+/);
+    await expect(page).toHaveURL(/licenses=[^&]+/);
 
     await page.reload();
     await expect(
@@ -115,7 +114,7 @@ test.describe("Catalog Filter Tests", () => {
   }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const typeFilter = page
       .getByTestId("filter-type-item")
@@ -126,9 +125,8 @@ test.describe("Catalog Filter Tests", () => {
 
     await page.keyboard.press("Escape");
 
-    const urlWithFilters = page.url();
-    expect(urlWithFilters).toContain("q=ESA");
-    expect(urlWithFilters).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     const firstCard = await page.getByTestId("service-card").first();
     await firstCard.click();
@@ -149,7 +147,7 @@ test.describe("Catalog Filter Tests", () => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("test & encode");
 
-    expect(page.url()).toContain("q=test+%26+encode");
+    await expect(page).toHaveURL(/q=test\+%26\+encode/);
 
     await page.reload();
     await expect(
@@ -160,7 +158,7 @@ test.describe("Catalog Filter Tests", () => {
   test("Should remove empty filters from URL", async ({ page }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const typeFilter = page
       .getByTestId("filter-type-item")
@@ -169,19 +167,19 @@ test.describe("Catalog Filter Tests", () => {
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     await textbox.clear();
 
-    expect(page.url()).not.toContain("q=");
-    expect(page.url()).toMatch(/types=[^&]+/); // Type filter should remain
+    await expect(page).not.toHaveURL(/q=/);
+    await expect(page).toHaveURL(/types=[^&]+/); // Type filter should remain
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await typeFilter.click(); // Uncheck
 
-    expect(page.url()).not.toMatch(/types=[^&]+/);
-    expect(page.url()).not.toContain("q=");
+    await expect(page).not.toHaveURL(/types=[^&]+/);
+    await expect(page).not.toHaveURL(/q=/);
   });
 
   test("Should apply the type filtering", async ({ page }) => {
@@ -189,7 +187,7 @@ test.describe("Catalog Filter Tests", () => {
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const openEOFilter = await page
       .getByTestId("filter-type-item")
@@ -235,7 +233,7 @@ test.describe("Catalog Filter Tests", () => {
   test("Should filter by certification and persist it in the URL", async ({
     page,
   }) => {
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const contributedFilter = page
       .getByTestId("filter-certification-item")
@@ -243,10 +241,10 @@ test.describe("Catalog Filter Tests", () => {
     await contributedFilter.scrollIntoViewIfNeeded();
     await contributedFilter.getByRole("checkbox").click();
 
-    expect(page.url()).toContain("certification=contributed");
+    await expect(page).toHaveURL(/certification=contributed/);
 
     await page.reload();
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await expect(
       page
         .getByTestId("filter-certification-item")
