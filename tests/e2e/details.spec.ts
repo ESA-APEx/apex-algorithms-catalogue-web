@@ -21,6 +21,7 @@ test.describe("Service Details Test", () => {
   test("Should open the details page", async ({ page }) => {
     await openService(page, "ESA worldcereal global crop type detector");
     await page.waitForURL("**/apps/worldcereal_crop_type");
+    await expect(page.getByTestId("certification-badge")).toBeVisible();
   });
 
   test("Should show the correct links for an openEO service", async ({

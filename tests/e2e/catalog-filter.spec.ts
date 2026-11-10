@@ -1,7 +1,15 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { test } from "./utils.ts";
 
 test.describe("Catalog Filter Tests", () => {
+  const openFilters = async (page: Page) => {
+    const filterButton = page.getByRole("button", { name: /^Filter/ });
+    await filterButton.evaluate((button) =>
+      button.scrollIntoView({ block: "start" }),
+    );
+    await filterButton.click();
+  };
+
   const getAlgorithmCount = async (page: any) => {
     const resultsText = await page.getByText("Showing").textContent();
     const totalMatch = resultsText?.match(/of (\d+) algorithms/);
@@ -38,20 +46,25 @@ test.describe("Catalog Filter Tests", () => {
     await page.getByRole("combobox").click();
     await page.getByRole("option", { name: "Last updated" }).click();
 
-    await page.getByRole("button").getByText("Filter").click();
-    const typeFilter = page.getByTestId("filter-type-item").first();
+    await openFilters(page);
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    const licenseFilter = page.getByTestId("filter-license-item").first();
+    const licenseFilter = page
+      .getByTestId("filter-license-item")
+      .filter({ hasText: "Apache-2.0" })
+      .getByRole("checkbox");
     await licenseFilter.scrollIntoViewIfNeeded();
     await licenseFilter.click();
 
-    const url = page.url();
-    expect(url).toContain("q=ESA");
-    expect(url).toContain("sort=last+updated");
-    expect(url).toMatch(/types=[^&]+/);
-    expect(url).toMatch(/licenses=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/sort=last\+updated/);
+    await expect(page).toHaveURL(/types=[^&]+/);
+    await expect(page).toHaveURL(/licenses=[^&]+/);
 
     await page.reload();
     await expect(
@@ -66,19 +79,22 @@ test.describe("Catalog Filter Tests", () => {
   test("Should clear URL params when filters are reset", async ({ page }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     await page.getByRole("button", { name: "Reset" }).click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).not.toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).not.toHaveURL(/types=[^&]+/);
   });
 
   test("Should handle invalid URL parameters gracefully", async ({ page }) => {
@@ -98,17 +114,19 @@ test.describe("Catalog Filter Tests", () => {
   }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
     await page.keyboard.press("Escape");
 
-    const urlWithFilters = page.url();
-    expect(urlWithFilters).toContain("q=ESA");
-    expect(urlWithFilters).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     const firstCard = await page.getByTestId("service-card").first();
     await firstCard.click();
@@ -129,7 +147,7 @@ test.describe("Catalog Filter Tests", () => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("test & encode");
 
-    expect(page.url()).toContain("q=test+%26+encode");
+    await expect(page).toHaveURL(/q=test\+%26\+encode/);
 
     await page.reload();
     await expect(
@@ -140,25 +158,28 @@ test.describe("Catalog Filter Tests", () => {
   test("Should remove empty filters from URL", async ({ page }) => {
     const textbox = await page.getByRole("textbox", { name: /Search algorithms/i });
     await textbox.fill("ESA");
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
-    const typeFilter = await page.getByTestId("filter-type-item").first();
+    const typeFilter = page
+      .getByTestId("filter-type-item")
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await typeFilter.scrollIntoViewIfNeeded();
     await typeFilter.click();
 
-    expect(page.url()).toContain("q=ESA");
-    expect(page.url()).toMatch(/types=[^&]+/);
+    await expect(page).toHaveURL(/q=ESA/);
+    await expect(page).toHaveURL(/types=[^&]+/);
 
     await textbox.clear();
 
-    expect(page.url()).not.toContain("q=");
-    expect(page.url()).toMatch(/types=[^&]+/); // Type filter should remain
+    await expect(page).not.toHaveURL(/q=/);
+    await expect(page).toHaveURL(/types=[^&]+/); // Type filter should remain
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await typeFilter.click(); // Uncheck
 
-    expect(page.url()).not.toMatch(/types=[^&]+/);
-    expect(page.url()).not.toContain("q=");
+    await expect(page).not.toHaveURL(/types=[^&]+/);
+    await expect(page).not.toHaveURL(/q=/);
   });
 
   test("Should apply the type filtering", async ({ page }) => {
@@ -166,11 +187,12 @@ test.describe("Catalog Filter Tests", () => {
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const openEOFilter = await page
       .getByTestId("filter-type-item")
-      .getByText("openEO");
+      .filter({ hasText: "openEO" })
+      .getByRole("checkbox");
     await openEOFilter.scrollIntoViewIfNeeded();
     await openEOFilter.click();
 
@@ -189,7 +211,8 @@ test.describe("Catalog Filter Tests", () => {
 
     const ogcFilter = await page
       .getByTestId("filter-type-item")
-      .getByText("OGC API Process");
+      .filter({ hasText: "OGC API Process" })
+      .getByRole("checkbox");
     await ogcFilter.scrollIntoViewIfNeeded();
     await ogcFilter.click();
 
@@ -205,6 +228,29 @@ test.describe("Catalog Filter Tests", () => {
 
     const finalTotal = await getAlgorithmCount(page);
     expect(finalTotal).toBeGreaterThan(ogcTotal);
+  });
+
+  test("Should filter by certification and persist it in the URL", async ({
+    page,
+  }) => {
+    await openFilters(page);
+
+    const contributedFilter = page
+      .getByTestId("filter-certification-item")
+      .filter({ hasText: "Community" });
+    await contributedFilter.scrollIntoViewIfNeeded();
+    await contributedFilter.getByRole("checkbox").click();
+
+    await expect(page).toHaveURL(/certification=contributed/);
+
+    await page.reload();
+    await openFilters(page);
+    await expect(
+      page
+        .getByTestId("filter-certification-item")
+        .filter({ hasText: "Community" })
+        .getByRole("checkbox"),
+    ).toHaveAttribute("data-state", "checked");
   });
 
   test.skip("Should persist pagination to URL and load from URL", async ({
@@ -266,18 +312,21 @@ test.describe("Catalog Filter Tests", () => {
   });
 
   test("Should apply provider filtering", async ({ page }) => {
+    const provider = "Vlaams Instituut voor Technologisch Onderzoek";
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const providerInput = page.getByPlaceholder("Select providers");
     await providerInput.scrollIntoViewIfNeeded();
     await providerInput.click();
 
-    await page.getByRole("option").first().click();
+    await page.getByRole("option", { name: provider, exact: true }).click();
 
+    await expect.poll(() => new URL(page.url()).searchParams.get("providers"))
+      .toBe(provider);
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -290,29 +339,32 @@ test.describe("Catalog Filter Tests", () => {
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await page
-      .getByRole("button", { name: /Remove .* option/ })
-      .first()
+      .getByRole("button", { name: `Remove ${provider} option`, exact: true })
       .click();
 
+    await expect(page).not.toHaveURL(/[?&]providers=/);
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
   });
 
   test("Should apply platform filtering", async ({ page }) => {
+    const platform = "CDSE openEO Federation processing backend";
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
     const initialTotal = await getAlgorithmCount(page);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
 
     const platformInput = page.getByPlaceholder("Select platforms");
     await platformInput.scrollIntoViewIfNeeded();
     await platformInput.click();
 
-    await page.getByRole("option").first().click();
+    await page.getByRole("option", { name: platform, exact: true }).click();
 
+    await expect.poll(() => new URL(page.url()).searchParams.get("platforms"))
+      .toBe(platform);
     const filteredTotal = await getAlgorithmCount(page);
     expect(filteredTotal).toBeLessThanOrEqual(initialTotal);
 
@@ -325,13 +377,12 @@ test.describe("Catalog Filter Tests", () => {
     const reloadedTotal = await getAlgorithmCount(page);
     expect(reloadedTotal).toBe(filteredTotal);
 
-    await page.getByRole("button").getByText("Filter").click();
+    await openFilters(page);
     await page
-      .getByRole("button", { name: /Remove .* option/ })
-      .first()
+      .getByRole("button", { name: `Remove ${platform} option`, exact: true })
       .click();
 
-
+    await expect(page).not.toHaveURL(/[?&]platforms=/);
     const resetTotal = await getAlgorithmCount(page);
     expect(resetTotal).toBeGreaterThanOrEqual(filteredTotal);
   });

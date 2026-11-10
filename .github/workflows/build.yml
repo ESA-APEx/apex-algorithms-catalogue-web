@@ -70,6 +70,10 @@ jobs:
         run: mkdir -p ./tmp
       - name: Run Playwright tests
         env:
+          BASIC_AUTH_USERNAME: e2e-user
+          BASIC_AUTH_PASSWORD: e2e-password
+          AUTH_TRUST_HOST: "true"
+          AUTH_SECRET: e2e-only-auth-secret-not-for-production-use
           PARQUET_FILE_TEMPLATE: http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet
         run: npm run test-e2e -- --reporter=list
       - uses: actions/upload-artifact@v4
