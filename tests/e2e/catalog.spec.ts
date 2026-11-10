@@ -43,7 +43,7 @@ test.describe("Catalog Tests", () => {
     const labels = await page.getByTestId("certification-badge").allTextContents();
     let sawContributed = false;
     for (const label of labels) {
-      if (label.includes("Contributed")) {
+      if (label.includes("Community")) {
         sawContributed = true;
       }
       if (label.includes("Validated")) {

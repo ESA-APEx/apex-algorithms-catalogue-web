@@ -69,7 +69,7 @@ const ITEMS_PER_PAGE = 15;
 
 const certificationOptions: Option[] = [
   { value: "validated", label: "Validated" },
-  { value: "contributed", label: "Contributed" },
+  { value: "contributed", label: "Community" },
 ];
 
 const getCertificationFilterValue = (

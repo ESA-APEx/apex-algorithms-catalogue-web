@@ -214,7 +214,7 @@ test.describe("Catalog Filter Tests", () => {
 
     const contributedFilter = page
       .getByTestId("filter-certification-item")
-      .filter({ hasText: "Contributed" });
+      .filter({ hasText: "Community" });
     await contributedFilter.scrollIntoViewIfNeeded();
     await contributedFilter.getByRole("checkbox").click();
 
@@ -225,7 +225,7 @@ test.describe("Catalog Filter Tests", () => {
     await expect(
       page
         .getByTestId("filter-certification-item")
-        .filter({ hasText: "Contributed" })
+        .filter({ hasText: "Community" })
         .getByRole("checkbox"),
     ).toHaveAttribute("data-state", "checked");
   });

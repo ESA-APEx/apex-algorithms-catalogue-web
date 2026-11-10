@@ -12,7 +12,7 @@ export const CertificationBadge = ({
   className = "",
 }: CertificationBadgeProps) => {
   const isValidated = category === "validated";
-  const label = isValidated ? "Validated" : "Contributed";
+  const label = isValidated ? "Validated" : "Community";
   const description = isValidated
     ? "This service's scientific validation category has been reviewed and accepted during APEx onboarding. This is separate from benchmark status."
     : "This service has been contributed to APEx and has not undergone scientific validation review.";
