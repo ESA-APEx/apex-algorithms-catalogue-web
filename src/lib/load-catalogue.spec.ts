@@ -1,7 +1,8 @@
 import fs from "fs";
 import https from "https";
 import { EventEmitter } from "events";
-import { PassThrough } from "stream";
+import { IncomingMessage } from "http";
+import { Socket } from "net";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   normalizeCertification,
@@ -130,11 +131,15 @@ describe("catalogue certification categories", () => {
     vi.spyOn(fs, "existsSync").mockReturnValue(false);
     vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(record));
     vi.spyOn(https, "get").mockImplementation(((_url, callback) => {
+      if (typeof callback !== "function") {
+        throw new Error("Expected a response callback");
+      }
       const request = new EventEmitter();
       setTimeout(() => {
-        const response = new PassThrough();
+        const response = new IncomingMessage(new Socket());
         callback(response);
-        response.end(JSON.stringify({ properties: { title: "Test Provider" } }));
+        response.push(JSON.stringify({ properties: { title: "Test Provider" } }));
+        response.push(null);
       }, 10);
       return request;
     }) as typeof https.get);
