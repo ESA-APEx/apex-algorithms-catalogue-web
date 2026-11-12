@@ -124,8 +124,9 @@ export const GET: APIRoute = async ({ params }) => {
     const message = `Fetching benchmark data for ${inputId} failed.`;
     console.error(message, error);
 
+    const details = error instanceof Error ? error.message : String(error);
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
-    return new Response(JSON.stringify({ message }), { status: 500, headers });
+    return new Response(JSON.stringify({ message, details }), { status: 500, headers });
   }
 };

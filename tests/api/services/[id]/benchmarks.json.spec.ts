@@ -103,6 +103,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
       message: `Fetching benchmark data for ${mockServiceId} failed.`,
+      details: "Parquet file not found",
     });
 
     expect(getUrls).toHaveBeenCalledOnce();
@@ -121,6 +122,7 @@ describe("Public Services API Route: GET /api/services/{id}/benchmarks.json", ()
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
       message: `Fetching benchmark data for ${mockServiceId} failed.`,
+      details: "Database connection failed",
     });
 
     expect(getUrls).toHaveBeenCalledOnce();

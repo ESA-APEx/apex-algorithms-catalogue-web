@@ -80,7 +80,8 @@ export const GET: APIRoute = async () => {
     const message = "Fetching benchmark statistics from all services failed.";
     console.error(message, error);
 
-    return new Response(JSON.stringify({ message }), {
+    const details = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ message, details }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

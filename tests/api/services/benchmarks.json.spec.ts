@@ -89,6 +89,7 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
       message: "Fetching benchmark statistics from all services failed.",
+      details: "Database connection failed",
     });
   });
 
@@ -104,6 +105,7 @@ describe("Public Services API Route: GET /api/services/benchmarks.json", () => {
     const jsonResponse = await response.json();
     expect(jsonResponse).toEqual({
       message: "Fetching benchmark statistics from all services failed.",
+      details: "Parquet file not found",
     });
   });
 
