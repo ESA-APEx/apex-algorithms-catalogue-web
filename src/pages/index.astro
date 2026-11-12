@@ -28,6 +28,40 @@ export const prerender = true;
           reliable platform to showcase and offer their services to a broader
           community, fostering collaboration and wider usage of their results.
         </p>
+        <details
+          class="mt-6 rounded-lg border border-brand-teal-50 bg-brand-teal-80 p-5 text-left text-sm leading-6 text-white shadow-lg"
+        >
+          <summary
+            class="cursor-pointer text-base font-semibold text-white marker:text-brand-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-teal-50"
+          >
+            Quality, validation, and benchmarks
+          </summary>
+          <div class="mt-4 border-t border-brand-teal-50/40 pt-4 text-brand-gray-50">
+            <p>
+              The catalogue includes EO value-adding algorithms from different
+              providers (Algorithm PIs), running on different EO platforms
+              (Hosting Environments), and following one of two interoperability
+              best practices: openEO or EO Application Packages.
+            </p>
+            <p class="mt-3">
+              Algorithms have undergone different levels of quality assurance
+              and validation. Those originating from ESA R&amp;D projects
+              usually involve quality assurance and some stages of validation;
+              these are marked as “validated” in the catalogue. Nevertheless,
+              this does not mean an algorithm will always return a validated
+              result. Applying these algorithms requires an understanding of
+              their context and limitations. Algorithms labeled “community”
+              were contributed by the wider EO community outside an ESA R&amp;D
+              project context. They have typically undergone less quality
+              assurance and validation and should be used accordingly.
+            </p>
+            <p class="mt-3">
+              In addition, APEx runs technical benchmarks on some algorithms.
+              These benchmarks check that an algorithm responds, functions, and
+              returns results according to a predefined application scenario.
+            </p>
+          </div>
+        </details>
       </div>
       <CatalogueList catalogues={data} client:only="react" />
     </main>
