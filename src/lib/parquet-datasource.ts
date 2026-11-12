@@ -54,7 +54,7 @@ export const getUrls = async (
     }
     if (urls.length === 0) {
       throw new Error(
-        `No benchmark Parquet files found. ${failures.length ? failures.join(", ") : "No months were checked."}`,
+        `No benchmark Parquet files found. Source: ${new URL(template).origin}. ${failures.length ? failures.join(", ") : "No months were checked."}`,
       );
     }
     return urls;

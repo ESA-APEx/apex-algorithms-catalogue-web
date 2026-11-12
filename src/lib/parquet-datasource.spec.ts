@@ -52,7 +52,7 @@ describe("getUrls", () => {
     vi.setSystemTime(currentDate);
 
     await expect(getUrls()).rejects.toThrow(
-      "No benchmark Parquet files found. 2024-06: HTTP 403, 2024-07: HTTP 404, 2024-08: HTTP 503",
+      "No benchmark Parquet files found. Source: https://s3.waw3-1.cloudferro.com. 2024-06: HTTP 403, 2024-07: HTTP 404, 2024-08: HTTP 503",
     );
     expect(fetch).toHaveBeenCalledTimes(3);
   });
@@ -71,7 +71,7 @@ describe("getUrls", () => {
 
   it("reports when no months were checked", async () => {
     await expect(getUrls("2024-09-01", "2024-08-01")).rejects.toThrow(
-      "No benchmark Parquet files found. No months were checked.",
+      "No benchmark Parquet files found. Source: https://s3.waw3-1.cloudferro.com. No months were checked.",
     );
     expect(fetch).not.toHaveBeenCalled();
   });
