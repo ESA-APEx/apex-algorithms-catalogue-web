@@ -2,11 +2,11 @@ import { formatDate, compareAsc, add as addDate, startOfMonth } from "date-fns";
 import { validateDateParameters } from "@/lib/api-validation";
 
 export const PARQUET_MONTH_COVERAGE =
-  import.meta.env.PARQUET_MONTH_COVERAGE || "2";
+  process.env.PARQUET_MONTH_COVERAGE || "2";
 const PARQUET_FILE_TEMPLATE =
-  import.meta.env.PARQUET_FILE_TEMPLATE ||
+  process.env.PARQUET_FILE_TEMPLATE ||
   "http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet";
-const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || "1"; // in hours
+const PARQUET_FILE_EXPIRATION = process.env.PARQUET_FILE_EXPIRATION || "1"; // in hours
 
 export const isCacheExpired = () => {
   const now = new Date();

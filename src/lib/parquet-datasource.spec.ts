@@ -1,20 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getUrls } from "./parquet-datasource";
-
 const baseUrl =
   "https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet";
 
 global.fetch = vi.fn();
 
 describe("getUrls", () => {
-  beforeEach(() => {
+  let getUrls: typeof import("./parquet-datasource").getUrls;
+
+  beforeEach(async () => {
     vi.useFakeTimers();
+    vi.resetModules();
     vi.stubEnv("PARQUET_MONTH_COVERAGE", "2");
     vi.stubEnv(
       "PARQUET_FILE_TEMPLATE",
       "https://s3.waw3-1.cloudferro.com/apex-benchmarks/metrics/v1/metrics-merged.parquet/[YEAR]-[MONTH]/part-0.parquet",
     );
     vi.stubEnv("PARQUET_FILE_EXPIRATION", "1");
+    ({ getUrls } = await import("./parquet-datasource"));
   });
 
   afterEach(() => {
@@ -74,5 +76,19 @@ describe("getUrls", () => {
       "No benchmark Parquet files found. Source: https://s3.waw3-1.cloudferro.com. No months were checked.",
     );
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the runtime template and month coverage", async () => {
+    vi.stubEnv("PARQUET_FILE_TEMPLATE", "https://runtime.example/[YEAR]-[MONTH].parquet");
+    vi.stubEnv("PARQUET_MONTH_COVERAGE", "1");
+    vi.resetModules();
+    const runtimeDatasource = await import("./parquet-datasource");
+    vi.setSystemTime(new Date("2024-08-01"));
+    vi.mocked(fetch).mockResolvedValue({ ok: true } as Response);
+
+    await expect(runtimeDatasource.getUrls()).resolves.toEqual([
+      "https://runtime.example/2024-07.parquet",
+      "https://runtime.example/2024-08.parquet",
+    ]);
   });
 });
