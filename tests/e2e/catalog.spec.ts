@@ -127,11 +127,11 @@ test.describe("Catalog Tests", () => {
   test("Should not display pagination controls when there are only few services", async ({
     page,
   }) => {
-    await page.getByRole("button").getByText("Filter").click();
-    await page.getByTestId("filter-type-item").first().click();
+    await page
+      .getByRole("textbox", { name: /Search algorithms/i })
+      .fill("ESA worldcereal global crop type detector");
 
-    await page.waitForTimeout(500);
-
+    await expect(page.getByTestId("service-card")).toHaveCount(1);
     await expect(page.getByTestId("pagination")).not.toBeVisible();
   });
 
