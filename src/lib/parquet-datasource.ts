@@ -8,11 +8,6 @@ const PARQUET_FILE_TEMPLATE =
   "http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet";
 const PARQUET_FILE_EXPIRATION = import.meta.env.PARQUET_FILE_EXPIRATION || "1"; // in hours
 
-const urlExists = async (url: string) => {
-  const result = await fetch(url, { method: "HEAD" });
-  return result.ok;
-};
-
 export const isCacheExpired = () => {
   const now = new Date();
   return !!global.cachedUrlsExpireTime
@@ -41,18 +36,26 @@ export const getUrls = async (
     let cursor = new Date(start);
     const endCursor = endDate ? startOfMonth(new Date(endDate)) : now;
     const urls: string[] = [];
+    const failures: string[] = [];
 
     while (compareAsc(endCursor, cursor) >= 0) {
       const url = template
         .replace("[YEAR]", formatDate(cursor, "yyyy"))
         .replace("[MONTH]", formatDate(cursor, "MM"));
 
-      const exists = await urlExists(url);
+      const response = await fetch(url, { method: "HEAD" });
 
-      if (exists) {
+      if (response.ok) {
         urls.push(url);
+      } else {
+        failures.push(`${formatDate(cursor, "yyyy-MM")}: HTTP ${response.status}`);
       }
       cursor = addDate(cursor, { months: 1 });
+    }
+    if (urls.length === 0) {
+      throw new Error(
+        `No benchmark Parquet files found. ${failures.length ? failures.join(", ") : "No months were checked."}`,
+      );
     }
     return urls;
   } else {
