@@ -132,12 +132,12 @@ const loadBenchmarkScenarios = (recordPath: string): BenchmarkScenario[] => {
   }
 };
 
-export const loadCatalogueData = () => {
+export const loadCatalogueData = async () => {
   const jsonsInDir = getServiceRecords();
 
   const data: Omit<Catalogue, "applicationDetails">[] = [];
 
-  jsonsInDir.forEach(async (file) => {
+  await Promise.all(jsonsInDir.map(async (file) => {
     const fileData = fs.readFileSync(path.join(CATALOGUE_JSON_DIR, file));
     const algorithm: Algorithm = JSON.parse(fileData.toString());
 
@@ -174,7 +174,7 @@ export const loadCatalogueData = () => {
         benchmarkScenarios,
       });
     }
-  });
+  }));
 
   return data;
 };

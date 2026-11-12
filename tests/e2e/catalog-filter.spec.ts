@@ -312,7 +312,6 @@ test.describe("Catalog Filter Tests", () => {
   });
 
   test("Should apply provider filtering", async ({ page }) => {
-    const provider = "Vlaams Instituut voor Technologisch Onderzoek";
     await expect(page.getByTestId("service-card").first()).toBeVisible();
 
     const initialTotal = await getAlgorithmCount(page);
@@ -323,7 +322,11 @@ test.describe("Catalog Filter Tests", () => {
     await providerInput.scrollIntoViewIfNeeded();
     await providerInput.click();
 
-    await page.getByRole("option", { name: provider, exact: true }).click();
+    const providerOption = page.getByRole("option").first();
+    await expect(providerOption).toBeVisible();
+    const provider = (await providerOption.innerText()).trim();
+    expect(provider).not.toBe("");
+    await providerOption.click();
 
     await expect.poll(() => new URL(page.url()).searchParams.get("providers"))
       .toBe(provider);

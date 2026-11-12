@@ -1,4 +1,7 @@
 import fs from "fs";
+import https from "https";
+import { EventEmitter } from "events";
+import { PassThrough } from "stream";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   normalizeCertification,
@@ -100,10 +103,8 @@ describe("catalogue certification categories", () => {
       const error = vi.spyOn(console, "error");
       const warn = vi.spyOn(console, "warn");
 
-      // The list loader populates its returned array asynchronously.
-      const catalogue = loadCatalogueData();
+      const catalogue = await loadCatalogueData();
       const details = await loadCatalogueDetailData();
-      await vi.waitFor(() => expect(catalogue).toHaveLength(1));
 
       for (const entries of [catalogue, details]) {
         expect(entries).toHaveLength(1);
@@ -115,4 +116,32 @@ describe("catalogue certification categories", () => {
       expect(warn).not.toHaveBeenCalled();
     },
   );
+
+  it("waits for remote provider details before returning the catalogue", async () => {
+    const record = {
+      id: "test-algorithm",
+      conformsTo: [],
+      properties: {},
+      links: [{ rel: "provider", href: "https://example.com/provider.json" }],
+    };
+    vi.spyOn(fs, "readdirSync").mockReturnValue([
+      "provider/service/records/algorithm.json",
+    ] as any);
+    vi.spyOn(fs, "existsSync").mockReturnValue(false);
+    vi.spyOn(fs, "readFileSync").mockReturnValue(JSON.stringify(record));
+    vi.spyOn(https, "get").mockImplementation(((_url, callback) => {
+      const request = new EventEmitter();
+      setTimeout(() => {
+        const response = new PassThrough();
+        callback(response);
+        response.end(JSON.stringify({ properties: { title: "Test Provider" } }));
+      }, 10);
+      return request;
+    }) as typeof https.get);
+
+    const catalogue = await loadCatalogueData();
+
+    expect(catalogue).toHaveLength(1);
+    expect(catalogue[0].provider?.properties.title).toBe("Test Provider");
+  });
 });
