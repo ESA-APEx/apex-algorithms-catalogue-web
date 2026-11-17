@@ -89,6 +89,8 @@ To deploy the website, follow these steps:
 
 Service detail pages are prerendered when the image is built. `JUPYTER_LITE_BASE_URL`, `PUBLIC_STAGING_BASE_URL`, and `PUBLIC_PRODUCTION_BASE_URL` must therefore be available at build time. The workflow supplies them to both native builds and tests, and forwards them as Docker build arguments. The Dockerfile provides defaults for local builds; override them with `docker build --build-arg NAME=value ...`.
 
+Use the direct `/lab/index.html` URL for `JUPYTER_LITE_BASE_URL`. The JupyterLite root redirect drops the `fromURL` query parameter, preventing the selected notebook from opening.
+
 Changing these values in a Kubernetes ConfigMap does not update generated HTML or browser bundles. Rebuild and deploy the image after changing them. The Docker build currently uses `BUILD_TARGET=production`; preview builds also require the appropriate `BUILD_TARGET` and optionally `PR_NUMBER` before running the build.
 
 Authentication settings (`AUTH_*`, `KEYCLOAK_*`, `BASIC_AUTH_*`) and Parquet settings (`PARQUET_*`) remain server runtime configuration. Supply them through Kubernetes Secrets or ConfigMaps, not Docker build arguments. Never pass authentication secrets into the image build.

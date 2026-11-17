@@ -11,7 +11,7 @@ env:
   DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 22.23.4
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
-  JUPYTER_LITE_BASE_URL: https://esa-apex.github.io/apex_jupyterlite
+  JUPYTER_LITE_BASE_URL: https://esa-apex.github.io/apex_jupyterlite/lab/index.html
   PUBLIC_STAGING_BASE_URL: https://algorithm-catalogue.dev.apex.esa.int
   PUBLIC_PRODUCTION_BASE_URL: https://algorithm-catalogue.apex.esa.int
 
