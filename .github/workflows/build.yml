@@ -11,6 +11,9 @@ env:
   DOCKER_REGISTRY_BUCKET: vito
   NODE_VERSION: 22.23.4
   PARQUET_FILE_TEMPLATE: ${{ vars.PARQUET_FILE_TEMPLATE }}
+  JUPYTER_LITE_BASE_URL: https://esa-apex.github.io/apex_jupyterlite
+  PUBLIC_STAGING_BASE_URL: https://algorithm-catalogue.dev.apex.esa.int
+  PUBLIC_PRODUCTION_BASE_URL: https://algorithm-catalogue.apex.esa.int
 
 permissions:
   contents: write
@@ -75,7 +78,6 @@ jobs:
           AUTH_TRUST_HOST: "true"
           AUTH_SECRET: e2e-only-auth-secret-not-for-production-use
           PARQUET_FILE_TEMPLATE: http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet
-          JUPYTER_LITE_BASE_URL: https://esa-apex.github.io/apex_jupyterlite
         run: npm run test-e2e -- --reporter=list
       - uses: actions/upload-artifact@v4
         if: always()
@@ -138,7 +140,11 @@ jobs:
           echo "IMAGE_TAG_LATEST=${DOCKER_REGISTRY_URL}/${DOCKER_REGISTRY_BUCKET}/${DOCKER_IMAGE_NAME}:latest" >> $GITHUB_ENV
       - name: Build docker image
         run: |
-          docker build --platform=linux/amd64 . --tag $IMAGE_NAME
+          docker build --platform=linux/amd64 \
+            --build-arg JUPYTER_LITE_BASE_URL="$JUPYTER_LITE_BASE_URL" \
+            --build-arg PUBLIC_STAGING_BASE_URL="$PUBLIC_STAGING_BASE_URL" \
+            --build-arg PUBLIC_PRODUCTION_BASE_URL="$PUBLIC_PRODUCTION_BASE_URL" \
+            . --tag "$IMAGE_NAME"
       - name: Log image size
         run: |
           SIZE_BYTES=$(docker image inspect "$IMAGE_NAME" --format='{{.Size}}')

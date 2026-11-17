@@ -14,6 +14,9 @@ FROM base AS build-deps
 RUN npm install
 
 FROM build-deps AS build
+ARG JUPYTER_LITE_BASE_URL=https://esa-apex.github.io/apex_jupyterlite
+ARG PUBLIC_STAGING_BASE_URL=https://algorithm-catalogue.dev.apex.esa.int
+ARG PUBLIC_PRODUCTION_BASE_URL=https://algorithm-catalogue.apex.esa.int
 COPY . .
 RUN BUILD_TARGET=production npm run build
 
