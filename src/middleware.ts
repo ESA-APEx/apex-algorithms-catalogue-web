@@ -19,8 +19,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   if (
-    import.meta.env.BASIC_AUTH_USERNAME &&
-    import.meta.env.BASIC_AUTH_PASSWORD &&
+    process.env.BASIC_AUTH_USERNAME &&
+    process.env.BASIC_AUTH_PASSWORD &&
     isFeatureEnabled(requestUrl, "basicAuth")
   ) {
     // Basic auth check
@@ -29,8 +29,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const authValue = basicAuth.split(" ")[1] ?? "username:password";
       const [username, pwd] = atob(authValue).split(":");
       if (
-        username === import.meta.env.BASIC_AUTH_USERNAME &&
-        pwd === import.meta.env.BASIC_AUTH_PASSWORD
+        username === process.env.BASIC_AUTH_USERNAME &&
+        pwd === process.env.BASIC_AUTH_PASSWORD
       ) {
         return next();
       }

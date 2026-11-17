@@ -195,6 +195,45 @@ test.describe("Notebook Execution Test", () => {
 
     await newPage.close();
   });
+
+  test("Should open the BSI notebook using the configured JupyterLite base URL", async ({
+    page,
+    context,
+  }) => {
+    const jupyterLiteBaseUrl = process.env.JUPYTER_LITE_BASE_URL;
+    expect(jupyterLiteBaseUrl, "JUPYTER_LITE_BASE_URL must be configured when building and testing").toBeTruthy();
+
+    await page.goto("/apps/bsi");
+    await expect(page.getByRole("heading", { name: "Bare Soil Index (BSI)", exact: true })).toBeVisible();
+
+    const notebookSelect = page.getByLabel("Open notebook");
+    const notebookOption = notebookSelect.locator("option").filter({
+      hasText: /BSI|Bare Soil/i,
+    });
+    await expect(notebookOption).toHaveCount(1);
+
+    const notebookUrl = await notebookOption.getAttribute("value");
+    expect(notebookUrl).toMatch(
+      /^https:\/\/raw\.githubusercontent\.com\/ESA-APEx\/apex_algorithms\/[^/]+\/algorithm_catalog\/terravision\/bsi\/notebooks\/bsi\.ipynb$/,
+    );
+
+    await context.route("**/*", (route) => {
+      if (route.request().isNavigationRequest()) {
+        return route.fulfill({ contentType: "text/html", body: "" });
+      }
+      return route.continue();
+    });
+
+    const popupPromise = page.waitForEvent("popup");
+    await notebookSelect.selectOption(notebookUrl!);
+    const notebookPage = await popupPromise;
+
+    await expect(notebookPage).toHaveURL(
+      `${jupyterLiteBaseUrl}?fromURL=${encodeURIComponent(notebookUrl!)}`,
+    );
+    await expect(notebookSelect).toHaveValue("");
+    await notebookPage.close();
+  });
 });
 
 test.describe("Detail page tabs", () => {

@@ -75,6 +75,7 @@ jobs:
           AUTH_TRUST_HOST: "true"
           AUTH_SECRET: e2e-only-auth-secret-not-for-production-use
           PARQUET_FILE_TEMPLATE: http://localhost:4321/fixtures/benchmarks/[YEAR]-[MONTH].parquet
+          JUPYTER_LITE_BASE_URL: https://esa-apex.github.io/apex_jupyterlite
         run: npm run test-e2e -- --reporter=list
       - uses: actions/upload-artifact@v4
         if: always()

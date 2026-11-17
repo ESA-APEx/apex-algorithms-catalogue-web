@@ -455,7 +455,7 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
                     value=""
                     onchange={
                       "window.open('" +
-                      import.meta.env.JUPYTER_LITE_BASE_URL +
+                      process.env.JUPYTER_LITE_BASE_URL +
                       "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
                     }
                   >
