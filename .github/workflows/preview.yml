@@ -6,7 +6,7 @@ on:
 
 env:
   NODE_VERSION: 22.23.4
-  PREVIEW_BASE_URL: https://esa-apex.github.io/apex-algorithms-catalogue-web
+  PUBLIC_PREVIEW_BASE_URL: https://esa-apex.github.io/apex-algorithms-catalogue-web
   PR_NUMBER: ${{ github.event.client_payload.pr_number }}
   PUBLIC_ALGO_REF: ${{ github.event.client_payload.head_ref }}
   ALGO_REPO: apex_algorithms
@@ -129,7 +129,7 @@ jobs:
 
           Your changes have been deployed to the preview site:
 
-          **🔗 Preview URL:** ${{ env.PREVIEW_BASE_URL }}/pr-preview/pr-${{ env.PR_NUMBER }}/
+          **🔗 Preview URL:** ${{ env.PUBLIC_PREVIEW_BASE_URL }}/pr-preview/pr-${{ env.PR_NUMBER }}/
 
           This preview will be updated automatically when you push new changes to your PR.
           EOF
