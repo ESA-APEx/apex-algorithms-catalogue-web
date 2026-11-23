@@ -9,6 +9,10 @@ import { RemarkNormalizeHeadings } from "./src/remark-plugins/normalize-headings
 
 dotenv.config();
 
+const PREVIEW_BASE_PATH = (
+  process.env.PUBLIC_PREVIEW_BASE_PATH ?? ""
+).replace(/\/$/, "");
+
 const PREVIEW_PR_BASE_PATH = process.env.PR_NUMBER
   ? `/pr-preview/pr-${process.env.PR_NUMBER}`
   : "";
@@ -20,11 +24,11 @@ const config = {
   },
   preview: {
     SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: `${process.env.PUBLIC_PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}`,
+    BASE_PATH: `${PREVIEW_BASE_PATH}${PREVIEW_PR_BASE_PATH}` || "/",
   },
   "preview-homepage": {
     SITE_URL: process.env.PUBLIC_PREVIEW_BASE_URL,
-    BASE_PATH: process.env.PUBLIC_PREVIEW_BASE_PATH,
+    BASE_PATH: PREVIEW_BASE_PATH || "/",
   },
   staging: {
     SITE_URL: process.env.PUBLIC_STAGING_BASE_URL,
