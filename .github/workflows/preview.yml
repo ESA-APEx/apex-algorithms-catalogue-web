@@ -130,7 +130,7 @@ jobs:
 
           Your changes have been deployed to the preview site:
 
-          **🔗 Preview URL:** ${{ env.PUBLIC_PREVIEW_BASE_URL }}/pr-preview/pr-${{ env.PR_NUMBER }}/
+          **🔗 Preview URL:** ${{ env.PUBLIC_PREVIEW_BASE_URL }}${{ env.PUBLIC_PREVIEW_BASE_PATH }}/pr-preview/pr-${{ env.PR_NUMBER }}/
 
           This preview will be updated automatically when you push new changes to your PR.
           EOF
