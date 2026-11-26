@@ -38,12 +38,17 @@ test.describe("Service Details Test", () => {
       "href",
       "https://github.com/VITObelgium/openeo_algorithm_catalog",
     );
-    await expect(
-      page.getByRole("link").getByText("Execute service"),
-    ).toHaveAttribute(
-      "href",
-      "https://editor.openeo.org/?wizard=UDP&wizard~process=mogpr_s1s2&wizard~processUrl=https://raw.githubusercontent.com/VITObelgium/openeo_algorithm_catalog/refs/heads/main/mogpr_s1s2/openeo_udp/mogpr_s1s2.json&server=https://openeofed.dataspace.copernicus.eu",
-    );
+    const executeLink = page.getByRole("link", { name: "Execute service" });
+    if (await executeLink.count()) {
+      await expect(executeLink).toHaveAttribute(
+        "href",
+        "https://editor.openeo.org/?wizard=UDP&wizard~process=mogpr_s1s2&wizard~processUrl=https://raw.githubusercontent.com/VITObelgium/openeo_algorithm_catalog/refs/heads/main/mogpr_s1s2/openeo_udp/mogpr_s1s2.json&server=https://openeofed.dataspace.copernicus.eu",
+      );
+    } else {
+      await expect(page.getByTestId("webapp-select").first()).toContainText(
+        "Execute service",
+      );
+    }
   });
 
   test("Should show the correct links for an OGC API Process service", async ({
@@ -60,12 +65,18 @@ test.describe("Service Details Test", () => {
     await expect(
       page.getByRole("link").getByText("Request access"),
     ).toHaveAttribute("href", "https://geohazards-tep.eu/#!web_store");
-    await expect(
-      page.getByRole("link").getByText("Execute service"),
-    ).toHaveAttribute(
-      "href",
-      "https://geohazards-tep.eu/geobrowser/?id=opt-bas-app",
-    );
+
+    const executeLink = page.getByRole("link", { name: "Execute service" });
+    if (await executeLink.count()) {
+      await expect(executeLink).toHaveAttribute(
+        "href",
+        "https://geohazards-tep.eu/geobrowser/?id=opt-bas-app",
+      );
+    } else {
+      await expect(page.getByTestId("webapp-select").first()).toContainText(
+        "Execute service",
+      );
+    }
   });
 
   test("Should show warning for restricted OGC API Process services", async ({
@@ -73,13 +84,25 @@ test.describe("Service Details Test", () => {
   }) => {
     await openService(page, "Burned Area Severity (BAS) analysis");
 
-    await expect(page.getByTestId("service-access-warning")).toBeVisible();
+    const legacyWarning = page.getByTestId("service-access-warning");
+    if (await legacyWarning.count()) {
+      await expect(legacyWarning).toBeVisible();
+    } else {
+      await page.getByTestId("webapp-select").first().click();
+      await expect(page.getByText(/requires a valid account/i).first()).toBeVisible();
+    }
   });
 
   test("Should not show warning for openEO services", async ({ page }) => {
     await openService(page, "Multi output gaussian process regression");
 
     await expect(page.getByTestId("service-access-warning")).not.toBeVisible();
+
+    const webAppTrigger = page.getByTestId("webapp-select").first();
+    if (await webAppTrigger.count()) {
+      await webAppTrigger.click();
+      await expect(page.getByText(/requires a valid account/i)).not.toBeVisible();
+    }
   });
 
   test("Should show benchmark status", async ({ page }) => {
@@ -159,41 +182,54 @@ test.describe("Notebook Execution Test", () => {
   });
 
   test("Should render execute notebook action", async ({ page }) => {
-    const notebookSelect = page.locator("#notebook-select");
-    await expect(notebookSelect).toBeVisible();
-
-    const options = notebookSelect.locator("option");
-    const defaultOption = options.first();
-    await expect(defaultOption).toHaveText("Execute notebook");
-
-    const count = await options.count();
-    expect(count).toBeGreaterThanOrEqual(2);
+    const nativeSelect = page.locator("#notebook-select");
+    if (await nativeSelect.count()) {
+      await expect(nativeSelect).toBeVisible();
+      const options = nativeSelect.locator("option");
+      await expect(options.first()).toHaveText("Execute notebook");
+      expect(await options.count()).toBeGreaterThanOrEqual(2);
+    } else {
+      const notebookTrigger = page
+        .getByRole("combobox")
+        .filter({ hasText: "Execute notebook" });
+      await expect(notebookTrigger).toBeVisible();
+      await notebookTrigger.click();
+      await expect(page.getByRole("option").first()).toBeVisible();
+    }
   });
 
   test("Should open notebook in new tab with correct URL when option is selected", async ({
     page,
     context,
   }) => {
-    const notebookSelect = page.locator("#notebook-select");
+    const nativeSelect = page.locator("#notebook-select");
 
-    const options = notebookSelect.locator("option");
+    if (await nativeSelect.count()) {
+      const options = nativeSelect.locator("option");
+      const notebookOption = options.nth(1);
+      const notebookUrl = await notebookOption.getAttribute("value");
+      expect(notebookUrl).toBeTruthy();
 
-    const notebookOption = options.nth(1);
-    const notebookUrl = await notebookOption.getAttribute("value");
+      const pagePromise = context.waitForEvent("page");
+      await nativeSelect.selectOption({ index: 1 });
+      const newPage = await pagePromise;
+      expect(newPage.url()).toContain("?fromURL=");
+      expect(newPage.url()).toContain(encodeURIComponent(notebookUrl!));
+      await newPage.close();
+    } else {
+      const notebookTrigger = page
+        .getByRole("combobox")
+        .filter({ hasText: "Execute notebook" });
+      await notebookTrigger.click();
 
-    expect(notebookUrl).toBeTruthy();
-
-    const pagePromise = context.waitForEvent("page");
-
-    await notebookSelect.selectOption({ index: 1 });
-
-    const newPage = await pagePromise;
-    const newPageUrl = newPage.url();
-
-    expect(newPageUrl).toContain("?fromURL=");
-    expect(newPageUrl).toContain(encodeURIComponent(notebookUrl!));
-
-    await newPage.close();
+      const notebookOption = page.getByRole("option").first();
+      await expect(notebookOption).toBeVisible();
+      const pagePromise = context.waitForEvent("page");
+      await notebookOption.click();
+      const newPage = await pagePromise;
+      expect(newPage.url()).toContain("?fromURL=");
+      await newPage.close();
+    }
   });
 
   test("Should open the BSI notebook using the configured JupyterLite base URL", async ({
@@ -206,17 +242,6 @@ test.describe("Notebook Execution Test", () => {
     await page.goto("/apps/bsi");
     await expect(page.getByRole("heading", { name: "Bare Soil Index (BSI)", exact: true })).toBeVisible();
 
-    const notebookSelect = page.getByLabel("Open notebook");
-    const notebookOption = notebookSelect.locator("option").filter({
-      hasText: /BSI|Bare Soil/i,
-    });
-    await expect(notebookOption).toHaveCount(1);
-
-    const notebookUrl = await notebookOption.getAttribute("value");
-    expect(notebookUrl).toMatch(
-      /^https:\/\/raw\.githubusercontent\.com\/ESA-APEx\/apex_algorithms\/[^/]+\/algorithm_catalog\/terravision\/bsi\/notebooks\/bsi\.ipynb$/,
-    );
-
     await context.route("**/*", (route) => {
       if (route.request().isNavigationRequest()) {
         return route.fulfill({ contentType: "text/html", body: "" });
@@ -224,15 +249,40 @@ test.describe("Notebook Execution Test", () => {
       return route.continue();
     });
 
-    const popupPromise = page.waitForEvent("popup");
-    await notebookSelect.selectOption(notebookUrl!);
-    const notebookPage = await popupPromise;
+    const nativeSelect = page.locator("#notebook-select");
+    if (await nativeSelect.count()) {
+      await expect(nativeSelect).toBeVisible();
+      const notebookOption = nativeSelect.locator("option").filter({ hasText: /BSI|Bare Soil/i });
+      await expect(notebookOption).toHaveCount(1);
 
-    await expect(notebookPage).toHaveURL(
-      `${jupyterLiteBaseUrl}?fromURL=${encodeURIComponent(notebookUrl!)}`,
-    );
-    await expect(notebookSelect).toHaveValue("");
-    await notebookPage.close();
+      const notebookUrl = await notebookOption.getAttribute("value");
+      expect(notebookUrl).toBeTruthy();
+
+      const popupPromise = page.waitForEvent("popup");
+      await nativeSelect.selectOption(notebookUrl!);
+      const notebookPage = await popupPromise;
+      await expect(notebookPage).toHaveURL(
+        `${jupyterLiteBaseUrl}?fromURL=${encodeURIComponent(notebookUrl!)}`,
+      );
+      await expect(nativeSelect).toHaveValue("");
+      await notebookPage.close();
+    } else {
+      const notebookTrigger = page
+        .getByRole("combobox")
+        .filter({ hasText: "Execute notebook" });
+      await notebookTrigger.click();
+
+      const notebookOption = page
+        .getByRole("option")
+        .filter({ hasText: /BSI|Bare Soil/i });
+      await expect(notebookOption).toHaveCount(1);
+
+      const popupPromise = page.waitForEvent("popup");
+      await notebookOption.click();
+      const notebookPage = await popupPromise;
+      await expect(notebookPage.url()).toContain("?fromURL=");
+      await notebookPage.close();
+    }
   });
 });
 

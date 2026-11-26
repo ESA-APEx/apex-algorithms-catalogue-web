@@ -4,6 +4,9 @@ import { mkdir, rm } from "fs/promises";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
 import unzipper from "unzipper";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const SOURCE_REF = process.env.PUBLIC_ALGO_REF || "main";
 const REPO_URL = `https://github.com/ESA-APEx/apex_algorithms/archive/refs/heads/${SOURCE_REF}.zip`;
@@ -20,14 +23,16 @@ async function main() {
   );
   await downloadedFile.extract({ path: `${DOWNLOAD_DIR}/` });
   console.log(
-    "Renaming",
+    "Copying and removing",
     `${DOWNLOAD_DIR}/${REPO_FILENAME}-${SOURCE_REF}`,
     `${DOWNLOAD_DIR}/${REPO_FILENAME}`,
   );
-  fs.renameSync(
+  await fs.promises.cp(
     `${DOWNLOAD_DIR}/${REPO_FILENAME}-${SOURCE_REF}`,
     `${DOWNLOAD_DIR}/${REPO_FILENAME}`,
+    { recursive: true },
   );
+  await rm(`${DOWNLOAD_DIR}/${REPO_FILENAME}-${SOURCE_REF}`, { recursive: true });
 }
 
 async function downloadFile(url, fileName) {
