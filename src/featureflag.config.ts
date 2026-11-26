@@ -1,3 +1,5 @@
+import { link } from "fs";
+
 export const featureflag: Record<any, any> = {
   staging: {
     benchmarkStatus: true,
@@ -7,6 +9,7 @@ export const featureflag: Record<any, any> = {
     providerPlatformLogo: true,
     costAnalysis: true,
     platformProviderFilter: true,
+    linkExplorer: true,
   },
   production: {
     benchmarkStatus: true,
@@ -16,6 +19,7 @@ export const featureflag: Record<any, any> = {
     providerPlatformLogo: true,
     costAnalysis: true,
     platformProviderFilter: true,
+    linkExplorer: false,
   },
   preview: {
     benchmarkStatus: false,
@@ -25,6 +29,7 @@ export const featureflag: Record<any, any> = {
     providerPlatformLogo: true,
     costAnalysis: false,
     platformProviderFilter: true,
+    linkExplorer: false,
   },
   default: {
     benchmarkStatus: true,
@@ -34,5 +39,6 @@ export const featureflag: Record<any, any> = {
     providerPlatformLogo: true,
     costAnalysis: true,
     platformProviderFilter: true,
+    linkExplorer: true,
   },
 };

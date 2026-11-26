@@ -21,6 +21,7 @@ import { CostEstimateSideNavItem } from "../../components/react/CostEstimateSide
 import { InfoPopover } from "../../components/react/InfoPopover";
 import { PlatformProviderLogos } from "../../components/react/PlatformProviderLogos";
 import { CertificationBadge } from "../../components/react/CertificationBadge";
+import { WebAppLinks } from "../../components/react/WebAppLinks";
 
 import type { InferGetStaticPropsType, GetStaticPaths } from "astro";
 import type { ToCElement } from "../../types/models/catalogue";
@@ -130,7 +131,7 @@ const eulaUrl = algorithm.links.find((link) => link.rel === "license")?.href;
 const previews = algorithm.links
   .filter((link) => link.rel === "preview")
   .filter((link) => ["image/png", "image/jpeg"].includes(link.type || ""));
-const webAppUrl = algorithm.links.find((link) => link.rel === "webapp")?.href;
+const webApps = algorithm.links.filter((link) => link.rel === "webapp");
 const cwlUrl = algorithm.links.find(
   (link) => link.rel === "application" && link.type === "application/cwl+yaml",
 )?.href;
@@ -147,6 +148,11 @@ const serviceRequestWarning =
 const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.cost_unit
   ? `${algorithm.properties.cost_estimate} ${algorithm.properties.cost_unit}`
   : "N/A";
+
+const linkExplorerEnabled = isFeatureEnabled(
+  Astro.url.href,
+  "linkExplorer",
+);
 
 ---
 
@@ -416,59 +422,96 @@ const costEstimate = algorithm.properties.cost_estimate && algorithm.properties.
             )
           }
           {
-            webAppUrl && (
-              <li class="mt-2">
-                <a
-                  class="btn btn-primary !flex items-center justify-center gap-2"
-                  href={webAppUrl}
-                  target="__blank"
-                >
-                  Execute service
-                  <SquareArrowOutUpRight className="w-4 h-4" />
-                </a>
-                {orderUrl && (
-                  <div
-                    class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md"
-                    data-testid="service-access-warning"
-                  >
-                    <p class="flex items-center font-bold mb-2">
-                      <TriangleAlert className="w-4 h-4 mr-1" />
-                      Warning
-                    </p>
-                    <p>{serviceRequestWarning}</p>
-                  </div>
-                )}
-              </li>
+            linkExplorerEnabled ? 
+            (
+              <>
+                {
+                  webApps.length > 0 && linkExplorerEnabled && (
+                    <WebAppLinks
+                      webApps={webApps}
+                      orderUrl={orderUrl}
+                      client:only="react"
+                    />
+                  )
+                }
+                {
+                  notebooks.length > 0 &&
+                  isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") &&
+                  linkExplorerEnabled ? (
+                    <WebAppLinks
+                      webApps={notebooks.map((notebook) => ({
+                        href: `${process.env.JUPYTER_LITE_BASE_URL}?fromURL=${encodeURIComponent(notebook.href)}`,
+                        title: notebook.title || "Execute notebook",
+                      }))}
+                      placeholder="Execute notebook"
+                      variant="secondary"
+                      client:only="react"
+                    />
+                  ) : null
+                }
+              </>
+            ) : (
+              <>
+                {
+                  webApps.length > 0 ? (
+                    <li class="mt-2">
+                      <a
+                        class="btn btn-primary !flex items-center justify-center gap-2"
+                        href={webApps[0].href}
+                        target="__blank"
+                      >
+                        Execute service
+                        <SquareArrowOutUpRight className="w-4 h-4" />
+                      </a>
+                      {orderUrl &&
+                        !webApps[0].title
+                          ?.toLowerCase()
+                          .includes("geospatial explorer") && (
+                          <div
+                            class="bg-neutral-100 rounded-sm border-yellow-500 border-2 text-neutral-700 text-sm p-2.5 mt-2.5 shadow-md"
+                            data-testid="service-access-warning"
+                          >
+                            <p class="flex items-center font-bold mb-2">
+                              <TriangleAlert className="w-4 h-4 mr-1" />
+                              Warning
+                            </p>
+                            <p>{serviceRequestWarning}</p>
+                          </div>
+                        )}
+                    </li>
+                  ) : null
+                }
+                {
+                  notebooks.length > 0 &&
+                  isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") ? (
+                    <li class="mt-2">
+                      <label for="notebook-select" class="sr-only">
+                        Open notebook
+                      </label>
+                      <div class="relative">
+                        <select
+                          id="notebook-select"
+                          class="w-full btn btn-secondary select"
+                          value=""
+                          onchange={
+                            "window.open('" +
+                            process.env.JUPYTER_LITE_BASE_URL +
+                            "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
+                          }
+                        >
+                          <option value="">Execute notebook</option>
+                          {notebooks.map((notebook) => (
+                            <option value={notebook.href}>
+                              {notebook.title || "Open notebook"}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </li>
+                  ) : null
+                }
+              </>
             )
-          }
-          {
-            notebooks.length &&
-            isFeatureEnabled(Astro.url.href, "jupyterLiteIntegration") ? (
-              <li class="mt-2">
-                <label for="notebook-select" class="sr-only">
-                  Open notebook
-                </label>
-                <div class="relative">
-                  <select
-                    id="notebook-select"
-                    class="w-full btn btn-secondary select"
-                    value=""
-                    onchange={
-                      "window.open('" +
-                      process.env.JUPYTER_LITE_BASE_URL +
-                      "?fromURL='+encodeURIComponent(this.value), '_blank');this.selectedIndex=0;"
-                    }
-                  >
-                    <option value="">Execute notebook</option>
-                    {notebooks.map((notebook) => (
-                      <option value={notebook.href}>
-                        {notebook.title || "Open notebook"}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </li>
-            ) : null
           }
         </ul>
       </aside>
