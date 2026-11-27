@@ -123,7 +123,7 @@ jobs:
 
   build-docker:
     needs: [release]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ needs.release.outputs.version != null }}
     steps:
       - uses: actions/checkout@v4
