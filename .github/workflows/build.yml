@@ -123,7 +123,7 @@ jobs:
 
   build-docker:
     needs: [release]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     if: ${{ needs.release.outputs.version != null }}
     steps:
       - uses: actions/checkout@v4
@@ -144,6 +144,8 @@ jobs:
             --build-arg JUPYTER_LITE_BASE_URL="$JUPYTER_LITE_BASE_URL" \
             --build-arg PUBLIC_STAGING_BASE_URL="$PUBLIC_STAGING_BASE_URL" \
             --build-arg PUBLIC_PRODUCTION_BASE_URL="$PUBLIC_PRODUCTION_BASE_URL" \
+            --provenance=false \
+            --sbom=false \
             . --tag "$IMAGE_NAME"
       - name: Log image size
         run: |
